@@ -6,12 +6,12 @@ import (
 )
 
 func SetUpRouter() *gin.Engine {
-	router := gin.New()
-	router.Use(gin.Recovery())
-	router.Use(gin.Logger())
+	router := gin.Default()
+	//router.Use(gin.Recovery())
+	//router.Use(gin.Logger())
 
 	helloWorldController := new(controllers.HelloWorldController)
-	router.GET("/helloWorld", helloWorldController.GetHelloWorld)
+	router.GET("/helloWorldJson", helloWorldController.GetHelloWorldJson)
 
 	//Groups can be used for nested paths, maybe add example later
 
