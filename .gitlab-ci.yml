@@ -1,0 +1,3 @@
+include:
+  - mainClient/.gitlab-ci-client.yml
+  - mainServer/.gitlab-ci-server.yml
