@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import React from 'react';
 import './App.css';
 
@@ -25,9 +24,9 @@ class Joke extends React.Component {
             </div>
             <div className="panel-footer">
               {this.props.joke.likes} Likes &nbsp;
-              <a onClick={this.like} className="btn btn-default">
-                <span className="glyphicon glyphicon-thumbs-up"></span>
-              </a>
+              {/*<a onClick={this.like} className="btn btn-default">*/}
+              {/*  <span className="glyphicon glyphicon-thumbs-up"></span>*/}
+              {/*</a>*/}
             </div>
           </div>
         </div>
@@ -68,7 +67,7 @@ class HelloWorld extends React.Component {
   }
 
   render() {
-    const { error, isLoaded, items } = this.state;
+    const { error, isLoaded} = this.state;
     if (error) {
       return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {

@@ -8,6 +8,7 @@ import (
 type HelloWorldController struct{}
 
 //Source for the joke stuff: https://www.freecodecamp.org/news/how-to-build-a-web-app-with-go-gin-and-react-cffdc473576/
+
 type Joke struct {
 	ID    int    `json:"id" binding:"required"`
 	Likes int    `json:"likes"`
