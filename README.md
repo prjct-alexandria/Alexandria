@@ -3,12 +3,16 @@ We work for clients Andrew Demetriou, PhD. student, and Cynthia Liem, PhD., to d
 
 # Usage
 ## API Documentation
-When the backend server is running, an interactive API documentation can be accessed through http://localhost:8080/docs/index.html. (Or the equivalent when running it on a different server address.)
-
-The documentation is generated from go annotations by [swag](https://github.com/swaggo/swag). To update the docs after making changes in the code, run from the project root:
+An API documentation can be generated from go annotations by [swag](https://github.com/swaggo/swag). Run from the project root:
     
     cd ./mainServer
     swag init -g server/router.go
+
+The documentation can be updated with the same commands, when the endpoints change in the code.
+
+After generating it, when running the backend, it can be accessed through http://localhost:8080/docs/index.html. (Or the equivalent when running it on a different server address.)
+
+
 
 # Team
 | Name                | Email adress                       |

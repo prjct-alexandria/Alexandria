@@ -27,7 +27,7 @@ var jokes = []Joke{
 
 // GetHelloWorldJson godoc
 // @Summary      Hello world test endpoint
-// @Description  Returns a list of joke in JSON format, demonstrates how future endpoints could work.
+// @Description  Returns a list of jokes in JSON format, demonstrates how future endpoints could work.
 // @Produce      json
 // @Success      200  {object} []Joke
 // @Router       /helloWorldJson [get]
