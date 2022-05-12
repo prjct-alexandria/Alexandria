@@ -1,0 +1,54 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Documentation of Alexandria's API",
+        "title": "API documentation",
+        "contact": {
+            "name": "TUDelft Software Project 2022"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/helloWorldJson": {
+            "get": {
+                "description": "Returns a joke in JSON format",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get hello world",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/controllers.Joke"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.Joke": {
+            "type": "object",
+            "required": [
+                "id",
+                "joke"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "joke": {
+                    "type": "string"
+                },
+                "likes": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

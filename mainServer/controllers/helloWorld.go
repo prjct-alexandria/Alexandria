@@ -25,6 +25,12 @@ var jokes = []Joke{
 	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
 }
 
+// GetHelloWorldJson godoc
+// @Summary      Hello world test endpoint
+// @Description  Returns a list of joke in JSON format, demonstrates how future endpoints could work.
+// @Produce      json
+// @Success      200  {object} []Joke
+// @Router       /helloWorldJson [get]
 func (contr HelloWorldController) GetHelloWorldJson(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
