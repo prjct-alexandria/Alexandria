@@ -10,9 +10,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "TUDelft Software Project 2022"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -20,11 +18,11 @@ const docTemplate = `{
     "paths": {
         "/helloWorldJson": {
             "get": {
-                "description": "Returns a joke in JSON format",
+                "description": "Returns a list of joke in JSON format, demonstrates how future endpoints could work.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get hello world",
+                "summary": "Hello world test endpoint",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -68,7 +66,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "API documentation",
-	Description:      "Documentation of Alexandria's API",
+	Description:      "Documentation of Alexandria's API. Endpoints can be tried out directly in this interactive documentation.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
