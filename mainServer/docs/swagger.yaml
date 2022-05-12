@@ -1,0 +1,36 @@
+definitions:
+  controllers.Joke:
+    properties:
+      id:
+        type: integer
+      joke:
+        type: string
+      likes:
+        type: integer
+    required:
+    - id
+    - joke
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Documentation of Alexandria's API. Endpoints can be tried out directly
+    in this interactive documentation.
+  title: API documentation
+  version: 1.0.0
+paths:
+  /helloWorldJson:
+    get:
+      description: Returns a list of jokes in JSON format, demonstrates how future
+        endpoints could work.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.Joke'
+            type: array
+      summary: Hello world test endpoint
+swagger: "2.0"
