@@ -1,0 +1,52 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Documentation of Alexandria's API. Endpoints can be tried out directly in this interactive documentation.",
+        "title": "API documentation",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/helloWorldJson": {
+            "get": {
+                "description": "Returns a list of jokes in JSON format, demonstrates how future endpoints could work.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Hello world test endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/controllers.Joke"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.Joke": {
+            "type": "object",
+            "required": [
+                "id",
+                "joke"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "joke": {
+                    "type": "string"
+                },
+                "likes": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
