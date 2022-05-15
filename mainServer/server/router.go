@@ -22,6 +22,9 @@ func SetUpRouter() *gin.Engine {
 	helloWorldController := new(controllers.HelloWorldController)
 	router.GET("/helloWorldJson", helloWorldController.GetHelloWorldJson)
 
+	versionController := new(controllers.VersionController)
+	router.PUT("/articles/{articleID}/versions/{versionID}", versionController.UploadFiles)
+
 	//Groups can be used for nested paths, maybe add example later
 
 	// Path for accessing the API documentation
