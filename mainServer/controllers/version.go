@@ -2,16 +2,15 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"mainServer/repositories"
+	"mainServer/services"
 	"net/http"
-	"path/filepath"
 )
 
 type VersionController struct {
-	gitrepo repositories.GitRepository
+	Serv services.VersionService
 }
 
-// UploadFiles godoc
+// UpdateVersion godoc
 // @Summary     Update article version
 // @Description Upload files to update an article version, can only be done by an owner.
 // @Accept      mpfd
@@ -21,17 +20,7 @@ type VersionController struct {
 // @Failure     400
 // @Failure     404
 // @Router      /articles/{articleID}/versions/{versionID} [put]
-func (contr VersionController) UploadFiles(c *gin.Context) {
-	aid := c.Param("articleID")
-	vid := c.Param("versionID")
-
-	// Hard coded to only accept /articles/1/versions/1
-	// TODO: replace with error if not found in actual database
-	if !(aid == "1" && vid == "1") {
-		c.Status(http.StatusNotFound)
-		return
-	}
-
+func (contr VersionController) UpdateVersion(c *gin.Context) {
 	// get file from form data
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -39,8 +28,10 @@ func (contr VersionController) UploadFiles(c *gin.Context) {
 		return
 	}
 
-	filename := filepath.Base(file.Filename)
-	if err := c.SaveUploadedFile(file, filename); err != nil {
+	aid := c.Param("articleID")
+	vid := c.Param("versionID")
+
+	if err := contr.Serv.UpdateVersion(c, file, aid, vid); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}

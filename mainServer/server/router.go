@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"mainServer/controllers"
 	_ "mainServer/docs"
 )
 
@@ -14,16 +13,10 @@ import (
 
 // @host      localhost:8080
 
-func SetUpRouter() *gin.Engine {
+func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
-	//router.Use(gin.Recovery())
-	//router.Use(gin.Logger())
 
-	helloWorldController := new(controllers.HelloWorldController)
-	router.GET("/helloWorldJson", helloWorldController.GetHelloWorldJson)
-
-	versionController := new(controllers.VersionController)
-	router.PUT("/articles/{articleID}/versions/{versionID}", versionController.UploadFiles)
+	router.PUT("/articles/{articleID}/versions/{versionID}", contrs.version.UpdateVersion)
 
 	//Groups can be used for nested paths, maybe add example later
 
