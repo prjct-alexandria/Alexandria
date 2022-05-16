@@ -16,7 +16,7 @@ import (
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
 
-	router.PUT("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
+	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 
 	// Groups can be used for nested paths, maybe add example later
 

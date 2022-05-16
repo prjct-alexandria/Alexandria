@@ -23,7 +23,11 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 
 	// Save file from gin context to git repo
 	// TODO: find something more flexible than hard-coding main.qmd
-	base := serv.Gitrepo.GetArticlePath(article)
+	base, err := serv.Gitrepo.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+
 	path := filepath.Join(base, "main.qmd")
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {

@@ -20,7 +20,7 @@ type VersionController struct {
 // @Success     200
 // @Failure     400
 // @Failure     404
-// @Router      /articles/{articleID}/versions/{versionID} [put]
+// @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
 
 	// get file from form data

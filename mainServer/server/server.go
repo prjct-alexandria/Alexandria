@@ -20,7 +20,8 @@ type ControllerEnv struct {
 
 func initRepoEnv() (RepoEnv, error) {
 	return RepoEnv{
-		git: repositories.GitRepository{Path: ".../gitfiles"},
+		// TODO: gitfiles path in config file
+		git: repositories.GitRepository{Path: "../../gitfiles"},
 	}, nil
 }
 
