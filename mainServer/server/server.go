@@ -4,6 +4,7 @@ import (
 	"mainServer/controllers"
 	"mainServer/repositories"
 	"mainServer/services"
+	"os"
 )
 
 type RepoEnv struct {
@@ -19,9 +20,17 @@ type ControllerEnv struct {
 }
 
 func initRepoEnv() (RepoEnv, error) {
+	// TODO: gitfiles path in config file
+	gitpath := "../../gitfiles"
+
+	// make folder for git files
+	err := os.MkdirAll(gitpath, os.ModePerm)
+	if err != nil {
+		return RepoEnv{}, err
+	}
+
 	return RepoEnv{
-		// TODO: gitfiles path in config file
-		git: repositories.GitRepository{Path: "../../gitfiles"},
+		git: repositories.GitRepository{Path: gitpath},
 	}, nil
 }
 
