@@ -7,11 +7,12 @@ info:
   version: 1.0.0
 paths:
   /articles/{articleID}/versions/{versionID}:
-    put:
+    post:
       consumes:
       - multipart/form-data
       description: Upload files to update an article version, can only be done by
-        an owner.
+        an owner. Requires multipart form data, with a file attached as the field
+        "file"
       parameters:
       - description: Article ID
         in: path
@@ -25,10 +26,10 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Bad request, possibly bad file data or permissions
         "404":
-          description: ""
+          description: Specified article version not found
       summary: Update article version
 swagger: "2.0"

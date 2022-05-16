@@ -13,13 +13,13 @@ type VersionController struct {
 
 // UpdateVersion godoc
 // @Summary     Update article version
-// @Description Upload files to update an article version, can only be done by an owner.
+// @Description Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field "file"
 // @Accept      mpfd
 // @Param		articleID	path	string	true "Article ID"
 // @Param		versionID	path	string	true "Version ID"
-// @Success     200
-// @Failure     400
-// @Failure     404
+// @Success     200 "Success"
+// @Failure     400 "Bad request, possibly bad file data or permissions"
+// @Failure     404 "Specified article version not found"
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
 
