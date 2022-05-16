@@ -16,9 +16,9 @@ import (
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
 
-	router.PUT("/articles/{articleID}/versions/{versionID}", contrs.version.UpdateVersion)
+	router.PUT("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 
-	//Groups can be used for nested paths, maybe add example later
+	// Groups can be used for nested paths, maybe add example later
 
 	// Path for accessing the API documentation
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

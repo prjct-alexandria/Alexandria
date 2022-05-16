@@ -1,67 +1,76 @@
 package repositories
 
 import (
-	"github.com/go-git/go-git/v5"
-	"path/filepath"
 	"fmt"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"path/filepath"
+	"time"
 )
 
 type GitRepository struct {
-	path string
+	Path string
 }
 
-// LoadVersionPath checks out the required version and returns the filepath to the repository
-// Can be used for reading and writing a version's files.
-// Version contents must be read/write ASAP after this function,
-// some other calls might cause the required  version to not be checked out anymore.
-func (r GitRepository) LoadVersionPath(article string, version string) (string, error) {
-	r.checkoutBranch(article, version)
-
-	return "",nil
-}
-
-// Commit commits all changes in the specified branch
-func (r GitRepository) Commit(article string, version string) error {
-	// Open  repository.
-	dir := r.getArticlePath(article)
-	repo, err := git.PlainOpen(dir)
+// Commit commits all changes in the specified article
+func (r GitRepository) Commit(article string) error {
+	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
 	}
 
-	w, err := repo.Worktree()
-	if err != nil {
-		return err
-	}
-
-	// TODO: verify if this adds all
+	// add all files
 	_, err = w.Add(".")
 	status, err := w.Status()
+
+	// TODO: verify if this added all files
 	fmt.Println(status)
+
+	// commit
+	_, err = w.Commit("version update", &git.CommitOptions{
+		Author: &object.Signature{
+			// TODO: add actual user name?
+			Name:  "Alexandria Git Manager",
+			Email: "",
+			When:  time.Now(),
+		},
+	})
+	return nil
+}
+
+func (r GitRepository) CheckoutBranch(article string, version string) error {
+	w, err := r.getWorktree(article)
+	if err != nil {
+		return err
+	}
+
+	// checkout
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.NewBranchReferenceName(version),
+	})
 
 	return nil
 }
 
-func (r GitRepository) checkoutBranch(article string, version string) error {
+// GetArticlePath returns the path to an article git repository
+func (r GitRepository) GetArticlePath(article string) string {
+	return filepath.Join(r.Path, article)
+}
+
+// getWorktree returns the go-git worktree of an article git repository
+func (r GitRepository) getWorktree(article string) (*git.Worktree, error) {
 	// Open  repository.
-	dir := r.getArticlePath(article)
+	dir := r.GetArticlePath(article)
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	w, err := repo.Worktree()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// TODO: verify if this adds all
-	_, err = w.Add(".")
-	status, err :=
-	return nil
-}
-
-// getVersionPath returns the path to an article git repository
-func (r GitRepository) getArticlePath(article string) string {
-	return filepath.Join(r.path, article)
+	return w, nil
 }

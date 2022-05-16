@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/services"
 	"net/http"
@@ -21,9 +22,11 @@ type VersionController struct {
 // @Failure     404
 // @Router      /articles/{articleID}/versions/{versionID} [put]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
+
 	// get file from form data
 	file, err := c.FormFile("file")
 	if err != nil {
+		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -33,10 +36,9 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 
 	if err := contr.Serv.UpdateVersion(c, file, aid, vid); err != nil {
 		c.Status(http.StatusBadRequest)
+		fmt.Println(err)
 		return
 	}
 
-	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
-	c.JSON(http.StatusOK, jokes)
+	c.Status(http.StatusOK)
 }

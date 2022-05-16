@@ -1,16 +1,3 @@
-definitions:
-  controllers.Joke:
-    properties:
-      id:
-        type: integer
-      joke:
-        type: string
-      likes:
-        type: integer
-    required:
-    - id
-    - joke
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -19,18 +6,29 @@ info:
   title: API documentation
   version: 1.0.0
 paths:
-  /helloWorldJson:
-    get:
-      description: Returns a list of jokes in JSON format, demonstrates how future
-        endpoints could work.
-      produces:
-      - application/json
+  /articles/{articleID}/versions/{versionID}:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Upload files to update an article version, can only be done by
+        an owner.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
       responses:
         "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/controllers.Joke'
-            type: array
-      summary: Hello world test endpoint
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+      summary: Update article version
 swagger: "2.0"

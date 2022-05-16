@@ -16,43 +16,39 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/helloWorldJson": {
-            "get": {
-                "description": "Returns a list of jokes in JSON format, demonstrates how future endpoints could work.",
-                "produces": [
-                    "application/json"
+        "/articles/{articleID}/versions/{versionID}": {
+            "put": {
+                "description": "Upload files to update an article version, can only be done by an owner.",
+                "consumes": [
+                    "multipart/form-data"
                 ],
-                "summary": "Hello world test endpoint",
+                "summary": "Update article version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/controllers.Joke"
-                            }
-                        }
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
                     }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "controllers.Joke": {
-            "type": "object",
-            "required": [
-                "id",
-                "joke"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "joke": {
-                    "type": "string"
-                },
-                "likes": {
-                    "type": "integer"
                 }
             }
         }

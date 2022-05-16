@@ -15,17 +15,13 @@ type ServiceEnv struct {
 }
 
 type ControllerEnv struct {
-	version    controllers.VersionController
-	helloWorld controllers.HelloWorldController
+	version controllers.VersionController
 }
 
 func initRepoEnv() (RepoEnv, error) {
-	gitrepo := repositories.GitRepository{Path: ".../gitfiles"}
-
-	env := RepoEnv{
-		git: gitrepo,
-	}
-	return env, nil
+	return RepoEnv{
+		git: repositories.GitRepository{Path: ".../gitfiles"},
+	}, nil
 }
 
 func initServiceEnv() (ServiceEnv, error) {
@@ -34,11 +30,9 @@ func initServiceEnv() (ServiceEnv, error) {
 		return ServiceEnv{}, err
 	}
 
-	env := ServiceEnv{
+	return ServiceEnv{
 		version: services.VersionService{Gitrepo: repos.git},
-	}
-
-	return env, nil
+	}, nil
 }
 
 func initControllerEnv() (ControllerEnv, error) {
@@ -47,11 +41,9 @@ func initControllerEnv() (ControllerEnv, error) {
 		return ControllerEnv{}, err
 	}
 
-	env := ControllerEnv{
+	return ControllerEnv{
 		version: controllers.VersionController{Serv: servs.version},
-	}
-
-	return env, nil
+	}, nil
 }
 
 func Init() {
