@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"mainServer/controllers"
 	"mainServer/repositories"
 	"mainServer/services"
@@ -59,12 +60,14 @@ func initControllerEnv() (ControllerEnv, error) {
 func Init() {
 	env, err := initControllerEnv()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	router := SetUpRouter(env)
 	err = router.Run("localhost:8080")
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 }
