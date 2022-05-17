@@ -16,6 +16,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/createExampleUser": {
+            "post": {
+                "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Temporary user creation endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/getExampleUser": {
+            "get": {
+                "description": "Returns a user with a hardcoded email address, demonstrates how to use the services.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get test user from database endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.User"
+                        }
+                    }
+                }
+            }
+        },
         "/helloWorldJson": {
             "get": {
                 "description": "Returns a list of jokes in JSON format, demonstrates how future endpoints could work.",
@@ -53,6 +87,20 @@ const docTemplate = `{
                 },
                 "likes": {
                     "type": "integer"
+                }
+            }
+        },
+        "entities.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pwd": {
+                    "type": "string"
                 }
             }
         }
