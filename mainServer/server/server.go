@@ -1,6 +1,10 @@
 package server
 
+import "mainServer/db"
+
 func Init() {
-	router := SetUpRouter()
+	Database := db.Connect()
+	router := SetUpRouter(Database)
+
 	router.Run("localhost:8080")
 }
