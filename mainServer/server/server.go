@@ -3,21 +3,26 @@ package server
 import (
 	"fmt"
 	"mainServer/controllers"
+	"mainServer/db"
 	"mainServer/repositories"
+	"mainServer/repositories/interfaces"
 	"mainServer/services"
 	"os"
 )
 
 type RepoEnv struct {
-	git repositories.GitRepository
+	git  repositories.GitRepository
+	user interfaces.UserRepository
 }
 
 type ServiceEnv struct {
 	version services.VersionService
+	user    services.UserService
 }
 
 type ControllerEnv struct {
 	version controllers.VersionController
+	user    controllers.UserController
 }
 
 func initRepoEnv() (RepoEnv, error) {
@@ -30,8 +35,11 @@ func initRepoEnv() (RepoEnv, error) {
 		return RepoEnv{}, err
 	}
 
+	database := db.Connect()
+
 	return RepoEnv{
-		git: repositories.GitRepository{Path: gitpath},
+		git:  repositories.GitRepository{Path: gitpath},
+		user: repositories.NewPgUserRepository(database),
 	}, nil
 }
 
@@ -43,6 +51,7 @@ func initServiceEnv() (ServiceEnv, error) {
 
 	return ServiceEnv{
 		version: services.VersionService{Gitrepo: repos.git},
+		user:    services.UserService{UserRepository: repos.user},
 	}, nil
 }
 
@@ -54,6 +63,7 @@ func initControllerEnv() (ControllerEnv, error) {
 
 	return ControllerEnv{
 		version: controllers.VersionController{Serv: servs.version},
+		user:    controllers.UserController{UserService: servs.user},
 	}, nil
 }
 
