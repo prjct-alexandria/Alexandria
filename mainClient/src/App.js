@@ -25,7 +25,7 @@ function App() {
                   <Route exact path='/' element={<Homepage/>}></Route>
                   <Route exact path='/papers' element={<ArticleList/>}></Route>
                   <Route exact path='/upload' element={<FileUpload/>}></Route>
-                  <Route path="/papers/:id" element={<ArticlePage/>}></Route>
+                  <Route path="/articles/:id" element={<ArticlePage/>}></Route>
               </Routes>
               <Footer/>
           </div>
