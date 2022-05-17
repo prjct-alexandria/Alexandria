@@ -13,7 +13,10 @@ export default class ArticlePage extends React.Component {
     }
 
     componentDidMount() {
-        const url = "../article.json"; // Placeholder
+        //const url = "../article.json"; // Placeholder
+        const articleId = window.location.href.split("/")[4];
+        const url = "../view/article/" + articleId; // Placeholder
+
         fetch(
             url, {headers: {
                     'Content-Type': 'application/json',
