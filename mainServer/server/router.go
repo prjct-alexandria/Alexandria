@@ -16,6 +16,7 @@ import (
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
 
+	router.POST("/articles", contrs.article.CreateArticle)
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)

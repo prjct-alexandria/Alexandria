@@ -1,4 +1,19 @@
 definitions:
+  entities.Article:
+    properties:
+      id:
+        type: string
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - id
+    - owners
+    - title
+    type: object
   entities.User:
     properties:
       email:
@@ -7,6 +22,9 @@ definitions:
         type: string
       pwd:
         type: string
+    required:
+    - email
+    - name
     type: object
 host: localhost:8080
 info:
@@ -16,6 +34,36 @@ info:
   title: API documentation
   version: 1.0.0
 paths:
+  /articles:
+    post:
+      consumes:
+      - application/json
+      description: Creates new article, including main article version
+      parameters:
+      - description: Title
+        example: Lorem Ipsum
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Owner emails
+        example: janedoe@mail.com,joedoe@mail.com
+        in: body
+        name: owners
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Article'
+      summary: Create new article
   /articles/{articleID}/versions/{versionID}:
     post:
       consumes:

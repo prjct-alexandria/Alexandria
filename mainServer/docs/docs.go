@@ -16,6 +16,51 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/articles": {
+            "post": {
+                "description": "Creates new article, including main article version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new article",
+                "parameters": [
+                    {
+                        "example": "Lorem Ipsum",
+                        "description": "Title",
+                        "name": "title",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "janedoe@mail.com,joedoe@mail.com",
+                        "description": "Owner emails",
+                        "name": "owners",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.Article"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/versions/{versionID}": {
             "post": {
                 "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
@@ -88,8 +133,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entities.Article": {
+            "type": "object",
+            "required": [
+                "id",
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.User": {
             "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
             "properties": {
                 "email": {
                     "type": "string"

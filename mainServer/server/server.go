@@ -22,6 +22,7 @@ type ServiceEnv struct {
 }
 
 type ControllerEnv struct {
+	article controllers.ArticleController
 	version controllers.VersionController
 	user    controllers.UserController
 }
@@ -63,6 +64,7 @@ func initControllerEnv() (ControllerEnv, error) {
 	}
 
 	return ControllerEnv{
+		article: controllers.ArticleController{},
 		version: controllers.VersionController{Serv: servs.version},
 		user:    controllers.UserController{UserService: servs.user},
 	}, nil
