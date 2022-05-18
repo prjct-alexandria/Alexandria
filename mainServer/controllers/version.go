@@ -11,6 +11,22 @@ type VersionController struct {
 	Serv services.VersionService
 }
 
+func (contr VersionController) GetVersion(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	aid := c.Param("articleID")
+	vid := c.Param("versionID")
+
+	res, err := contr.Serv.GetVersion(c, aid, vid)
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		fmt.Println(err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 // UpdateVersion godoc
 // @Summary     Update article version
 // @Description Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field "file"

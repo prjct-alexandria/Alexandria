@@ -2,6 +2,8 @@ package services
 
 import (
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
+	"mainServer/entities"
 	"mainServer/repositories"
 	"mime/multipart"
 	"path/filepath"
@@ -9,6 +11,16 @@ import (
 
 type VersionService struct {
 	Gitrepo repositories.GitRepository
+}
+
+func (serv VersionService) GetVersion(c *gin.Context, article string, version string) (entities.Version, error) {
+	err := serv.Gitrepo.CheckoutBranch(article, version)
+
+	path, err := serv.Gitrepo.GetArticlePath(article)
+	fileContent, err := ioutil.ReadFile(path + "\\main.qmd")
+
+	fullVersion := entities.Version{version, article, [1]string{"John Doe"}, string(fileContent)}
+	return fullVersion, err
 }
 
 // UpdateVersion overwrites file of specified article version and commits
