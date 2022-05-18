@@ -2,7 +2,7 @@ import React from 'react';
 import '../../App.js';
 import {Link} from "react-router-dom";
 
-export default class Article extends React.Component {
+export default class ArticleListElement extends React.Component {
 
     constructor(props) {
         super(props);
@@ -37,8 +37,13 @@ export default class Article extends React.Component {
                             {this.props.article.title}
                         </Link>
                     </div>
-                    <div className='col-md-2'>
+                    <div className='col-md-1'>
                         {this.props.article.date_created}
+                    </div>
+                    <div className='col-md-1'>
+                        <Link to={'/articles/' + this.props.article.id + '/versions'}>
+                            View versions list
+                        </Link>
                     </div>
                 </div>
 
