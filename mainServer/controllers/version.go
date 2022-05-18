@@ -40,5 +40,6 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 		return
 	}
 
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.Status(http.StatusOK)
 }
