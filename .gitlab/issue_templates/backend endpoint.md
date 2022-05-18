@@ -1,5 +1,4 @@
 ## Description
-Back-end functionality for creating a new article version from an existing one
 
 ## Definition of done:
 - [ ] 
