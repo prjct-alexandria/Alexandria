@@ -15,7 +15,7 @@ export default class ArticlePage extends React.Component {
     componentDidMount() {
         //const url = "../article.json"; // Placeholder
         const articleId = window.location.href.split("/")[4];
-        const url = "../view/article/" + articleId; // Placeholder
+        const url = "localhost:8080/view/article/" + articleId;
 
         fetch(
             url, {headers: {
@@ -50,9 +50,9 @@ export default class ArticlePage extends React.Component {
                     {items.map((data, key) => {
                         return (
                             <div>
-                                <h3 key={key}>
-                                    {data.author}
-                                </h3>
+                                <ul key={key}>
+                                    {data.authors.map(a => (<li>{a}</li>))}
+                                </ul>
                                 <h1 key={key}>
                                     {data.title}
                                 </h1>
