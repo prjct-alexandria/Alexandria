@@ -21,8 +21,9 @@ export default class FileUpload extends React.Component {
 
     uploadFileHandler = () => {
         const formData = new FormData();
-        formData.append('File', this.state.selectedFile);
-        const url = '/articles';
+        formData.append('file', this.state.selectedFile);
+        // TODO: server url in config file
+        const url = 'http://localhost:8080/articles/1/versions/1';
         fetch(
             url,
             {
@@ -30,7 +31,6 @@ export default class FileUpload extends React.Component {
                 body: formData,
             }
         )
-            .then(res => res.json())
             .then(
                 (result) => {
                     console.log('Success:', result);
