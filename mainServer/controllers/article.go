@@ -11,10 +11,9 @@ type ArticleController struct{}
 // @Summary      Create new article
 // @Description  Creates new article, including main article version
 // @Accept		 json
-// @Param		 title 		body	string		true 	"Title"			example(Lorem Ipsum)
-// @Param		 owners	    body	[]string	true	"Owner emails"  example(janedoe@mail.com,johndoe@mail.com)
+// @Param		 article 		body	models.ArticleCreationForm		true 	"Article"			example(Lorem Ipsum)
 // @Produce      json
-// @Success      200  {object} entities.Article
+// @Success      200  {object} models.Article
 // @Router       /articles [post]
 func (contr ArticleController) CreateArticle(c *gin.Context) {
 	// TODO: implement

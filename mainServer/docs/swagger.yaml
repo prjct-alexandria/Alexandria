@@ -1,19 +1,4 @@
 definitions:
-  entities.Article:
-    properties:
-      id:
-        type: string
-      owners:
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-    required:
-    - id
-    - owners
-    - title
-    type: object
   entities.User:
     properties:
       email:
@@ -21,6 +6,36 @@ definitions:
       name:
         type: string
       pwd:
+        type: string
+    type: object
+  models.Article:
+    properties:
+      id:
+        type: string
+      owners:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      title:
+        type: string
+    type: object
+  models.ArticleCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - owners
+    - title
+    type: object
+  models.User:
+    properties:
+      email:
+        type: string
+      name:
         type: string
     required:
     - email
@@ -40,29 +55,19 @@ paths:
       - application/json
       description: Creates new article, including main article version
       parameters:
-      - description: Title
-        example: Lorem Ipsum
+      - description: Article
         in: body
-        name: title
+        name: article
         required: true
         schema:
-          type: string
-      - description: Owner emails
-        example: janedoe@mail.com,joedoe@mail.com
-        in: body
-        name: owners
-        required: true
-        schema:
-          items:
-            type: string
-          type: array
+          $ref: '#/definitions/models.ArticleCreationForm'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entities.Article'
+            $ref: '#/definitions/models.Article'
       summary: Create new article
   /articles/{articleID}/versions/{versionID}:
     post:

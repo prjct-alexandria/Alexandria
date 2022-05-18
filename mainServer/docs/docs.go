@@ -28,26 +28,12 @@ const docTemplate = `{
                 "summary": "Create new article",
                 "parameters": [
                     {
-                        "example": "Lorem Ipsum",
-                        "description": "Title",
-                        "name": "title",
+                        "description": "Article",
+                        "name": "article",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "example": "janedoe@mail.com,joedoe@mail.com",
-                        "description": "Owner emails",
-                        "name": "owners",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.ArticleCreationForm"
                         }
                     }
                 ],
@@ -55,7 +41,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entities.Article"
+                            "$ref": "#/definitions/models.Article"
                         }
                     }
                 }
@@ -133,17 +119,44 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entities.Article": {
+        "entities.User": {
             "type": "object",
-            "required": [
-                "id",
-                "owners",
-                "title"
-            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pwd": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Article": {
+            "type": "object",
             "properties": {
                 "id": {
                     "type": "string"
                 },
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ArticleCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "title"
+            ],
+            "properties": {
                 "owners": {
                     "type": "array",
                     "items": {
@@ -155,7 +168,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.User": {
+        "models.User": {
             "type": "object",
             "required": [
                 "email",
@@ -166,9 +179,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "pwd": {
                     "type": "string"
                 }
             }
