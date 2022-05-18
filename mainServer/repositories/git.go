@@ -4,12 +4,17 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"mainServer/utils/clock"
 	"path/filepath"
-	"time"
 )
 
 type GitRepository struct {
-	Path string
+	Path  string
+	Clock clock.Clock
+}
+
+func NewGitRepository(path string) GitRepository {
+	return GitRepository{Path: path, Clock: clock.RealClock{}}
 }
 
 // Commit commits all changes in the specified article
@@ -31,7 +36,7 @@ func (r GitRepository) Commit(article string) error {
 			// TODO: add actual user name?
 			Name:  "Alexandria Git Manager",
 			Email: "",
-			When:  time.Now(),
+			When:  r.Clock.Now(),
 		},
 	})
 	return nil

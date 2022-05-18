@@ -6,6 +6,7 @@ import (
 	"mainServer/db"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/repositories/postgres"
 	"mainServer/services"
 	"os"
 )
@@ -38,8 +39,8 @@ func initRepoEnv() (RepoEnv, error) {
 	database := db.Connect()
 
 	return RepoEnv{
-		git:  repositories.GitRepository{Path: gitpath},
-		user: repositories.NewPgUserRepository(database),
+		git:  repositories.NewGitRepository(gitpath),
+		user: postgres.NewPgUserRepository(database),
 	}, nil
 }
 
