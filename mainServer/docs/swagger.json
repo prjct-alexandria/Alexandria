@@ -8,21 +8,71 @@
     },
     "host": "localhost:8080",
     "paths": {
-        "/helloWorldJson": {
-            "get": {
-                "description": "Returns a list of jokes in JSON format, demonstrates how future endpoints could work.",
-                "produces": [
-                    "application/json"
+        "/articles/{articleID}/versions/{versionID}": {
+            "post": {
+                "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
+                "consumes": [
+                    "multipart/form-data"
                 ],
-                "summary": "Hello world test endpoint",
+                "summary": "Update article version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request, possibly bad file data or permissions"
+                    },
+                    "404": {
+                        "description": "Specified article version not found"
+                    }
+                }
+            }
+        },
+        "/createExampleUser": {
+            "post": {
+                "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Temporary user creation endpoint",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/controllers.Joke"
-                            }
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/getExampleUser": {
+            "get": {
+                "description": "Returns a user with a hardcoded email address, demonstrates how to use the services.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get test user from database endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.User"
                         }
                     }
                 }
@@ -30,21 +80,17 @@
         }
     },
     "definitions": {
-        "controllers.Joke": {
+        "entities.User": {
             "type": "object",
-            "required": [
-                "id",
-                "joke"
-            ],
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "joke": {
+                "email": {
                     "type": "string"
                 },
-                "likes": {
-                    "type": "integer"
+                "name": {
+                    "type": "string"
+                },
+                "pwd": {
+                    "type": "string"
                 }
             }
         }
