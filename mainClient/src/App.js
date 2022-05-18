@@ -15,6 +15,7 @@ import {
     Routes,
     Route
 } from 'react-router-dom';
+import VersionList from "./Components/Article/VersionList";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                   <Route exact path='/' element={<Homepage/>}></Route>
                   <Route exact path='/articles' element={<ArticleList/>}></Route>
                   <Route exact path='/upload' element={<FileUpload/>}></Route>
+                  <Route exact path="/articles/:aid/versions" element={<VersionList />}></Route>
                   <Route exact path="/articles/:articleId/versions/:versionId" element={<ArticlePage/>}></Route>
               </Routes>
               <Footer/>
