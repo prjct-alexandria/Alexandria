@@ -13,7 +13,6 @@ export default class ArticleList extends React.Component {
     }
 
     componentDidMount() {
-        //"http://localhost:8080/helloWorldJson"
         const url = 'articleList.json'; // Placeholder
         // const url = '/articles' // should be this url, but used the one above for demonstration
         fetch(url
