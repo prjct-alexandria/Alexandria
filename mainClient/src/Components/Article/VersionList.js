@@ -4,8 +4,8 @@ import VersionListElement from "./VersionListElement";
 
 export default function VersionList() {
     let params = useParams();
-    // const url = '/versionList.json'; // Placeholder
-    const url = '/articles/' + params.aid + "versions" // should be this when endpoint is there
+    const url = '/versionList.json'; // Placeholder
+    // const url = '/articles/' + params.aid + "versions" // should be this when endpoint is there
 
     let [data, setData] = useState([]);
     let [loading, setLoading] = useState(true);

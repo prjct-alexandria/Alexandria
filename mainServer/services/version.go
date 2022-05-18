@@ -19,7 +19,7 @@ func (serv VersionService) GetVersion(c *gin.Context, article string, version st
 	path, err := serv.Gitrepo.GetArticlePath(article)
 	fileContent, err := ioutil.ReadFile(path + "\\main.qmd")
 
-	fullVersion := entities.Version{version, article, [1]string{"John Doe"}, string(fileContent)}
+	fullVersion := entities.Version{Id: version, Title: article, Authors: [2]string{"John Doe", "Jane Doe"}, Content: string(fileContent)}
 	return fullVersion, err
 }
 
