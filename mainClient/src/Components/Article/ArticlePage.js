@@ -52,7 +52,7 @@ export default class ArticlePage extends React.Component {
                         return (
                             <div key={key}>
                                 <ul key={1}>
-                                    {data.authors.map(a => (<li>{a}</li>))}
+                                    {data.authors.map((a, i) => (<li key={i}>{a}</li>))}
                                 </ul>
                                 <h1 key={2}>
                                     {data.title}
