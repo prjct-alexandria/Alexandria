@@ -1,6 +1,6 @@
 import React from 'react';
 import '../../App.js';
-import Article from "./Article.js";
+import ArticleListElement from "./ArticleListElement";
 
 export default class ArticleList extends React.Component {
     constructor(props) {
@@ -15,12 +15,9 @@ export default class ArticleList extends React.Component {
     componentDidMount() {
         //"http://localhost:8080/helloWorldJson"
         const url = 'articleList.json'; // Placeholder
+        // const url = '/articles' // should be this url, but used the one above for demonstration
         fetch(url
-            ,{headers : {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            })
+            )
             .then(res => res.json())
             .then(
                 (result) => {
@@ -50,7 +47,7 @@ export default class ArticleList extends React.Component {
         } else {
             return (
                 items.map(function(article, i){
-                    return (<Article key={i} article={article} />);
+                    return (<ArticleListElement key={i} article={article} />);
                 })
             );
         }
