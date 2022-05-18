@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mainServer/entities"
 	"mainServer/services"
 	"net/http"
 )
@@ -24,7 +25,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+	c.IndentedJSON(http.StatusOK, [1]entities.Version{res})
 }
 
 // UpdateVersion godoc

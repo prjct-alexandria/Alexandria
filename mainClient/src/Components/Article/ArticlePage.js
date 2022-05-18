@@ -13,15 +13,15 @@ export default class ArticlePage extends React.Component {
     }
 
     componentDidMount() {
-        //const url = "../article.json"; // Placeholder
+        // const url = "../article.json"; // Placeholder
         const articleId = window.location.href.split("/")[4];
         const versionId = window.location.href.split("/")[6];
-        const url = "localhost:8080/articles/" + articleId + "/version/" + versionId;
+        const url = "http://localhost:8080/articles/" + articleId + "/versions/" + versionId;
 
         fetch(
-            url, {headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+            url, {
+                headers: {
+                    'Accept': 'text/plain'
                 }
             }
         )
@@ -52,13 +52,13 @@ export default class ArticlePage extends React.Component {
                         return (
                             <div key={key}>
                                 <ul key={1}>
-                                    {data.authors.map((a, i) => (<li key={i}>{a}</li>))}
+                                    {data.Authors.map((a, i) => (<li key={i}>{a}</li>))}
                                 </ul>
                                 <h1 key={2}>
-                                    {data.title}
+                                    {data.Title}
                                 </h1>
                                 <div key={3}>
-                                    {data.content}
+                                    {data.Content}
                                 </div>
                             </div>
                         );
