@@ -50,14 +50,14 @@ export default class ArticlePage extends React.Component {
                 <div className="article">
                     {items.map((data, key) => {
                         return (
-                            <div>
-                                <ul key={key}>
+                            <div key={key}>
+                                <ul key={1}>
                                     {data.authors.map(a => (<li>{a}</li>))}
                                 </ul>
-                                <h1 key={key}>
+                                <h1 key={2}>
                                     {data.title}
                                 </h1>
-                                <div key={key}>
+                                <div key={3}>
                                     {data.content}
                                 </div>
                             </div>
