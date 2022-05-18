@@ -15,7 +15,8 @@ export default class ArticlePage extends React.Component {
     componentDidMount() {
         //const url = "../article.json"; // Placeholder
         const articleId = window.location.href.split("/")[4];
-        const url = "localhost:8080/view/article/" + articleId;
+        const versionId = window.location.href.split("/")[6];
+        const url = "localhost:8080/articles/" + articleId + "/version/" + versionId;
 
         fetch(
             url, {headers: {
