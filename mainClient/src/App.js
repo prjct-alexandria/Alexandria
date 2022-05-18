@@ -7,6 +7,7 @@ import './Components/Article/Article.js';
 import Homepage from './Components/Homepage/Homepage.js';
 import FileUpload from './Components/Repo/FileUpload.js';
 import ArticleList from "./Components/Article/ArticleList";
+import ArticlePage from "./Components/Article/ArticlePage";
 import Header from './Components/Header/Header.js';
 import Footer from './Components/Footer/Footer.js';
 import {
@@ -24,6 +25,7 @@ function App() {
                   <Route exact path='/' element={<Homepage/>}></Route>
                   <Route exact path='/articles' element={<ArticleList/>}></Route>
                   <Route exact path='/upload' element={<FileUpload/>}></Route>
+                  <Route exact path="/articles/:articleId/versions/:versionId" element={<ArticlePage/>}></Route>
               </Routes>
               <Footer/>
           </div>
