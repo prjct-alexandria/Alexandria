@@ -3,6 +3,6 @@ package entities
 type Version struct {
 	Id      string
 	Title   string
-	Authors [2]string
+	Authors []string
 	Content string
 }
