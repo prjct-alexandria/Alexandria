@@ -21,7 +21,7 @@ export default class ArticlePage extends React.Component {
         fetch(
             url, {
                 headers: {
-                    'Accept': 'text/plain'
+                    'Accept': 'application/json'
                 }
             }
         )

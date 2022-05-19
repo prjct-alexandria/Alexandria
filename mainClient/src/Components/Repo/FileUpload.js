@@ -23,7 +23,7 @@ export default class FileUpload extends React.Component {
         const formData = new FormData();
         formData.append('file', this.state.selectedFile);
         // TODO: server url in config file
-        const url = 'http://localhost:8080/articles/Lorem_ipsum/versions/2';
+        const url = 'http://localhost:8080/articles/1/versions/1';
         fetch(
             url,
             {
