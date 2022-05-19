@@ -13,6 +13,8 @@ type VersionService struct {
 	Gitrepo repositories.GitRepository
 }
 
+// GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
+// For now it is hardcoded but it should
 func (serv VersionService) GetVersion(c *gin.Context, article string, version string) (entities.Version, error) {
 	err := serv.Gitrepo.CheckoutBranch(article, version)
 
