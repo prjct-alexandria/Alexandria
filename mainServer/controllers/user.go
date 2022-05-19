@@ -10,6 +10,8 @@ import (
 	"mainServer/services"
 	"mainServer/utils/httperror"
 	"net/http"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type UserController struct {
@@ -21,17 +23,17 @@ type UserController struct {
 // @Description	Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.
 // @Accept		json
 // @Success		200 "Success"
-// @Failure		400 "could not read user data"
+// @Failure		400 "could not read request body"
 // @Failure		400 "invalid user JSON provided"
-// @Failure		403 "could not generate safe password hash"
-// @Failure		500	"could not save user to database"
+// @Failure		403 "could not generate password hash"
+// @Failure		500 "could not save user to database"
 // @Router		/users
 func (u *UserController) Register(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
 	byteBody, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read user data"))
+		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read request body"))
 		return
 	}
 
@@ -44,7 +46,7 @@ func (u *UserController) Register(c *gin.Context) {
 
 	hashedUser, err := user.Hash()
 	if err != nil {
-		httperror.NewError(c, http.StatusForbidden, errors.New("could not generate safe password hash"))
+		httperror.NewError(c, http.StatusForbidden, errors.New("could not generate password hash"))
 		return
 	}
 	err = u.UserService.SaveUser(hashedUser)
@@ -55,6 +57,56 @@ func (u *UserController) Register(c *gin.Context) {
 	} else {
 		c.Status(http.StatusOK)
 	}
+}
+
+type credentials struct {
+	Email string `json:"email"`
+	Pwd   string `json:"pwd"`
+}
+
+// Login		godoc
+// @Summary		Endpoint for user logging in
+// @Description	Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token
+// @Accept		json
+// @Success		200 "Success"
+// @Failure		400 "could not read request body"
+// @Failure		400 "invalid JSON provided
+// @Failure		403 "invalid password"
+// @Failure		500 "could not create token"
+// @Router		/login
+func (u *UserController) Login(c *gin.Context) {
+	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
+
+	byteBody, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read request body"))
+		return
+	}
+
+	var cred credentials
+	err = json.Unmarshal(byteBody, &cred)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("invalid JSON provided"))
+		return
+	}
+
+	//Check email + pwd combo
+	err = u.UserService.CheckPassword(cred.Email, cred.Pwd)
+	if err != nil {
+		httperror.NewError(c, http.StatusForbidden, errors.New("invalid password"))
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": cred.Email,
+	})
+
+	tokenString, err := token.SignedString([]byte(jwtSecret))
+	if err != nil {
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))
+		return
+	}
+	c.String(http.StatusOK, tokenString)
 }
 
 // CreateExampleUser godoc
