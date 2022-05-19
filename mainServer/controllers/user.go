@@ -75,6 +75,7 @@ type credentials struct {
 // @Failure		500 "could not create token"
 // @Router		/login
 func (u *UserController) Login(c *gin.Context) {
+	//TODO: Put this in a config file
 	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
 
 	byteBody, err := ioutil.ReadAll(c.Request.Body)
