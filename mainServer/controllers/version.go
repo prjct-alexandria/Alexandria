@@ -12,6 +12,15 @@ type VersionController struct {
 	Serv services.VersionService
 }
 
+// GetVersion 	godoc
+// @Summary		Get version content + metadata
+// @Description	Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.
+// @Param		articleID	path	string	true	"Article ID"
+// @Param		versionID	path	string	true	"Version ID"
+// @Produce		json
+// @Success		200 {object} []entities.Version
+// @Failure		404 "Version not found"
+// @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
@@ -21,7 +30,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 
 	res, err := contr.Serv.GetVersion(c, aid, vid)
 	if err != nil {
-		c.Status(http.StatusBadRequest)
+		c.Status(http.StatusNotFound)
 		fmt.Println(err)
 		return
 	}
