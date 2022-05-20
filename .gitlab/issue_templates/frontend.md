@@ -8,9 +8,9 @@
 - [ ] Render response element(s) as (list of) [...]
 - [ ] Create UI [... name of element] for [... what purpose]
 - [ ] Update App.js Routing to be able to navigate to [... url]
+- [ ] Code follows React best practices
 
 ## Code quality:
-- [ ] Code follows best practices of the specific language
 - [ ] Pipeline passes without warnings
 - [ ] New code is properly unit tested (>90% branch coverage)
 - [ ] Functions have appropriate comments and documentation
