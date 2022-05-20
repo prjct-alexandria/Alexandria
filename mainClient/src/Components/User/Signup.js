@@ -7,6 +7,7 @@ export default class Signup extends React.Component {
     super(props);
     this.state = {
       error: null,
+      // Keep form data in component state
       user: {
         username: "",
         email: "",
@@ -14,45 +15,56 @@ export default class Signup extends React.Component {
         passwordConfirm: "",
       },
     };
+
+    // Bind handler functions to component
     this.submitHandler = this.submitHandler.bind(this);
     this.changeHandler = this.changeHandler.bind(this);
   }
 
+  // Update state on a change in one of the form fields
+  // Keep previous state, only replace updated elements
   changeHandler = (event) => {
     this.setState((state) => ({
       user: { ...state.user, [event.target.name]: event.target.value },
     }));
   };
 
+  // Send an HTTP POST request to /register with user info
   submitHandler = (event) => {
+    // Prevent unwanted default browser behavior
     event.preventDefault();
 
     const url = "http://localhost:8080/register";
     const user = this.state.user;
+
+    // Construct request body from state.user
     const body = {
       name: user.username,
       email: user.email,
       pwd: user.password,
     };
 
+    // Send request with a JSON of the user data
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       mode: "cors",
       body: JSON.stringify(body),
     }).then(
-      (result) => {
-        console.log("Success:", result);
+      // Success; set response in state
+      (response) => {
         this.setState({
           isLoaded: true,
-          items: result,
+          items: response,
         });
-        // Uncomment when finished debugging
-        // if (typeof window !== "undefined") {
-        //   window.location.href = "http://localhost:3000/login";
-        // }
+
+        // Redirect to login page; Comment this to debug the form submission
+        if (typeof window !== "undefined") {
+          window.location.href = "http://localhost:3000/login";
+        }
       },
       (error) => {
+        // Request returns an error; set it in component's state
         this.setState({
           isLoaded: true,
           error,
@@ -64,12 +76,14 @@ export default class Signup extends React.Component {
   render() {
     const { error } = this.state;
     if (error) {
+      // Render error message whenever state.error is set by HTTP response
       return (
         <div className="alert alert-danger" role="alert">
           Error: {error.message}. Please try again.
         </div>
       );
     } else {
+      // Render SignupForm and pass state and handlers to its props
       return (
         <div className="wrapper">
           <SignupForm
