@@ -19,8 +19,7 @@ export default class Login extends React.Component {
   submitHandler = (event) => {
     event.preventDefault();
 
-    // const url = "http://localhost:8080/login";
-    const url = "http://localhost:3000";
+    const url = "http://localhost:8080/login";
     const user = this.state.user;
     const body = {
       email: user.email,
@@ -39,10 +38,9 @@ export default class Login extends React.Component {
           isLoaded: true,
           items: result,
         });
-        // Uncomment when finished debugging
-        // if (typeof window !== "undefined") {
-        //   window.location.href = "http://localhost:3000/";
-        // }
+        if (typeof window !== "undefined") {
+          window.location.href = "http://localhost:3000/";
+        }
       },
       (error) => {
         console.error("Error:", error);

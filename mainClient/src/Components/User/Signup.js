@@ -27,8 +27,7 @@ export default class Signup extends React.Component {
   submitHandler = (event) => {
     event.preventDefault();
 
-    // const url = "http://localhost:8080/register";
-    const url = "http://localhost:3000";
+    const url = "http://localhost:8080/register";
     const user = this.state.user;
     const body = {
       name: user.username,
