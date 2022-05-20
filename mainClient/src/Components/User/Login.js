@@ -57,7 +57,7 @@ export default class Login extends React.Component {
           items: result,
         });
 
-        // Redirect to login page; Comment this to debug the form submission
+        // Redirect to homepage; Comment this to debug the form submission
         if (typeof window !== "undefined") {
           window.location.href = "http://localhost:3000/";
         }
