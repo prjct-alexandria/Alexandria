@@ -19,5 +19,5 @@ func NewPgVersionRepository(db *sql.DB) PgVersionRepository {
 }
 
 func (repo PgVersionRepository) CreateVersion(version entities.Version) error {
-	
+	return nil
 }

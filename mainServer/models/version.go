@@ -5,4 +5,5 @@ type Version struct {
 	Id        string   `json:"versionID"`
 	Title     string   `json:"title"`
 	Owners    []string `json:"owners"`
+	Content   string   `json:"content"`
 }

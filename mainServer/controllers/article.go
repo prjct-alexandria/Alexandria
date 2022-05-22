@@ -39,5 +39,5 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 	version, err := contr.serv.CreateArticle(article.Title, article.Owners)
 
 	// Respond after converting the db entity to a model meant for JSON serializing
-	c.JSON(http.StatusOK, models.Version(version))
+	c.JSON(http.StatusOK, version)
 }

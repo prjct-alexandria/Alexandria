@@ -1,7 +1,7 @@
 package services
 
 import (
-	"mainServer/entities"
+	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
 )
@@ -16,8 +16,8 @@ func NewArticleService(versionrepo interfaces.VersionRepository, gitrepo reposit
 }
 
 // CreateArticle creates a new article repo and main article version, returns main version
-func (serv ArticleService) CreateArticle(title string, owners []string) (entities.Version, error) {
+func (serv ArticleService) CreateArticle(title string, owners []string) (models.Version, error) {
 	// TODO: ensure authenticated user is among owners
-	id, err := gitrepo.CreateRepo()
-
+	//id, err := gitrepo.CreateRepo()
+	return models.Version{}, nil
 }
