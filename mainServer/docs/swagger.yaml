@@ -8,17 +8,6 @@ definitions:
       pwd:
         type: string
     type: object
-  models.Article:
-    properties:
-      id:
-        type: string
-      owners:
-        items:
-          $ref: '#/definitions/models.User'
-        type: array
-      title:
-        type: string
-    type: object
   models.ArticleCreationForm:
     properties:
       owners:
@@ -31,15 +20,20 @@ definitions:
     - owners
     - title
     type: object
-  models.User:
+  models.Version:
     properties:
-      email:
+      articleID:
+        type: integer
+      content:
         type: string
-      name:
+      owners:
+        items:
+          type: string
+        type: array
+      title:
         type: string
-    required:
-    - email
-    - name
+      versionID:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -53,9 +47,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates new article, including main article version
+      description: Creates new article, including main article version. Returns main
+        version
       parameters:
-      - description: Article
+      - description: Article info
         in: body
         name: article
         required: true
@@ -67,9 +62,33 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Article'
+            $ref: '#/definitions/models.Version'
       summary: Create new article
   /articles/{articleID}/versions/{versionID}:
+    get:
+      description: Gets the version content + metadata from the database + filesystem.
+        Must be accessible without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "404":
+          description: Version not found
+      summary: Get version content + metadata
     post:
       consumes:
       - multipart/form-data

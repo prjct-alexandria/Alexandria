@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version",
+                "description": "Creates new article, including main article version. Returns main version",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "summary": "Create new article",
                 "parameters": [
                     {
-                        "description": "Article",
+                        "description": "Article info",
                         "name": "article",
                         "in": "body",
                         "required": true,
@@ -41,13 +41,47 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Article"
+                            "$ref": "#/definitions/models.Version"
                         }
                     }
                 }
             }
         },
         "/articles/{articleID}/versions/{versionID}": {
+            "get": {
+                "description": "Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get version content + metadata",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "404": {
+                        "description": "Version not found"
+                    }
+                }
+            },
             "post": {
                 "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
                 "consumes": [
@@ -133,23 +167,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Article": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "owners": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.User"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ArticleCreationForm": {
             "type": "object",
             "required": [
@@ -168,18 +185,26 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "models.Version": {
             "type": "object",
-            "required": [
-                "email",
-                "name"
-            ],
             "properties": {
-                "email": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "content": {
                     "type": "string"
                 },
-                "name": {
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
                     "type": "string"
+                },
+                "versionID": {
+                    "type": "integer"
                 }
             }
         }

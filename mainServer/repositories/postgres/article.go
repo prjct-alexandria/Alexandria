@@ -44,8 +44,8 @@ func (r PgArticleRepository) LinkVersion(articleID int64, versionID int64) error
 }
 
 func (r PgArticleRepository) createArticleTable() error {
-	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS articles (
-    			id SERIAL PRIMARY KEY,
+	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS article (
+    			id SERIAL PRIMARY KEY
     )`)
 	return err
 }
@@ -54,7 +54,8 @@ func (r PgArticleRepository) createArticleVersionsTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS articleVersions (
     			versionID PRIMARY KEY,
     			articleID int NOT NULL,
-    			FOREIGN KEY (articleID) REFERENCES versions(id)    			
+    			FOREIGN KEY (articleID) REFERENCES article(id),
+    			FOREIGN KEY (versionID) REFERENCES version(id)
     )`)
 	return err
 }

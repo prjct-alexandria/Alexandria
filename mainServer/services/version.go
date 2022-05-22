@@ -7,6 +7,7 @@ import (
 	"mainServer/repositories"
 	"mime/multipart"
 	"path/filepath"
+	"strconv"
 )
 
 type VersionService struct {
@@ -14,7 +15,7 @@ type VersionService struct {
 }
 
 // GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
-func (serv VersionService) GetVersion(c *gin.Context, article string, version string) (models.Version, error) {
+func (serv VersionService) GetVersion(c *gin.Context, article int64, version int64) (models.Version, error) {
 	err := serv.Gitrepo.CheckoutBranch(article, version)
 
 	path, err := serv.Gitrepo.GetArticlePath(article)
@@ -24,14 +25,14 @@ func (serv VersionService) GetVersion(c *gin.Context, article string, version st
 	fullVersion := models.Version{
 		ArticleID: article,
 		Id:        version,
-		Title:     article,
-		Owners:    []string{"John Doe", "Jane Doe"},
+		Title:     strconv.FormatInt(article, 10),
+		Owners:    []string{"johndoe@mail.com", "janedoe@mail.com"},
 		Content:   string(fileContent)}
 	return fullVersion, err
 }
 
 // UpdateVersion overwrites file of specified article version and commits
-func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 	// TODO: check if user of authenticated session is version owner
 
 	// Checkout

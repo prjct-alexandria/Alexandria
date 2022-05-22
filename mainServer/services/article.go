@@ -25,8 +25,7 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 	// TODO: ensure authenticated user is among owners
 
 	// Create article in database, this generates article ID
-	article := entities.Article{}
-	article, err := serv.articlerepo.SaveArticle(article)
+	article, err := serv.articlerepo.CreateArticle()
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -39,7 +38,7 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 
 	// Create main version info in database
 	version := entities.Version{Title: title, Owners: owners}
-	version, err = serv.versionrepo.SaveVersion(version)
+	version, err = serv.versionrepo.CreateVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}

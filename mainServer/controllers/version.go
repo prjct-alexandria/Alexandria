@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/services"
+	"mainServer/utils/httperror"
 	"net/http"
+	"strconv"
 )
 
 type VersionController struct {
@@ -24,13 +26,26 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
 
+	// extract article id
 	aid := c.Param("articleID")
-	vid := c.Param("versionID")
-
-	res, err := contr.Serv.GetVersion(c, aid, vid)
+	article, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
-		c.Status(http.StatusNotFound)
-		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// extract version id
+	vid := c.Param("versionID")
+	version, err := strconv.ParseInt(vid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// get version
+	res, err := contr.Serv.GetVersion(c, article, version)
+	if err != nil {
+		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
 	c.IndentedJSON(http.StatusOK, res)
@@ -56,10 +71,24 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 		return
 	}
 
+	// extract article id
 	aid := c.Param("articleID")
-	vid := c.Param("versionID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
 
-	if err := contr.Serv.UpdateVersion(c, file, aid, vid); err != nil {
+	// extract version id
+	vid := c.Param("versionID")
+	version, err := strconv.ParseInt(vid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// update version data
+	if err := contr.Serv.UpdateVersion(c, file, article, version); err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
 		return

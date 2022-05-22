@@ -21,7 +21,7 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 // @Summary      Create new article
 // @Description  Creates new article, including main article version. Returns main version
 // @Accept		 json
-// @Param		 article 		body	models.ArticleCreationForm		true 	"Article"			example(Lorem Ipsum)
+// @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
 // @Produce      json
 // @Success      200  {object} models.Version
 // @Router       /articles [post]
@@ -38,6 +38,6 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 	// Create article in service
 	version, err := contr.serv.CreateArticle(article.Title, article.Owners)
 
-	// Respond after converting the db entity to a model meant for JSON serializing
+	// Respond with a frontend-readable description of the created version
 	c.JSON(http.StatusOK, version)
 }
