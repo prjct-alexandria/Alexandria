@@ -8,11 +8,11 @@ import (
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
 	"mainServer/services"
-	"os"
 )
 
 type RepoEnv struct {
 	git     repositories.GitRepository
+	article interfaces.ArticleRepository
 	user    interfaces.UserRepository
 	version interfaces.VersionRepository
 }
@@ -33,8 +33,7 @@ func initRepoEnv() (RepoEnv, error) {
 	// TODO: gitfiles path in config file
 	gitpath := "../../gitfiles"
 
-	// make folder for git files
-	err := os.MkdirAll(gitpath, os.ModePerm)
+	gitrepo, err := repositories.NewGitRepository(gitpath)
 	if err != nil {
 		return RepoEnv{}, err
 	}
@@ -42,7 +41,8 @@ func initRepoEnv() (RepoEnv, error) {
 	database := db.Connect()
 
 	return RepoEnv{
-		git:     repositories.NewGitRepository(gitpath),
+		git:     gitrepo,
+		article: postgres.NewPgArticleRepository(database),
 		user:    postgres.NewPgUserRepository(database),
 		version: postgres.NewPgVersionRepository(database),
 	}, nil
@@ -55,7 +55,7 @@ func initServiceEnv() (ServiceEnv, error) {
 	}
 
 	return ServiceEnv{
-		article: services.NewArticleService(repos.version, repos.git),
+		article: services.NewArticleService(repos.article, repos.version, repos.git),
 		user:    services.UserService{UserRepository: repos.user},
 		version: services.VersionService{Gitrepo: repos.git},
 	}, nil
