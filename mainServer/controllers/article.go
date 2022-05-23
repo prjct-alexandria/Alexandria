@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"mainServer/models"
 	"mainServer/services"
+	"mainServer/utils/httperror"
 	"net/http"
 )
 
@@ -29,14 +30,20 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 
 	// Read article creation JSON
 	article := models.ArticleCreationForm{}
-	err := c.ShouldBindBodyWith(article, binding.JSON)
+	err := c.BindJSON(&article)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, errors.New("cannot bind article creation form"))
+		return
 	}
 
 	// Create article in service
 	version, err := contr.serv.CreateArticle(article.Title, article.Owners)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed creating article on server"))
+		return
+	}
 
 	// Respond with a frontend-readable description of the created version
 	c.JSON(http.StatusOK, version)

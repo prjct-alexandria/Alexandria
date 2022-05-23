@@ -30,6 +30,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
+		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
 		return
 	}
@@ -38,6 +39,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	vid := c.Param("versionID")
 	version, err := strconv.ParseInt(vid, 10, 64)
 	if err != nil {
+		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
 		return
 	}
@@ -45,6 +47,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	// get version
 	res, err := contr.Serv.GetVersion(c, article, version)
 	if err != nil {
+		fmt.Println(err)
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
@@ -75,6 +78,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
+		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
 		return
 	}
@@ -83,6 +87,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	vid := c.Param("versionID")
 	version, err := strconv.ParseInt(vid, 10, 64)
 	if err != nil {
+		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
 		return
 	}
