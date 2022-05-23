@@ -1,0 +1,69 @@
+definitions:
+  entities.User:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      pwd:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Documentation of Alexandria's API. Endpoints can be tried out directly
+    in this interactive documentation.
+  title: API documentation
+  version: 1.0.0
+paths:
+  /articles/{articleID}/versions/{versionID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload files to update an article version, can only be done by
+        an owner. Requires multipart form data, with a file attached as the field
+        "file"
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad request, possibly bad file data or permissions
+        "404":
+          description: Specified article version not found
+      summary: Update article version
+  /createExampleUser:
+    post:
+      description: Creates a hardcoded user entity and adds it to the database, demonstrates
+        how to add to database
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Temporary user creation endpoint
+  /getExampleUser:
+    get:
+      description: Returns a user with a hardcoded email address, demonstrates how
+        to use the services.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+      summary: Get test user from database endpoint
+swagger: "2.0"

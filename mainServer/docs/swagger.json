@@ -1,0 +1,98 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Documentation of Alexandria's API. Endpoints can be tried out directly in this interactive documentation.",
+        "title": "API documentation",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/articles/{articleID}/versions/{versionID}": {
+            "post": {
+                "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "summary": "Update article version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request, possibly bad file data or permissions"
+                    },
+                    "404": {
+                        "description": "Specified article version not found"
+                    }
+                }
+            }
+        },
+        "/createExampleUser": {
+            "post": {
+                "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Temporary user creation endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/getExampleUser": {
+            "get": {
+                "description": "Returns a user with a hardcoded email address, demonstrates how to use the services.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get test user from database endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.User"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entities.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pwd": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

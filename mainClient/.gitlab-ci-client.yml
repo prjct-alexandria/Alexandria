@@ -1,0 +1,32 @@
+image: node:18
+
+cache:
+  paths:
+    - node_modules/
+
+variables:
+  REPO: gitlab.ewi.tudelft.nl
+  PROJECT: alexandria
+  FOLDER: mainClient
+
+stages:
+  - build
+  - test
+
+build-client:
+  image: node:18
+  stage: build
+  script:
+    - cd mainClient
+    - npm install
+    - echo "Building client..."
+    - npm run build
+
+test-client:
+  image: node:18
+  stage: test
+  script:
+    - cd mainClient
+    - npm install
+    - echo "Running client tests..."
+    - npm test
