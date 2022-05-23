@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"mainServer/entities"
-	"strings"
 )
 
 type PgVersionRepository struct {
@@ -27,29 +26,70 @@ func NewPgVersionRepository(db *sql.DB) PgVersionRepository {
 }
 
 func (r PgVersionRepository) CreateVersion(version entities.Version) (entities.Version, error) {
-	title := version.Title
-	owners := version.Owners
+
+	// add entry in version table
+	id, err := r.createVersion(version.ArticleID, version.Title)
+	if err != nil {
+		return entities.Version{}, err
+	}
+
+	// link owners in versionOwner table
+	err = r.linkOwners(id, version.Owners)
+	if err != nil {
+		return entities.Version{}, err
+	}
+
+	version.Id = id
+	return version, nil
+}
+
+// createVersion adds a single row to the version table, returns generated id.
+// Does not link owners.
+func (r PgVersionRepository) createVersion(article int64, title string) (int64, error) {
 
 	// store version entity
-	result, err := r.Db.Exec(fmt.Sprintf("INSERT INTO version (id, title) VALUES (DEFAULT, %s)", version.Title))
+	stmt, err := r.Db.Prepare("INSERT INTO version (id, articleID, title) VALUES (DEFAULT,$1,$2) RETURNING id")
 	if err != nil {
-		return entities.Version{}, err
+		return -1, err
+	}
+	row := stmt.QueryRow(article, title)
+
+	// Because QueryRow instead of Exec was used, with the RETURNING keyword,
+	// The generated id can be retrieved
+	var id int64
+	err = row.Scan(&id)
+	if err != nil {
+		return -1, err
 	}
 
-	// read the generated id to return, should always be here if the query itself returned no error
-	id, _ := result.LastInsertId()
+	return id, nil
+}
 
-	// create a string with pairs like "(versionID, email1), (versionID, email2), (versionID, email3)"
-	center := strings.Join(owners, fmt.Sprintf("),(%d,", id))
-	pairs := fmt.Sprintf("(%s, %s)", id, center)
+// linkOwners inserts rows to specify the owners of a version.
+// note: does not delete rows, so will not remove existing owners, if they are excluded in the function parameter.
+func (r PgVersionRepository) linkOwners(version int64, owners []string) error {
+	query := `INSERT INTO versionOwners (versionID, email) VALUES `
 
-	// store owners of this version, by inserting the created pairs
-	_, err = r.Db.Exec(fmt.Sprintf("INSERT INTO versionOwners (id, title) VALUES %s", pairs))
+	// add a parametrized value list to the query dynamically, using the length of owners
+	// (<versionID>, $1), (<versionID>, $2), ...
+	// also converts owners from []string to []any (required for stmt.Exec)
+	// implementation inspired by https://stackoverflow.com/a/51132288
+	var values []any
+	for i, s := range owners {
+		values = append(values, s)
+		query = query + fmt.Sprintf("(%d,$%d),", version, i+1)
+	}
+	query = query[:len(query)-1] // remove trailing comma
+
+	// prepare query
+	stmt, err := r.Db.Prepare(query)
 	if err != nil {
-		return entities.Version{}, err
+		return err
 	}
 
-	return entities.Version{Id: id, Title: title, Owners: owners}, nil
+	// execute the statement by inserting the owner emails in the $i's
+	_, err = stmt.Exec(values...)
+	return err
 }
 
 func (r PgVersionRepository) createVersionTable() error {
