@@ -30,19 +30,18 @@ func NewGitRepository(path string) (GitRepository, error) {
 	return GitRepository{Path: path, Clock: clock.RealClock{}}, nil
 }
 
-// CreateRepo creates a new folder/git repository to store an article in.
+// CreateRepo creates a new folder/git repository to store an article in, including main version branch.
 // This is NOT the function used to create the Go repository class,
 // see NewGitRepository instead,
-// Return ID of created repository
-func (r GitRepository) CreateRepo(id int64) error {
-	path, err := r.GetArticlePath(id)
+func (r GitRepository) CreateRepo(article int64, version int64) error {
+	path, err := r.GetArticlePath(article)
 	if err != nil {
 		return err
 	}
 
 	// Check if folder with the same name already exists
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return fmt.Errorf("trying to create a git repository that already exists with id=%d", id)
+		return fmt.Errorf("trying to create a git repository that already exists with id=%d", article)
 	}
 
 	// Create directory
@@ -51,7 +50,14 @@ func (r GitRepository) CreateRepo(id int64) error {
 		return err
 	}
 
+	// Git init, Go-git automatically creates a branch called "master"
 	_, err = git.PlainInit(path, false)
+	if err != nil {
+		return err
+	}
+
+	// Rename the branch to the main version ID
+	err = r.renameInitialBranch(article, version)
 	if err != nil {
 		return err
 	}
@@ -91,12 +97,12 @@ func (r GitRepository) CheckoutBranch(article int64, version int64) error {
 	}
 
 	// checkout
-	idString := strconv.FormatInt(article, 10)
+	branchName := strconv.FormatInt(version, 10)
 	err = w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.NewBranchReferenceName(idString),
+		Branch: plumbing.NewBranchReferenceName(branchName),
 	})
 
-	return nil
+	return err
 }
 
 // GetArticlePath returns the path to an article git repository
@@ -128,4 +134,35 @@ func (r GitRepository) getWorktree(article int64) (*git.Worktree, error) {
 	}
 
 	return w, nil
+}
+
+// renameInitialBranch manually renames the initial branch on a new repo.
+// Do not use on git repos that already have commits!
+// The main branch must have a database-usable version ID, not "master"
+// So, a file in .git is edited manually
+func (r GitRepository) renameInitialBranch(article int64, version int64) error {
+	path, err := r.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+
+	headPath := filepath.Join(path, ".git", "HEAD")
+	f, err := os.Create(headPath)
+	if err != nil {
+		_ = f.Close()
+		return err
+	}
+
+	_, err = fmt.Fprintf(f, "ref: refs/heads/%d", version)
+	if err != nil {
+		_ = f.Close()
+		return err
+	}
+
+	err = f.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

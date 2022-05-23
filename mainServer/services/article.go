@@ -30,15 +30,21 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		return models.Version{}, err
 	}
 
-	// Create article git repo
-	err = serv.gitrepo.CreateRepo(article.Id)
+	// Create main version in database, this generates version ID
+	version := entities.Version{ArticleID: article.Id, Title: title, Owners: owners}
+	version, err = serv.versionrepo.CreateVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	// Create main version info in database
-	version := entities.Version{ArticleID: article.Id, Title: title, Owners: owners}
-	version, err = serv.versionrepo.CreateVersion(version)
+	// Go back to the article entity and link the main version
+	err = serv.articlerepo.UpdateMainVersion(article.Id, version.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Create article git repo
+	err = serv.gitrepo.CreateRepo(article.Id, version.Id)
 	if err != nil {
 		return models.Version{}, err
 	}
