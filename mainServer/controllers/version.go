@@ -45,7 +45,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	}
 
 	// get version
-	res, err := contr.Serv.GetVersion(c, article, version)
+	res, err := contr.Serv.GetVersion(article, version)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))

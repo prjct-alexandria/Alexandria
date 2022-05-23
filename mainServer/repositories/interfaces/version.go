@@ -8,4 +8,7 @@ type VersionRepository interface {
 	// Will ignore the specified ID and generate a new one.
 	// Created entity is returned.
 	CreateVersion(version entities.Version) (entities.Version, error)
+
+	// GetVersion returns version entity from database
+	GetVersion(version int64) (entities.Version, error)
 }

@@ -57,7 +57,7 @@ func initServiceEnv() (ServiceEnv, error) {
 	return ServiceEnv{
 		article: services.NewArticleService(repos.article, repos.version, repos.git),
 		user:    services.UserService{UserRepository: repos.user},
-		version: services.VersionService{Gitrepo: repos.git},
+		version: services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
 	}, nil
 }
 

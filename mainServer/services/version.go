@@ -5,28 +5,46 @@ import (
 	"io/ioutil"
 	"mainServer/models"
 	"mainServer/repositories"
+	"mainServer/repositories/interfaces"
 	"mime/multipart"
 	"path/filepath"
-	"strconv"
 )
 
 type VersionService struct {
-	Gitrepo repositories.GitRepository
+	Gitrepo     repositories.GitRepository
+	Versionrepo interfaces.VersionRepository
 }
 
 // GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
-func (serv VersionService) GetVersion(c *gin.Context, article int64, version int64) (models.Version, error) {
+func (serv VersionService) GetVersion(article int64, version int64) (models.Version, error) {
+
+	// Get file contents from Git
 	err := serv.Gitrepo.CheckoutBranch(article, version)
+	if err != nil {
+		return models.Version{}, err
+	}
 
 	path, err := serv.Gitrepo.GetArticlePath(article)
-	fileContent, err := ioutil.ReadFile(path + "\\main.qmd")
+	if err != nil {
+		return models.Version{}, err
+	}
 
-	//TODO get version data from database after article creation has been added
+	fileContent, err := ioutil.ReadFile(filepath.Join(path, "main.qmd"))
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Get other version info from database
+	entity, err := serv.Versionrepo.GetVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
 	fullVersion := models.Version{
-		ArticleID: article,
-		Id:        version,
-		Title:     strconv.FormatInt(article, 10),
-		Owners:    []string{"johndoe@mail.com", "janedoe@mail.com"},
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
 		Content:   string(fileContent)}
 	return fullVersion, err
 }
