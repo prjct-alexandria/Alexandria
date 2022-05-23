@@ -34,7 +34,7 @@ export default class Signup extends React.Component {
     // Prevent unwanted default browser behavior
     event.preventDefault();
 
-    const url = "http://localhost:8080/register";
+    const url = "http://localhost:8080/users";
     const user = this.state.user;
 
     // Construct request body from state.user
