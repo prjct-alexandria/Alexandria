@@ -37,21 +37,15 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 	}
 
 	// Create main version info in database
-	version := entities.Version{Title: title, Owners: owners}
+	version := entities.Version{ArticleID: article.Id, Title: title, Owners: owners}
 	version, err = serv.versionrepo.CreateVersion(version)
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	// Link version to article
-	err = serv.articlerepo.LinkVersion(article.Id, version.Id)
 	if err != nil {
 		return models.Version{}, err
 	}
 
 	// Return frontend-readable description of created data
 	return models.Version{
-		ArticleID: article.Id,
+		ArticleID: version.ArticleID,
 		Id:        version.Id,
 		Title:     version.Title,
 		Owners:    version.Owners,

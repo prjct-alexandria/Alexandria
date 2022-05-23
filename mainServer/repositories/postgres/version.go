@@ -55,7 +55,9 @@ func (r PgVersionRepository) CreateVersion(version entities.Version) (entities.V
 func (r PgVersionRepository) createVersionTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS version (
     			id SERIAL PRIMARY KEY,
-    			title VARCHAR(255) NOT NULL    			
+    			articleID int NOT NULL,
+    			title VARCHAR(255) NOT NULL,
+    			FOREIGN KEY (articleID) REFERENCES article(id)    			
     )`)
 	return err
 }
@@ -63,7 +65,7 @@ func (r PgVersionRepository) createVersionTable() error {
 func (r PgVersionRepository) createVersionOwnersTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS versionOwners (
     			email VARCHAR(255) NOT NULL,
-    			versionID VARCHAR(255) NOT NULL,
+    			versionID int NOT NULL,
     			FOREIGN KEY (email) REFERENCES users(email),
     			FOREIGN KEY (versionID) REFERENCES version(id)    			 
     )`)
