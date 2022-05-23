@@ -15,12 +15,12 @@ func NewPgArticleRepository(db *sql.DB) PgArticleRepository {
 
 	err := repo.createArticleTable()
 	if err != nil {
-		return PgArticleRepository{}
+		panic(err)
 	}
 
 	err = repo.createArticleVersionsTable()
 	if err != nil {
-		return PgArticleRepository{}
+		panic(err)
 	}
 	return repo
 }
@@ -52,7 +52,7 @@ func (r PgArticleRepository) createArticleTable() error {
 
 func (r PgArticleRepository) createArticleVersionsTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS articleVersions (
-    			versionID PRIMARY KEY,
+    			versionID int PRIMARY KEY,
     			articleID int NOT NULL,
     			FOREIGN KEY (articleID) REFERENCES article(id),
     			FOREIGN KEY (versionID) REFERENCES version(id)

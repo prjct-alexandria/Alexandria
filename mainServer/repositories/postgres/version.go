@@ -16,12 +16,12 @@ func NewPgVersionRepository(db *sql.DB) PgVersionRepository {
 
 	err := repo.createVersionTable()
 	if err != nil {
-		return PgVersionRepository{}
+		panic(err)
 	}
 
 	err = repo.createVersionOwnersTable()
 	if err != nil {
-		return PgVersionRepository{}
+		panic(err)
 	}
 	return repo
 }
