@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/middlewares"
 	"mainServer/services"
@@ -30,14 +28,9 @@ type UserController struct {
 func (u *UserController) Register(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
-	byteBody, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read request body"))
-		return
-	}
-
 	var user entities.User
-	err = json.Unmarshal(byteBody, &user)
+
+	err := c.BindJSON(&user)
 	if err != nil {
 		httperror.NewError(c, http.StatusBadRequest, errors.New("invalid user JSON provided"))
 		return
@@ -74,14 +67,9 @@ type credentials struct {
 // @Failure		500 "could not create token"
 // @Router		/login
 func (u *UserController) Login(c *gin.Context) {
-	byteBody, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read request body"))
-		return
-	}
-
 	var cred credentials
-	err = json.Unmarshal(byteBody, &cred)
+
+	err := c.BindJSON(&cred)
 	if err != nil {
 		httperror.NewError(c, http.StatusBadRequest, errors.New("invalid JSON provided"))
 		return
@@ -90,7 +78,7 @@ func (u *UserController) Login(c *gin.Context) {
 	//Check email + pwd combo
 	err = u.UserService.CheckPassword(cred.Email, cred.Pwd)
 	if err != nil {
-		httperror.NewError(c, http.StatusForbidden, errors.New("invalid password"))
+		httperror.NewError(c, http.StatusForbidden, errors.New("invalid email and password combination"))
 		return
 	}
 
