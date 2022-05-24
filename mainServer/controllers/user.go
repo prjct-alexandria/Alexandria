@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/entities"
 	"mainServer/middlewares"
+	"mainServer/models"
 	"mainServer/services"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -51,11 +52,6 @@ func (u *UserController) Register(c *gin.Context) {
 	}
 }
 
-type credentials struct {
-	Email string `json:"email"`
-	Pwd   string `json:"pwd"`
-}
-
 // Login		godoc
 // @Summary		Endpoint for user logging in
 // @Description	Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token
@@ -67,7 +63,7 @@ type credentials struct {
 // @Failure		500 "Could not create token"
 // @Router		/login	[post]
 func (u *UserController) Login(c *gin.Context) {
-	var cred credentials
+	var cred models.LoginForm
 
 	err := c.BindJSON(&cred)
 	if err != nil {
