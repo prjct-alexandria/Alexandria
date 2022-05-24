@@ -12,18 +12,21 @@ import (
 )
 
 type RepoEnv struct {
-	git  repositories.GitRepository
-	user interfaces.UserRepository
+	git          repositories.GitRepository
+	user         interfaces.UserRepository
+	commitThread interfaces.CommitThreadRepository
 }
 
 type ServiceEnv struct {
-	version services.VersionService
-	user    services.UserService
+	version      services.VersionService
+	user         services.UserService
+	commitThread services.CommitThreadService
 }
 
 type ControllerEnv struct {
-	version controllers.VersionController
-	user    controllers.UserController
+	version      controllers.VersionController
+	user         controllers.UserController
+	commitThread controllers.CommitThreadController
 }
 
 func initRepoEnv() (RepoEnv, error) {
@@ -39,8 +42,9 @@ func initRepoEnv() (RepoEnv, error) {
 	database := db.Connect()
 
 	return RepoEnv{
-		git:  repositories.NewGitRepository(gitpath),
-		user: postgres.NewPgUserRepository(database),
+		git:          repositories.NewGitRepository(gitpath),
+		user:         postgres.NewPgUserRepository(database),
+		commitThread: postgres.NewPgCommitThreadRepository(database),
 	}, nil
 }
 
@@ -51,8 +55,9 @@ func initServiceEnv() (ServiceEnv, error) {
 	}
 
 	return ServiceEnv{
-		version: services.VersionService{Gitrepo: repos.git},
-		user:    services.UserService{UserRepository: repos.user},
+		version:      services.VersionService{Gitrepo: repos.git},
+		user:         services.UserService{UserRepository: repos.user},
+		commitThread: services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 	}, nil
 }
 
@@ -63,8 +68,9 @@ func initControllerEnv() (ControllerEnv, error) {
 	}
 
 	return ControllerEnv{
-		version: controllers.VersionController{Serv: servs.version},
-		user:    controllers.UserController{UserService: servs.user},
+		version:      controllers.VersionController{Serv: servs.version},
+		user:         controllers.UserController{UserService: servs.user},
+		commitThread: controllers.CommitThreadController{CommitThreadService: servs.commitThread},
 	}, nil
 }
 
