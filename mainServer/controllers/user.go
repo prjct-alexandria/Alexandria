@@ -24,7 +24,7 @@ type UserController struct {
 // @Failure		400 "Could not read request body"
 // @Failure		400 "Invalid user JSON provided"
 // @Failure		403 "Could not generate password hash"
-// @Failure		500 "Could not save user to database"
+// @Failure		409 "Could not save user to database"
 // @Router		/users	[post]
 func (u *UserController) Register(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
@@ -45,7 +45,7 @@ func (u *UserController) Register(c *gin.Context) {
 	err = u.UserService.SaveUser(hashedUser)
 
 	if err != nil {
-		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not save user to database"))
+		httperror.NewError(c, http.StatusConflict, errors.New("email address already in use"))
 		return
 	} else {
 		c.Status(http.StatusOK)
