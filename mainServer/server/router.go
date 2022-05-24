@@ -5,6 +5,7 @@ import (
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "mainServer/docs"
+	"mainServer/middlewares"
 )
 
 // @title API documentation
@@ -21,7 +22,8 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
-	router.GET("/getExampleUser", contrs.user.GetExampleUser)
+
+	router.GET("/getExampleUser", middlewares.AuthMiddleware(), contrs.user.GetExampleUser)
 
 	//Groups can be used for nested paths, maybe add example later
 	// Path for accessing the API documentation

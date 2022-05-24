@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/services"
+	"mainServer/utils/clock"
 	"mainServer/utils/httperror"
 	"net/http"
-
-	"github.com/golang-jwt/jwt"
+	"time"
 )
 
 type UserController struct {
@@ -98,8 +99,13 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 
+	cl := clock.RealClock{}
+
+	//TODO add token expire time to config file
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": cred.Email,
+		"email":     cred.Email,
+		"expiresAt": cl.Now().Add(time.Hour * 168).Unix(),
+		"issuedAt":  cl.Now(),
 	})
 
 	tokenString, err := token.SignedString([]byte(jwtSecret))
