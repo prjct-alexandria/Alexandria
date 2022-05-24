@@ -1,0 +1,63 @@
+// Declare SASS variables
+$primary-color: #282c34;
+$primary-accent-color: cornflowerblue;
+$link-hover-color: #0a58ca;
+
+.text-primary {
+  color: $primary-accent-color;
+}
+a {
+  color: $primary-color;
+}
+a:hover {
+  color: $link-hover-color;
+  text-decoration: underline;
+}
+.file-upload-input:hover {
+  cursor: pointer;
+}
+.article-elem-btn {
+  padding: 0 20px;
+}
+.article-elem-title {
+  text-align: left;
+  margin: 0;
+  color: $primary-color;
+}
+.article-elem-header {
+  padding: 10px;
+}
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+//
+//.App-header {
+//  background-color: #282c34;
+//  min-height: 100vh;
+//  display: flex;
+//  flex-direction: column;
+//  align-items: center;
+//  justify-content: center;
+//  font-size: calc(10px + 2vmin);
+//  color: white;
+//}
+//
+//.App-link {
+//  color: #61dafb;
+//}
+//
+//@keyframes App-logo-spin {
+//  from {
+//    transform: rotate(0deg);
+//  }
+//  to {
+//    transform: rotate(360deg);
+//  }
+//}
