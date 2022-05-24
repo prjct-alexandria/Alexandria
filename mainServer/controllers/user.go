@@ -72,7 +72,7 @@ func (u *UserController) Login(c *gin.Context) {
 	}
 
 	//Check email + pwd combo
-	err = u.UserService.CheckPassword(cred.Email, cred.Pwd)
+	dbUser, err := u.UserService.CheckPassword(cred.Email, cred.Pwd)
 	if err != nil {
 		httperror.NewError(c, http.StatusForbidden, errors.New("invalid email and password combination"))
 		return
@@ -84,7 +84,7 @@ func (u *UserController) Login(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))
 		return
 	}
-	c.Status(http.StatusOK)
+	c.IndentedJSON(http.StatusOK, models.User{Name: dbUser.Name, Email: dbUser.Email})
 }
 
 // CreateExampleUser godoc

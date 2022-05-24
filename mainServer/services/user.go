@@ -15,13 +15,13 @@ func (u *UserService) SaveUser(user entities.User) error {
 	return u.UserRepository.CreateUser(user)
 }
 
-func (u *UserService) CheckPassword(email string, pwdClaim string) error {
+func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.User, error) {
 	dbUser, err := u.UserRepository.GetFullUserByEmail(email)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return entities.User{}, err
 	}
-	return bcrypt.CompareHashAndPassword([]byte(dbUser.Pwd), []byte(pwdClaim))
+	return dbUser, bcrypt.CompareHashAndPassword([]byte(dbUser.Pwd), []byte(pwdClaim))
 }
 
 func (u *UserService) GetUserByEmail(email string) (entities.User, error) {
