@@ -2,41 +2,66 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"mainServer/controllers"
 	"mime/multipart"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-// MainTest is a keyword function, this is run by the testing package
-func MainTest(m *testing.M) {
+var servMock versionServiceMock
+var contr controllers.VersionController
+var r gin.Engine
+
+// TestMain is a keyword function, this is run by the testing package before other tests
+func TestMain(m *testing.M) {
+	globalSetup()
 	gin.SetMode(gin.TestMode)
 	m.Run()
 }
 
-func TestUpdateVersionSuccess(t *testing.T) {
+// globalSetup should be called once, before any test starts
+func globalSetup() {
+	// Create controller, mocks are added later during localSetup
+	contr = controllers.VersionController{}
 
-	// define mock function behaviour
+	// Setup test router, to test controller endpoints through http
+	r := gin.Default()
+	r.POST("/articles/:articleID/versions/:versionID", contr.UpdateVersion)
+}
+
+// localSetup should be called before each individual test
+func localSetup() {
+	// initialize/reset mocks
+	contr.Serv = versionServiceMock{}
+}
+
+func TestUpdateVersionSuccess(t *testing.T) {
+	localSetup()
+
+	// define service mock behaviour
 	updateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
 		return nil
 	}
 
-	// Create controller with mock
-	servMock := versionServiceMock{}
-	contr := controllers.VersionController{Serv: servMock}
-
-	// mock gin http request using built-in gin TestContext
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Params = []gin.Param{
-		{Key: "articleID", Value: "42"},
-		{Key: "versionID", Value: "123456"},
+	// Create the mock request
+	req, err := http.NewRequest(http.MethodPost, "/articles/:articleID/versions/:versionID", nil)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
 	}
 
-	// act
-	contr.UpdateVersion(c)
+	// Perform the request, with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
 
-	// assert
+	// Check the response
+	if w.Code != 200 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// Check the service mock
 	if !servMock.UpdateVersionCalled {
 		t.Errorf("Expected UpdateVersion to be called")
 	}
