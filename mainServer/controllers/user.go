@@ -20,11 +20,11 @@ type UserController struct {
 // @Description	Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.
 // @Accept		json
 // @Success		200 "Success"
-// @Failure		400 "could not read request body"
-// @Failure		400 "invalid user JSON provided"
-// @Failure		403 "could not generate password hash"
-// @Failure		500 "could not save user to database"
-// @Router		/users
+// @Failure		400 "Could not read request body"
+// @Failure		400 "Invalid user JSON provided"
+// @Failure		403 "Could not generate password hash"
+// @Failure		500 "Could not save user to database"
+// @Router		/users	[post]
 func (u *UserController) Register(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
@@ -61,11 +61,11 @@ type credentials struct {
 // @Description	Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token
 // @Accept		json
 // @Success		200 "Success"
-// @Failure		400 "could not read request body"
-// @Failure		400 "invalid JSON provided
-// @Failure		403 "invalid password"
-// @Failure		500 "could not create token"
-// @Router		/login
+// @Failure		400 "Could not read request body"
+// @Failure		400 "Invalid JSON provided"
+// @Failure		403 "Invalid password"
+// @Failure		500 "Could not create token"
+// @Router		/login	[post]
 func (u *UserController) Login(c *gin.Context) {
 	var cred credentials
 
