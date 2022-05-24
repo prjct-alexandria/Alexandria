@@ -5,14 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"io/ioutil"
 	"mainServer/entities"
+	"mainServer/middlewares"
 	"mainServer/services"
-	"mainServer/utils/clock"
 	"mainServer/utils/httperror"
 	"net/http"
-	"time"
 )
 
 type UserController struct {
@@ -76,9 +74,6 @@ type credentials struct {
 // @Failure		500 "could not create token"
 // @Router		/login
 func (u *UserController) Login(c *gin.Context) {
-	//TODO: Put this in a config file
-	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
-
 	byteBody, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not read request body"))
@@ -99,21 +94,13 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	cl := clock.RealClock{}
+	err = middlewares.UpdateJwtCookie(c, cred.Email)
 
-	//TODO add token expire time to config file
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":     cred.Email,
-		"expiresAt": cl.Now().Add(time.Hour * 168).Unix(),
-		"issuedAt":  cl.Now(),
-	})
-
-	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))
 		return
 	}
-	c.String(http.StatusOK, tokenString)
+	c.Status(http.StatusOK)
 }
 
 // CreateExampleUser godoc
@@ -130,6 +117,7 @@ func (u *UserController) CreateExampleUser(c *gin.Context) {
 		Email: "pietjepuk@gmail.com",
 		Pwd:   "password123",
 	}
+
 	err := u.UserService.SaveUser(user)
 	if err != nil {
 		fmt.Println(err)
@@ -149,6 +137,7 @@ func (u *UserController) GetExampleUser(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
 	user, err := u.UserService.GetUserByEmail("pietjepuk@gmail.com")
+
 	if err != nil {
 		fmt.Println(err)
 		c.String(http.StatusBadRequest, "Fail")
