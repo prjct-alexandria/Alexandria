@@ -21,6 +21,8 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
+	router.POST("/articles/:articleID/history/:commitID", contrs.commitThread.CreateThread)
+
 	//Groups can be used for nested paths, maybe add example later
 	// Path for accessing the API documentation
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
