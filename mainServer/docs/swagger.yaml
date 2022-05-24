@@ -95,7 +95,7 @@ paths:
           description: Invalid user JSON provided
         "403":
           description: Could not generate password hash
-        "500":
+        "409":
           description: Could not save user to database
       summary: Endpoint for user registration
 swagger: "2.0"

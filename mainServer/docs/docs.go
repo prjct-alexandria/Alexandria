@@ -126,7 +126,7 @@ const docTemplate = `{
                     "403": {
                         "description": "Could not generate password hash"
                     },
-                    "500": {
+                    "409": {
                         "description": "Could not save user to database"
                     }
                 }
