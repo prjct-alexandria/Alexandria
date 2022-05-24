@@ -8,6 +8,7 @@ import (
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
 	"mainServer/services"
+	servinterfaces "mainServer/services/interfaces"
 	"os"
 )
 
@@ -17,7 +18,7 @@ type RepoEnv struct {
 }
 
 type ServiceEnv struct {
-	version services.VersionService
+	version servinterfaces.VersionService
 	user    services.UserService
 }
 
