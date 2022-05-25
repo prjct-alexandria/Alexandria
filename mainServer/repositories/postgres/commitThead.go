@@ -22,24 +22,24 @@ func NewPgCommitThreadRepository(db *sql.DB) PgCommitThreadRepository {
 
 func (r PgCommitThreadRepository) createCommitThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitThread (
-    	commitThreadId int(64) NOT NULL AUTO_INCREMENT,
-    	commitId int(64) NOT NULL,
-        threadId int(64) NOT NULL,
+    	commitThreadId SERIAL,
+    	commitId BIGINT NOT NULL,
+        threadId BIGINT NOT NULL,
     	PRIMARY KEY (commitThreadId)
     )`)
 	return err
 }
 
 func (r PgCommitThreadRepository) CreateCommitThread(thread models.ThreadNoId, tid string) (int64, error) {
-	result, err := r.Db.Exec("INSERT INTO commitThread (commitId, threadId) " +
-		"OUTPUT Inserted.threadId" +
+	var id int64
+	_, err := r.Db.Exec("INSERT INTO commitThread (commitId, threadId) " +
 		"VALUES ('" +
 		strconv.FormatInt(thread.CommitId, 10) + "', '" +
-		tid + "')")
+		tid + "')" +
+		"RETURNING commitThreadId")
 	if err != nil {
 		return 0, fmt.Errorf("CreateThread: %v", err)
 	}
-	id, err := result.LastInsertId()
 
 	return id, err
 }

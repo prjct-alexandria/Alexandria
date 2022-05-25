@@ -13,7 +13,6 @@ type ThreadService struct {
 
 // creates thread entity in db
 // returns thread id
-// TODO: divide in two parts: create thread and create specific thread (like review/request/commit)
 func (serv ThreadService) StartThread(thread models.ThreadNoId, aid string, cid string) (int64, error) {
 	// TODO: check if user is authenticated
 

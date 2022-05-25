@@ -13,6 +13,7 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 	repo := PgThreadRepository{db}
 	err := repo.createThreadTable()
 	if err != nil {
+		fmt.Println(err)
 		return PgThreadRepository{}
 	}
 	//err = repo.createCommitThreadTable()
@@ -23,13 +24,15 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 }
 
 func (r PgThreadRepository) CreateThread(aid string) (int64, error) {
-	result, err := r.Db.Exec("INSERT INTO thread (articleId) " +
-		"OUTPUT Inserted.threadId" +
-		"VALUES ('" + aid + "')")
+	var tid int64
+	_, err := r.Db.Exec("INSERT INTO thread (articleId) " +
+		"VALUES ('" + aid + "')" +
+		"RETURNING threadId")
+
 	if err != nil {
+		fmt.Println(err)
 		return 0, fmt.Errorf("CreateThread: %v", err)
 	}
-	tid, err := result.LastInsertId()
 
 	return tid, err
 }
@@ -41,8 +44,8 @@ func (r PgThreadRepository) CreateThread(aid string) (int64, error) {
 
 func (r PgThreadRepository) createThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS thread (
-    	threadId int(64) NOT NULL AUTO_INCREMENT,
-    	articleId int(64) NOT NULL,
+    	threadId SERIAL,
+    	articleId BIGINT NOT NULL,
     	PRIMARY KEY (threadId)
     )`)
 	return err

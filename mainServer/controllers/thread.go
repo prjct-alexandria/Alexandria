@@ -17,7 +17,7 @@ type ThreadController struct {
 
 // creates thread entity, and specific thread entity. returns both id's
 func (contr *ThreadController) CreateThread(c *gin.Context) {
-	thread := models.ThreadNoId{}
+	var thread models.ThreadNoId
 	err := c.BindJSON(&thread)
 	if err != nil {
 		fmt.Println(err)
@@ -30,6 +30,11 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	threadType := c.Param("threadType")
 
 	tid, err := contr.ThreadService.StartThread(thread, aid, cid)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
 
 	id, err := int64(0), nil
 	switch threadType {
