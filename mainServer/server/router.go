@@ -19,6 +19,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.Use(middlewares.AuthMiddleware())
 
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
+	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
 
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
