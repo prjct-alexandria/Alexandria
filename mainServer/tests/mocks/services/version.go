@@ -8,13 +8,15 @@ import (
 // UpdateVersionMock is a declared function whose behaviour can be modified by individual tests
 var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article string, version string) error
 
-// VersionServiceMock mocks class using publicly variable mock functions
+// VersionServiceMock mocks class using publicly modifiable mock functions
 type VersionServiceMock struct {
 	// mock tracks what functions were called
 	UpdateVersionCalled *bool
 	UpdateVersionParams *map[string]interface{}
 }
 
+// NewVersionServiceMock initializes a mock with variables that are passed by reference,
+// so the values can be retrieved from anywhere in the program
 func NewVersionServiceMock() VersionServiceMock {
 	b := true
 	return VersionServiceMock{
