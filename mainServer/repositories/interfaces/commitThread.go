@@ -1,11 +1,7 @@
 package interfaces
 
-import (
-	"mainServer/entities"
-	"mainServer/models"
-)
+import "mainServer/models"
 
 type CommitThreadRepository interface {
-	CreateThread(aid string) (entities.Thread, error)
-	CreateCommitThread(thread models.CommitThreadNoId) (models.CommitThread, error)
+	CreateCommitThread(thread models.ThreadNoId, tid string) (int64, error)
 }
