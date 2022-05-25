@@ -1,6 +1,9 @@
 package postgres
 
-import "database/sql"
+import (
+	"database/sql"
+	"mainServer/entities"
+)
 
 type PgRequestRepository struct {
 	Db *sql.DB
@@ -16,11 +19,32 @@ func NewPgRequestRepository(db *sql.DB) PgRequestRepository {
 	return repo
 }
 
+func (r PgRequestRepository) CreateRequest(req entities.Request) (entities.Request, error) {
+
+	// store request entity
+	stmt, err := r.Db.Prepare("INSERT INTO request (id, articleID, sourceVersionID, sourceHistoryID, targetVersionID, targetHistoryID) VALUES (DEFAULT,$1,$2,$3,$4,$5) RETURNING id")
+	if err != nil {
+		return entities.Request{}, err
+	}
+	row := stmt.QueryRow(req.ArticleID, req.SourceVersionID, req.SourceHistoryID, req.TargetVersionID, req.TargetHistoryID)
+
+	// Because QueryRow instead of Exec was used, with the RETURNING keyword,
+	// The generated id can be retrieved
+	var id int64
+	err = row.Scan(&id)
+	if err != nil {
+		return entities.Request{}, err
+	}
+
+	req.RequestID = id
+	return req, nil
+}
+
 // creates request table, storing history/commit IDs as fixed-length,
 // as they are always sha-1 hashes of 40 hex digits long
 func (r PgRequestRepository) createRequestTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS request (
-    	requestID SERIAL PRIMARY KEY,
+    	id SERIAL PRIMARY KEY,
     	articleID INT NOT NULL,
     	sourceVersionID INT NOT NULL,
     	sourceHistoryID NCHAR(40) NOT NULL,

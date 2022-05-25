@@ -1,13 +1,13 @@
 package entities
 
 type Request struct {
-	articleID       int64
-	requestID       int64
-	sourceVersionID int64
-	sourceHistoryID int64
-	targetVersionID int64
-	targetHistoryID int64
-	state           string
+	RequestID       int64
+	ArticleID       int64
+	SourceVersionID int64
+	SourceHistoryID int64
+	TargetVersionID int64
+	TargetHistoryID int64
+	State           string
 }
 
 const (
