@@ -29,7 +29,6 @@ func TestMain(m *testing.M) {
 func globalSetup() {
 	// Setup test router, to test controller endpoints through http
 	r = gin.Default()
-
 	contr = controllers.VersionController{}
 
 	// route

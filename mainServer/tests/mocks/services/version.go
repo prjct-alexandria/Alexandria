@@ -24,6 +24,8 @@ func NewVersionServiceMock() VersionServiceMock {
 	}
 }
 
+// UpdateVersion implements the corresponding version from the VersionService interface.
+// Stores in the mock that it was called, including the arguments, and executes the custom UpdateVersionMock function
 func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
 	(*m.Called)["UpdateVersion"] = true
 	(*m.Params)["UpdateVersion"] = map[string]interface{}{
