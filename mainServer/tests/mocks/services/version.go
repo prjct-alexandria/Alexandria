@@ -11,15 +11,21 @@ var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article s
 // VersionServiceMock mocks class using publicly variable mock functions
 type VersionServiceMock struct {
 	// mock tracks what functions were called
-	UpdateVersionCalled bool
-	UpdateVersionParams map[string]interface{}
+	UpdateVersionCalled *bool
+	UpdateVersionParams *map[string]interface{}
+}
+
+func NewVersionServiceMock() VersionServiceMock {
+	b := true
+	return VersionServiceMock{
+		UpdateVersionCalled: &b,
+		UpdateVersionParams: &map[string]interface{}{},
+	}
 }
 
 func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
-	m.UpdateVersionCalled = true
-	m.UpdateVersionParams = map[string]interface{}{
-		"article": article,
-		"version": version,
-	}
-	return nil //UpdateVersionMock(c, file, article, version)
+	*m.UpdateVersionCalled = true
+	(*m.UpdateVersionParams)["article"] = article
+	(*m.UpdateVersionParams)["version"] = version
+	return UpdateVersionMock(c, file, article, version)
 }

@@ -33,8 +33,8 @@ func globalSetup() {
 // localSetup should be called before each individual test
 func localSetup() {
 	// Create controller with mocks
-	contr = controllers.VersionController{}
-	contr.Serv = services.VersionServiceMock{}
+	servMock = services.NewVersionServiceMock()
+	contr = controllers.VersionController{Serv: servMock}
 
 	// route
 	r.POST("/articles/:articleID/versions/:versionID", func(c *gin.Context) {
@@ -51,32 +51,12 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	}
 
 	// set request url
-	const article = 42
-	const version = 123456
-	url := fmt.Sprintf("/articles/%d/versions/%d", article, version)
-
-	// set request file contents as form data
-	var b bytes.Buffer
-	m := multipart.NewWriter(&b)
-	field, err := m.CreateFormFile("file", "helloworld.txt")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err = field.Write([]byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100})
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	err = m.Close()
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	const article = "42"
+	const version = "123456"
+	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
 
 	// create request
-	req, err := http.NewRequest(http.MethodPost, url, &b)
-	req.Header.Set("Content-Type", m.FormDataContentType())
+	req, err := fileUploadHelper(url)
 	if err != nil {
 		t.Fatalf("Couldn't create request: %v\n", err)
 		return
@@ -93,12 +73,39 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	}
 
 	// check the service mock
-	if !servMock.UpdateVersionCalled {
+	if !*(servMock.UpdateVersionCalled) {
 		t.Errorf("Expected UpdateVersion to be called")
 	}
-	a := servMock.UpdateVersionParams["article"]
-	v := servMock.UpdateVersionParams["version"]
+	a := (*servMock.UpdateVersionParams)["article"]
+	v := (*servMock.UpdateVersionParams)["version"]
 	if a != article || v != version {
 		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
 	}
+}
+
+// fileUploaderHelper creates a http request with a file in the form data
+func fileUploadHelper(url string) (*http.Request, error) {
+	// set request file contents as form data
+	var b bytes.Buffer
+	m := multipart.NewWriter(&b)
+	field, err := m.CreateFormFile("file", "helloworld.txt")
+	if err != nil {
+		return &http.Request{}, err
+	}
+	_, err = field.Write([]byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100})
+	if err != nil {
+		return &http.Request{}, err
+	}
+	err = m.Close()
+	if err != nil {
+		return &http.Request{}, err
+	}
+
+	// create request
+	req, err := http.NewRequest(http.MethodPost, url, &b)
+	req.Header.Set("Content-Type", m.FormDataContentType())
+	if err != nil {
+
+	}
+	return req, nil
 }
