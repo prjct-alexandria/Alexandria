@@ -1,0 +1,26 @@
+package services
+
+import (
+	"mainServer/entities"
+	"mainServer/repositories/interfaces"
+)
+
+type RequestService struct {
+	Repo interfaces.RequestRepository
+}
+
+func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64, sourceHistory string, targetHistory string) error {
+	req := entities.Request{
+		ArticleID:       article,
+		SourceVersionID: sourceVersion,
+		SourceHistoryID: sourceHistory,
+		TargetVersionID: targetVersion,
+		TargetHistoryID: targetHistory,
+	}
+
+	req, err := s.Repo.CreateRequest(req)
+	if err != nil {
+		return err
+	}
+	return err
+}
