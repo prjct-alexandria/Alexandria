@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
@@ -28,18 +29,20 @@ func TestMain(m *testing.M) {
 func globalSetup() {
 	// Setup test router, to test controller endpoints through http
 	r = gin.Default()
-}
 
-// localSetup should be called before each individual test
-func localSetup() {
-	// Create controller with mocks
-	servMock = services.NewVersionServiceMock()
-	contr = controllers.VersionController{Serv: servMock}
+	contr = controllers.VersionController{}
 
 	// route
 	r.POST("/articles/:articleID/versions/:versionID", func(c *gin.Context) {
 		contr.UpdateVersion(c)
 	})
+}
+
+// localSetup should be called before each individual test
+func localSetup() {
+	// (Re)set controller mocks
+	servMock = services.NewVersionServiceMock()
+	contr.Serv = servMock
 }
 
 func TestUpdateVersionSuccess(t *testing.T) {
@@ -80,6 +83,82 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	v := (*servMock.Params)["UpdateVersion"]["version"]
 	if a != article || v != version {
 		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
+	}
+}
+
+func TestUpdateVersionFail(t *testing.T) {
+	localSetup()
+
+	// define service mock behaviour
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+		return errors.New("oh no, the version coulnd't be updated")
+	}
+
+	// set request url
+	const article = "42"
+	const version = "123456"
+	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
+
+	// create request
+	req, err := fileUploadHelper(url)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+		return
+	}
+
+	// perform the request, with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 400 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if !(*servMock.Called)["UpdateVersion"] {
+		t.Errorf("Expected UpdateVersion to be called")
+	}
+	a := (*servMock.Params)["UpdateVersion"]["article"]
+	v := (*servMock.Params)["UpdateVersion"]["version"]
+	if a != article || v != version {
+		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
+	}
+}
+
+func TestUpdateVersionNoFile(t *testing.T) {
+	localSetup()
+
+	// define service mock behaviour
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+		return nil
+	}
+
+	// set request url
+	const article = "42"
+	const version = "123456"
+	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
+
+	// create request
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// perform the request, with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 400 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if (*servMock.Called)["UpdateVersion"] {
+		t.Errorf("Expected UpdateVersion to not be called")
 	}
 }
 
