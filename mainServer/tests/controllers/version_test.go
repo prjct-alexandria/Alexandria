@@ -73,11 +73,11 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	}
 
 	// check the service mock
-	if !*(servMock.UpdateVersionCalled) {
+	if !(*servMock.Called)["UpdateVersion"] {
 		t.Errorf("Expected UpdateVersion to be called")
 	}
-	a := (*servMock.UpdateVersionParams)["article"]
-	v := (*servMock.UpdateVersionParams)["version"]
+	a := (*servMock.Params)["UpdateVersion"]["article"]
+	v := (*servMock.Params)["UpdateVersion"]["version"]
 	if a != article || v != version {
 		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
 	}
