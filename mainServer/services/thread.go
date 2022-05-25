@@ -11,7 +11,7 @@ type ThreadService struct {
 	ThreadRepository interfaces.ThreadRepository
 }
 
-// creates thread entity in db
+// StartThread creates thread entity in db
 // returns thread id
 func (serv ThreadService) StartThread(thread models.ThreadNoId, aid string, cid string) (int64, error) {
 	// TODO: check if user is authenticated

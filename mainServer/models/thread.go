@@ -19,5 +19,13 @@ type ThreadNoId struct {
 
 type ReturnIds struct {
 	ThreadId   int64
+	CommentId  []int64
 	SpecificId int64
+}
+
+type CommentNoId struct {
+	AuthorId     string
+	ThreadId     int64
+	Content      string
+	CreationDate string
 }

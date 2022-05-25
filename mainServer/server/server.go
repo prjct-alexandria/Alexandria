@@ -15,6 +15,7 @@ type RepoEnv struct {
 	git          repositories.GitRepository
 	user         interfaces.UserRepository
 	thread       interfaces.ThreadRepository
+	comment      interfaces.CommentRepository
 	commitThread interfaces.CommitThreadRepository
 }
 
@@ -22,6 +23,7 @@ type ServiceEnv struct {
 	version      services.VersionService
 	user         services.UserService
 	thread       services.ThreadService
+	comment      services.CommentService
 	commitThread services.CommitThreadService
 }
 
@@ -47,6 +49,7 @@ func initRepoEnv() (RepoEnv, error) {
 		git:          repositories.NewGitRepository(gitpath),
 		user:         postgres.NewPgUserRepository(database),
 		thread:       postgres.NewPgThreadRepository(database),
+		comment:      postgres.NewPgCommentRepository(database),
 		commitThread: postgres.NewPgCommitThreadRepository(database),
 	}, nil
 }
@@ -61,6 +64,7 @@ func initServiceEnv() (ServiceEnv, error) {
 		version:      services.VersionService{Gitrepo: repos.git},
 		user:         services.UserService{UserRepository: repos.user},
 		thread:       services.ThreadService{ThreadRepository: repos.thread},
+		comment:      services.CommentService{CommentRepository: repos.comment},
 		commitThread: services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 	}, nil
 }
@@ -75,7 +79,8 @@ func initControllerEnv() (ControllerEnv, error) {
 		version: controllers.VersionController{Serv: servs.version},
 		user:    controllers.UserController{UserService: servs.user},
 		thread: controllers.ThreadController{ThreadService: servs.thread,
-			CommitThreadService: servs.commitThread},
+			CommitThreadService: servs.commitThread,
+			CommentService:      servs.comment},
 	}, nil
 }
 

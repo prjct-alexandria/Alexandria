@@ -13,6 +13,7 @@ type ThreadController struct {
 	CommitThreadService services.CommitThreadService
 	//RequestThreadService services.RequestThreadService
 	//ReviewThreadService  services.ReviewThreadService
+	CommentService services.CommentService
 }
 
 // creates thread entity, and specific thread entity. returns both id's
@@ -29,7 +30,12 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	cid := c.Param("commitID")
 	threadType := c.Param("threadType")
 
+	// save threat in the db
 	tid, err := contr.ThreadService.StartThread(thread, aid, cid)
+
+	// save first comment in the db
+	coid, err := contr.CommentService.SaveComment(thread.Comment, tid)
+
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
@@ -54,6 +60,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	// return tid and specific id
 	ids := models.ReturnIds{
 		ThreadId:   tid,
+		CommentId:  coid,
 		SpecificId: id,
 	}
 

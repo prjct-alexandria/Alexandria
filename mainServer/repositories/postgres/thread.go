@@ -16,10 +16,8 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 		fmt.Println(err)
 		return PgThreadRepository{}
 	}
-	//err = repo.createCommitThreadTable()
-	//if err != nil {
-	//	return PgCommitThreadRepository{}
-	//}
+	// TODO: create comment table
+
 	return repo
 }
 
@@ -37,11 +35,6 @@ func (r PgThreadRepository) CreateThread(aid string) (int64, error) {
 	return tid, err
 }
 
-//func (r PgCommitThreadRepository) CreateCommitThread(thread models.CommitThreadNoId) (models.CommitThread, error) {
-//	// TODO
-//	return models.CommitThread{}, errors.New("")
-//}
-
 func (r PgThreadRepository) createThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS thread (
     	threadId SERIAL,
@@ -50,13 +43,3 @@ func (r PgThreadRepository) createThreadTable() error {
     )`)
 	return err
 }
-
-//func (r PgCommitThreadRepository) createCommitThreadTable() error {
-//	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitThread (
-//    	commitThreadId int(64) NOT NULL AUTO_INCREMENT,
-//    	commitId int(64) NOT NULL,
-//	    threadId int(64) NOT NULL,
-//    	PRIMARY KEY (commitThreadId)
-//    )`)
-//	return err
-//}
