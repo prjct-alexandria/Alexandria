@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/gin-gonic/gin"
+	"mainServer/entities"
 	"mime/multipart"
 )
 
@@ -13,6 +14,12 @@ type VersionServiceMock struct {
 	// mock tracks what functions were called and with what parameters
 	Called *map[string]bool
 	Params *map[string]map[string]interface{}
+}
+
+func (m VersionServiceMock) GetVersion(c *gin.Context, article string, version string) (entities.Version, error) {
+	// added to solve merge conflicts after the testing issue was finished
+	// TODO: implement for future testing
+	panic("implement me")
 }
 
 // NewVersionServiceMock initializes a mock with variables that are passed by reference,

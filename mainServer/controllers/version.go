@@ -3,12 +3,38 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mainServer/entities"
 	"mainServer/services/interfaces"
 	"net/http"
 )
 
 type VersionController struct {
 	Serv interfaces.VersionService
+}
+
+// GetVersion 	godoc
+// @Summary		Get version content + metadata
+// @Description	Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.
+// @Param		articleID	path	string	true	"Article ID"
+// @Param		versionID	path	string	true	"Version ID"
+// @Produce		json
+// @Success		200 {object} []entities.Version
+// @Failure		404 "Version not found"
+// @Router		/articles/{articleID}/versions/{versionID} [get]
+func (contr VersionController) GetVersion(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	aid := c.Param("articleID")
+	vid := c.Param("versionID")
+
+	res, err := contr.Serv.GetVersion(c, aid, vid)
+	if err != nil {
+		c.Status(http.StatusNotFound)
+		fmt.Println(err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, [1]entities.Version{res})
 }
 
 // UpdateVersion godoc
