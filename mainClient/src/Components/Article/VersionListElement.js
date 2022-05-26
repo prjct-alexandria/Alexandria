@@ -12,10 +12,7 @@ export default class VersionListElement extends React.Component {
                     </Link>
                 </div>
                 <div className='col-md-1'>
-                    {this.props.version.author}
-                </div>
-                <div className='col-md-1'>
-                    {this.props.version.date_created}
+                    {this.props.version.owners.join(', ')}
                 </div>
                 <div className='col-md-1'>
                     {this.props.version.status}
