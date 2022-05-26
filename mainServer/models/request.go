@@ -11,8 +11,8 @@ type Request struct {
 }
 
 type RequestCreationForm struct {
-	SourceVersionID int64  `json:"sourceVersionID"`
-	SourceHistoryID string `json:"sourceHistoryID"`
-	TargetVersionID int64  `json:"targetVersionID"`
-	TargetHistoryID string `json:"targetHistoryID"`
+	SourceVersionID int64  `json:"sourceVersionID" binding:"required"`
+	SourceHistoryID string `json:"sourceHistoryID" binding:"required"`
+	TargetVersionID int64  `json:"targetVersionID" binding:"required"`
+	TargetHistoryID string `json:"targetHistoryID" binding:"required"`
 }

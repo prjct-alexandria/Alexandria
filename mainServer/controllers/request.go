@@ -15,6 +15,17 @@ type RequestController struct {
 	Serv services.RequestService
 }
 
+// CreateRequest godoc
+// @Summary     Create request
+// @Description Creates request to merge one article versions' changes into another
+// @Accept      json
+// @Produce 	json
+// @Param		articleID	path	string	true "Article ID"
+// @Param		request		body	models.RequestCreationForm	true "Request"
+// @Success     200 {object} models.Request
+// @Failure     400 "Invalid article ID or request creation data"
+// @Failure     500 "Error creating request on server"
+// @Router      /articles/{articleID}/requests [post]
 func (contr RequestController) CreateRequest(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")

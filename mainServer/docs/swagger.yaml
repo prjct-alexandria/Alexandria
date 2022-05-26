@@ -8,6 +8,52 @@ definitions:
       pwd:
         type: string
     type: object
+  entities.Version:
+    properties:
+      authors:
+        items:
+          type: string
+        type: array
+      content:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  models.Request:
+    properties:
+      articleID:
+        type: integer
+      requestID:
+        type: integer
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      state:
+        type: string
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    type: object
+  models.RequestCreationForm:
+    properties:
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    required:
+    - sourceHistoryID
+    - sourceVersionID
+    - targetHistoryID
+    - targetVersionID
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -16,7 +62,62 @@ info:
   title: API documentation
   version: 1.0.0
 paths:
+  /articles/{articleID}/requests:
+    post:
+      consumes:
+      - application/json
+      description: Creates request to merge one article versions' changes into another
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Request'
+        "400":
+          description: Invalid article ID or request creation data
+        "500":
+          description: Error creating request on server
+      summary: Create request
   /articles/{articleID}/versions/{versionID}:
+    get:
+      description: Gets the version content + metadata from the database + filesystem.
+        Must be accessible without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Version'
+            type: array
+        "404":
+          description: Version not found
+      summary: Get version content + metadata
     post:
       consumes:
       - multipart/form-data
