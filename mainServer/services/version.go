@@ -15,6 +15,29 @@ type VersionService struct {
 	Versionrepo interfaces.VersionRepository
 }
 
+func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
+
+	// Get entities from database
+	entities, err := serv.Versionrepo.GetVersionsByArticle(article)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert entities to models to send to frontend
+	result := make([]models.Version, len(entities))
+	for i, e := range entities {
+		result[i] = models.Version{
+			ArticleID: article,
+			Id:        e.Id,
+			Title:     e.Title,
+			Owners:    e.Owners,
+			Content:   "",
+			Status:    e.Status,
+		}
+	}
+	return result, nil
+}
+
 // GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
 func (serv VersionService) GetVersion(article int64, version int64) (models.Version, error) {
 

@@ -8,6 +8,9 @@ type Version struct {
 	Status    string
 }
 
+// Possible statuses
+// Depending on the context,
+// Accepted can be interpreted as "ready to merge", or "accepted"
 const (
 	VersionDraft    string = "draft"
 	VersionPending  string = "pending"

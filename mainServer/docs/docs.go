@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version. Returns main version",
+                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
                     "application/json"
                 ],
@@ -43,6 +43,41 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Version"
                         }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/versions": {
+            "get": {
+                "description": "Gets all versions belonging to a specific article. Does not include version contents.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Version"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request input"
+                    },
+                    "500": {
+                        "description": "Could not get versions from server"
                     }
                 }
             }
@@ -199,6 +234,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "status": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

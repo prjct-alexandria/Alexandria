@@ -54,6 +54,38 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+// ListVersions 	godoc
+// @Summary		List article versions
+// @Description	Gets all versions belonging to a specific article. Does not include version contents.
+// @Param		articleID	path	string	true	"Article ID"
+// @Produce		json
+// @Success		200 {object} []models.Version
+// @Failure		400 "Bad request input"
+// @Failure		500 "Could not get versions from server"
+// @Router		/articles/{articleID}/versions [get]
+func (contr VersionController) ListVersions(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	// extract article id
+	aid := c.Param("articleID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// get versions
+	res, err := contr.Serv.ListVersions(article)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get versions of aid=%d", article))
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 // UpdateVersion godoc
 // @Summary     Update article version
 // @Description Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field "file"

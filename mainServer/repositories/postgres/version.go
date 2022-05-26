@@ -167,7 +167,7 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 
 	// Extract results into map,
 	// Necessary because the same version might appear in multiple rows if it has multiple owners
-	var versions map[int64]entities.Version
+	versions := make(map[int64]entities.Version)
 	for rows.Next() {
 		// Read the current row
 		row := entities.Version{}
