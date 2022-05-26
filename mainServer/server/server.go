@@ -14,16 +14,19 @@ import (
 type RepoEnv struct {
 	git  repositories.GitRepository
 	user interfaces.UserRepository
+	req  interfaces.RequestRepository
 }
 
 type ServiceEnv struct {
 	version services.VersionService
 	user    services.UserService
+	req     services.RequestService
 }
 
 type ControllerEnv struct {
 	version controllers.VersionController
 	user    controllers.UserController
+	req     controllers.RequestController
 }
 
 func initRepoEnv() (RepoEnv, error) {
@@ -41,6 +44,7 @@ func initRepoEnv() (RepoEnv, error) {
 	return RepoEnv{
 		git:  repositories.NewGitRepository(gitpath),
 		user: postgres.NewPgUserRepository(database),
+		req:  postgres.NewPgRequestRepository(database),
 	}, nil
 }
 
@@ -53,6 +57,7 @@ func initServiceEnv() (ServiceEnv, error) {
 	return ServiceEnv{
 		version: services.VersionService{Gitrepo: repos.git},
 		user:    services.UserService{UserRepository: repos.user},
+		req:     services.RequestService{Repo: repos.req},
 	}, nil
 }
 
@@ -65,6 +70,7 @@ func initControllerEnv() (ControllerEnv, error) {
 	return ControllerEnv{
 		version: controllers.VersionController{Serv: servs.version},
 		user:    controllers.UserController{UserService: servs.user},
+		req:     controllers.RequestController{Serv: servs.req},
 	}, nil
 }
 
