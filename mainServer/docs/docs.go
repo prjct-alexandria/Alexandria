@@ -17,6 +17,43 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/articles/{articleID}/versions/{versionID}": {
+            "get": {
+                "description": "Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get version content + metadata",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Version"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Version not found"
+                    }
+                }
+            },
             "post": {
                 "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
                 "consumes": [
@@ -144,6 +181,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "pwd": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Version": {
+            "type": "object",
+            "properties": {
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
