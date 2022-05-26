@@ -150,6 +150,52 @@ func (r PgVersionRepository) getVersion(version int64) (entities.Version, error)
 	return entity, nil
 }
 
+// GetVersionsByArticle gets the version entities related to a specific article, links the owners
+func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Version, error) {
+
+	// Prepare and execute query
+	stmt, err := r.Db.Prepare(`SELECT id, title, status, versionowners.email
+		FROM version INNER JOIN versionowners ON version.id = versionowners.versionid
+		WHERE articleid=$1`)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(article)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract results into map,
+	// Necessary because the same version might appear in multiple rows if it has multiple owners
+	var versions map[int64]entities.Version
+	for rows.Next() {
+		// Read the current row
+		row := entities.Version{}
+		var email string
+		if err := rows.Scan(&row.Id, &row.Title, &row.Status, &email); err != nil {
+			return nil, err
+		}
+
+		// Insert new version into map, or append email to existing
+		if version, ok := versions[row.Id]; ok {
+			// Exists
+			version.Owners = append(version.Owners, email)
+		} else {
+			// Add new, with list of just one email
+			row.Owners = []string{email}
+			versions[row.Id] = row
+		}
+	}
+
+	// Turn map into go slice
+	var result []entities.Version
+	for _, value := range versions {
+		result = append(result, value)
+	}
+
+	return result, nil
+}
+
 // getOwners gets a string of owner emails, belonging to the specified version
 func (r PgVersionRepository) getOwners(version int64) ([]string, error) {
 	// Prepare and execute query
