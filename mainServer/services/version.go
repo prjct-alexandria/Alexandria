@@ -45,8 +45,10 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 		Id:        entity.Id,
 		Title:     entity.Title,
 		Owners:    entity.Owners,
-		Content:   string(fileContent)}
-	return fullVersion, err
+		Content:   string(fileContent),
+		Status:    entity.Status,
+	}
+	return fullVersion, nil
 }
 
 // UpdateVersion overwrites file of specified article version and commits

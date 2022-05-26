@@ -56,5 +56,6 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		Title:     version.Title,
 		Owners:    version.Owners,
 		Content:   "",
+		Status:    entities.VersionDraft,
 	}, nil
 }

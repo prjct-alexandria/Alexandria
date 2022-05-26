@@ -115,6 +115,7 @@ func (r PgVersionRepository) createVersionTable() error {
     			id SERIAL PRIMARY KEY,
     			articleID int NOT NULL,
     			title VARCHAR(255) NOT NULL,
+    			status VARCHAR(16) NOT NULL DEFAULT 'draft',
     			FOREIGN KEY (articleID) REFERENCES article(id)    			
     )`)
 	return err
@@ -133,7 +134,7 @@ func (r PgVersionRepository) createVersionOwnersTable() error {
 // getVersion gets the version entity from the database, but doesn't link the owners
 func (r PgVersionRepository) getVersion(version int64) (entities.Version, error) {
 	// Prepare and execute query
-	stmt, err := r.Db.Prepare("SELECT articleid, id, title FROM version WHERE id=$1")
+	stmt, err := r.Db.Prepare("SELECT articleid, id, title, status FROM version WHERE id=$1")
 	if err != nil {
 		return entities.Version{}, err
 	}
@@ -141,7 +142,7 @@ func (r PgVersionRepository) getVersion(version int64) (entities.Version, error)
 
 	// Extract results
 	var entity entities.Version
-	err = row.Scan(&entity.ArticleID, &entity.Id, &entity.Title)
+	err = row.Scan(&entity.ArticleID, &entity.Id, &entity.Title, &entity.Status)
 	if err != nil {
 		return entities.Version{}, err
 	}
