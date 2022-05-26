@@ -180,6 +180,7 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 		if version, ok := versions[row.Id]; ok {
 			// Exists
 			version.Owners = append(version.Owners, email)
+			versions[row.Id] = version
 		} else {
 			// Add new, with list of just one email
 			row.Owners = []string{email}
