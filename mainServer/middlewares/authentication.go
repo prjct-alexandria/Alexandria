@@ -19,7 +19,6 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader, err := c.Request.Cookie("Authorization")
 		if err != nil {
-			fmt.Println(err)
 			c.Set("Email", nil)
 			return
 		}
