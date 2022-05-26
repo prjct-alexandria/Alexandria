@@ -63,6 +63,9 @@ func (u *UserController) Register(c *gin.Context) {
 // @Failure		500 "Could not create token"
 // @Router		/login	[post]
 func (u *UserController) Login(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+	c.Header("Access-Control-Allow-Credentials", "true")
+
 	var cred models.LoginForm
 
 	err := c.BindJSON(&cred)

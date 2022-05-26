@@ -42,7 +42,7 @@ func AuthMiddleware() gin.HandlerFunc {
 				return
 			}
 
-			//Act
+			//Store in this context
 			c.Set("Email", claims["email"].(string))
 
 			//Refresh token
@@ -88,6 +88,7 @@ func UpdateJwtCookie(c *gin.Context, email string) error {
 
 	//TODO: Add domain when necessary
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", "", false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", ".app.localhost", false, false)
+
 	return nil
 }
