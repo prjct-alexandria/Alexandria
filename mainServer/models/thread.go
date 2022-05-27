@@ -1,6 +1,8 @@
 package models
 
-import "mainServer/entities"
+import (
+	"mainServer/entities"
+)
 
 type Thread struct {
 	Id         int64
@@ -12,7 +14,7 @@ type Thread struct {
 type ThreadNoId struct {
 	ArticleId  int64
 	SpecificId int64
-	Comment    []entities.Comment
+	Comment    []CommentNoId
 }
 
 type ReturnIds struct {

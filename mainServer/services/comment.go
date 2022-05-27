@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 )
@@ -13,10 +12,10 @@ type CommentService struct {
 
 // SaveComment saves list of comments to the db
 // returns the id's of the saved comments
-func (serv CommentService) SaveComment(comment entities.Comment, tid int64) (int64, error) {
+func (serv CommentService) SaveComment(comment models.CommentNoId, tid int64) (int64, error) {
 	// TODO: check if user is authenticated
-	var err error
 
+	var err error
 	id, err := serv.CommentRepository.SaveComment(
 		models.CommentNoId{
 			AuthorId:     comment.AuthorId,
