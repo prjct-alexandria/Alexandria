@@ -14,7 +14,7 @@ func NewPgUserRepository(db *sql.DB) PgUserRepository {
 	repo := PgUserRepository{db}
 	err := repo.createUserTable()
 	if err != nil {
-		return PgUserRepository{}
+		panic(err)
 	}
 	return repo
 }

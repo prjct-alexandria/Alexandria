@@ -8,6 +8,42 @@ definitions:
       pwd:
         type: string
     type: object
+  httperror.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  models.ArticleCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - owners
+    - title
+    type: object
+  models.Version:
+    properties:
+      articleID:
+        type: integer
+      content:
+        type: string
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      versionID:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -16,7 +52,60 @@ info:
   title: API documentation
   version: 1.0.0
 paths:
+  /articles:
+    post:
+      consumes:
+      - application/json
+      description: Creates new article, including main article version. Returns main
+        version. Owners must be specified as email addresses, not usernames.
+      parameters:
+      - description: Article info
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.ArticleCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Create new article
   /articles/{articleID}/versions/{versionID}:
+    get:
+      description: Gets the version content + metadata from the database + filesystem.
+        Must be accessible without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "404":
+          description: Version not found
+      summary: Get version content + metadata
     post:
       consumes:
       - multipart/form-data

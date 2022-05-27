@@ -1,8 +1,8 @@
 package entities
 
 type Version struct {
-	Id      string
-	Title   string
-	Authors []string
-	Content string
+	ArticleID int64
+	Id        int64
+	Title     string
+	Owners    []string
 }
