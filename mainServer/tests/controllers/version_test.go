@@ -163,13 +163,16 @@ func TestUpdateVersionNoFile(t *testing.T) {
 
 // fileUploaderHelper creates a http request with a file in the form data
 func fileUploadHelper(url string) (*http.Request, error) {
-	// set request file contents as form data
+	// Use the multipart format to attach a file
 	var b bytes.Buffer
 	m := multipart.NewWriter(&b)
 	field, err := m.CreateFormFile("file", "helloworld.txt")
 	if err != nil {
 		return &http.Request{}, err
 	}
+
+	// To add some file contents, write "Hello World" in ASCII,
+	// directly as a byte array for simplicity, instead of reading from an external file
 	_, err = field.Write([]byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100})
 	if err != nil {
 		return &http.Request{}, err
@@ -183,7 +186,7 @@ func fileUploadHelper(url string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodPost, url, &b)
 	req.Header.Set("Content-Type", m.FormDataContentType())
 	if err != nil {
-
+		return nil, err
 	}
 	return req, nil
 }
