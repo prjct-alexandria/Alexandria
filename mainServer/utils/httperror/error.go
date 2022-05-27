@@ -1,6 +1,9 @@
 package httperror
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
 
 // Using http error handling as in:
 // https://github.com/swaggo/swag/blob/master/example/celler/httputil/error.go
@@ -10,6 +13,7 @@ func NewError(ctx *gin.Context, status int, err error) {
 		Code:    status,
 		Message: err.Error(),
 	}
+	fmt.Println(err)
 	ctx.JSON(status, er)
 }
 

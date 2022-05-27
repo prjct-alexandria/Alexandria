@@ -8,12 +8,13 @@ import (
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
 	"mainServer/services"
-	"os"
 )
 
 type RepoEnv struct {
 	git           repositories.GitRepository
+	article       interfaces.ArticleRepository
 	user          interfaces.UserRepository
+	version       interfaces.VersionRepository
 	thread        interfaces.ThreadRepository
 	comment       interfaces.CommentRepository
 	commitThread  interfaces.CommitThreadRepository
@@ -22,8 +23,9 @@ type RepoEnv struct {
 }
 
 type ServiceEnv struct {
-	version       services.VersionService
+	article       services.ArticleService
 	user          services.UserService
+	version       services.VersionService
 	thread        services.ThreadService
 	comment       services.CommentService
 	commitThread  services.CommitThreadService
@@ -32,6 +34,7 @@ type ServiceEnv struct {
 }
 
 type ControllerEnv struct {
+	article controllers.ArticleController
 	version controllers.VersionController
 	user    controllers.UserController
 	thread  controllers.ThreadController
@@ -41,8 +44,7 @@ func initRepoEnv() (RepoEnv, error) {
 	// TODO: gitfiles path in config file
 	gitpath := "../../gitfiles"
 
-	// make folder for git files
-	err := os.MkdirAll(gitpath, os.ModePerm)
+	gitrepo, err := repositories.NewGitRepository(gitpath)
 	if err != nil {
 		return RepoEnv{}, err
 	}
@@ -50,8 +52,10 @@ func initRepoEnv() (RepoEnv, error) {
 	database := db.Connect()
 
 	return RepoEnv{
-		git:           repositories.NewGitRepository(gitpath),
+		git:           gitrepo,
+		article:       postgres.NewPgArticleRepository(database),
 		user:          postgres.NewPgUserRepository(database),
+		version:       postgres.NewPgVersionRepository(database),
 		thread:        postgres.NewPgThreadRepository(database),
 		comment:       postgres.NewPgCommentRepository(database),
 		commitThread:  postgres.NewPgCommitThreadRepository(database),
@@ -67,8 +71,9 @@ func initServiceEnv() (ServiceEnv, error) {
 	}
 
 	return ServiceEnv{
-		version:       services.VersionService{Gitrepo: repos.git},
+		article:       services.NewArticleService(repos.article, repos.version, repos.git),
 		user:          services.UserService{UserRepository: repos.user},
+		version:       services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
 		thread:        services.ThreadService{ThreadRepository: repos.thread},
 		comment:       services.CommentService{CommentRepository: repos.comment},
 		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
@@ -84,8 +89,9 @@ func initControllerEnv() (ControllerEnv, error) {
 	}
 
 	return ControllerEnv{
-		version: controllers.VersionController{Serv: servs.version},
+		article: controllers.NewArticleController(servs.article),
 		user:    controllers.UserController{UserService: servs.user},
+		version: controllers.VersionController{Serv: servs.version},
 		thread: controllers.ThreadController{ThreadService: servs.thread,
 			CommitThreadService:  servs.commitThread,
 			RequestThreadService: servs.requestThread,
