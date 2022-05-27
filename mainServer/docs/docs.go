@@ -86,6 +86,46 @@ const docTemplate = `{
                 }
             }
         }
+		"/articles/{articleID}/thread/{threadType}/id/{specificID}": {
+			"post": {
+				"description": "Start a new request-, review- or commit Thread. The thread is saved in the specific table, the comment in the comment table",
+				"consumes": [
+					"multipart/form-data"
+				],
+				"summary": "Update article version",
+				"parameters": [
+					{
+						"type": "int",
+						"description": "Article ID",
+						"name": "articleID",
+						"in": "path",
+						"required": true
+					},
+					{
+						"type": "string",
+						"description": "thread Type",
+						"name": " threadType ",
+						"in": "path",
+						"required": true
+					},
+					{
+						"type": "int",
+						"description": " specific ID ",
+						"name": " specificID ",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success"
+					},
+					"400": {
+						"description": "Bad request, possibly bad file data or permissions"
+					},
+				}
+			}
+		}
     },
     "definitions": {
         "entities.User": {

@@ -16,7 +16,8 @@ type ThreadController struct {
 	CommentService       services.CommentService
 }
 
-// creates thread entity, and specific thread entity. returns both id's
+// CreateThread creates thread entity, and specific thread entity.
+// returns id's of thread, specific thread and comment
 func (contr *ThreadController) CreateThread(c *gin.Context) {
 	var thread models.ThreadNoId
 	err := c.BindJSON(&thread)

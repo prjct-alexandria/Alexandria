@@ -21,7 +21,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
-	router.POST("/articles/:articleID/history/:specificID/thread/:threadType", contrs.thread.CreateThread)
+	router.POST("/articles/:articleID/thread/:threadType/id/:specificID/", contrs.thread.CreateThread)
 
 	//Groups can be used for nested paths, maybe add example later
 	// Path for accessing the API documentation
