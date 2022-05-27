@@ -18,6 +18,7 @@ type RepoEnv struct {
 	comment       interfaces.CommentRepository
 	commitThread  interfaces.CommitThreadRepository
 	requestThread interfaces.RequestThreadRepository
+	reviewThread  interfaces.ReviewThreadRepository
 }
 
 type ServiceEnv struct {
@@ -27,6 +28,7 @@ type ServiceEnv struct {
 	comment       services.CommentService
 	commitThread  services.CommitThreadService
 	requestThread services.RequestThreadService
+	reviewThread  services.ReviewThreadService
 }
 
 type ControllerEnv struct {
@@ -54,6 +56,7 @@ func initRepoEnv() (RepoEnv, error) {
 		comment:       postgres.NewPgCommentRepository(database),
 		commitThread:  postgres.NewPgCommitThreadRepository(database),
 		requestThread: postgres.NewPgRequestThreadRepository(database),
+		reviewThread:  postgres.NewPgReviewThreadRepository(database),
 	}, nil
 }
 
@@ -70,6 +73,7 @@ func initServiceEnv() (ServiceEnv, error) {
 		comment:       services.CommentService{CommentRepository: repos.comment},
 		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread},
+		reviewThread:  services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
 	}, nil
 }
 
@@ -85,7 +89,8 @@ func initControllerEnv() (ControllerEnv, error) {
 		thread: controllers.ThreadController{ThreadService: servs.thread,
 			CommitThreadService:  servs.commitThread,
 			RequestThreadService: servs.requestThread,
-			CommentService:       servs.comment},
+			CommentService:       servs.comment,
+			ReviewThreadService:  servs.reviewThread},
 	}, nil
 }
 

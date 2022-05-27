@@ -12,8 +12,8 @@ type ThreadController struct {
 	ThreadService        services.ThreadService
 	CommitThreadService  services.CommitThreadService
 	RequestThreadService services.RequestThreadService
-	//ReviewThreadService  services.ReviewThreadService
-	CommentService services.CommentService
+	ReviewThreadService  services.ReviewThreadService
+	CommentService       services.CommentService
 }
 
 // creates thread entity, and specific thread entity. returns both id's
@@ -53,8 +53,8 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		id, err = contr.CommitThreadService.StartCommitThread(thread, tid)
 	case "request":
 		id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
-		//case "review":
-		//	id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
+	case "review":
+		id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
 	}
 	if err != nil {
 		c.Status(http.StatusBadRequest)
