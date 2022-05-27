@@ -6,6 +6,7 @@ import (
 	"mainServer/models"
 	"mainServer/services"
 	"net/http"
+	"strconv"
 )
 
 type ThreadController struct {
@@ -73,4 +74,26 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.IndentedJSON(http.StatusOK, ids)
+}
+
+func (contr *ThreadController) SaveComment(c *gin.Context) {
+	var comment models.CommentNoId
+	err := c.BindJSON(&comment)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	tid := c.Param("threadID")
+	intTid, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	id, err := contr.CommentService.SaveComment(comment, intTid)
+
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.IndentedJSON(http.StatusOK, id)
 }
