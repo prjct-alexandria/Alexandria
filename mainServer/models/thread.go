@@ -18,7 +18,7 @@ type ThreadNoId struct {
 type ReturnIds struct {
 	Id        int64
 	ThreadId  int64
-	CommentId []int64
+	CommentId int64
 }
 
 type CommentNoId struct {
