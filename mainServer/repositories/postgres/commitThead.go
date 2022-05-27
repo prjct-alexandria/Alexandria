@@ -33,7 +33,7 @@ func (r PgCommitThreadRepository) createCommitThreadTable() error {
 func (r PgCommitThreadRepository) CreateCommitThread(thread models.ThreadNoId, tid string) (int64, error) {
 	row := r.Db.QueryRow("INSERT INTO commitThread (commitId, threadId) " +
 		"VALUES ('" +
-		strconv.FormatInt(thread.CommitId, 10) + "', '" +
+		strconv.FormatInt(thread.SpecificId, 10) + "', '" +
 		tid + "')" +
 		"RETURNING commitThreadId")
 	var id int64

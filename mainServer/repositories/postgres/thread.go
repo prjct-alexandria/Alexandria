@@ -16,7 +16,6 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 		fmt.Println(err)
 		return PgThreadRepository{}
 	}
-	// TODO: create comment table
 
 	return repo
 }

@@ -9,9 +9,9 @@ import (
 )
 
 type ThreadController struct {
-	ThreadService       services.ThreadService
-	CommitThreadService services.CommitThreadService
-	//RequestThreadService services.RequestThreadService
+	ThreadService        services.ThreadService
+	CommitThreadService  services.CommitThreadService
+	RequestThreadService services.RequestThreadService
 	//ReviewThreadService  services.ReviewThreadService
 	CommentService services.CommentService
 }
@@ -27,11 +27,16 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	aid := c.Param("articleID")
-	cid := c.Param("commitID")
+	sid := c.Param("specificID")
 	threadType := c.Param("threadType")
 
 	// save threat in the db
-	tid, err := contr.ThreadService.StartThread(thread, aid, cid)
+	tid, err := contr.ThreadService.StartThread(thread, aid, sid)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
 
 	// save first comment in the db
 	coid, err := contr.CommentService.SaveComment(thread.Comment, tid)
@@ -46,8 +51,8 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	switch threadType {
 	case "commit":
 		id, err = contr.CommitThreadService.StartCommitThread(thread, tid)
-		//case "request":
-		//	id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
+	case "request":
+		id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
 		//case "review":
 		//	id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
 	}
@@ -59,9 +64,9 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 
 	// return tid and specific id
 	ids := models.ReturnIds{
-		ThreadId:   tid,
-		CommentId:  coid,
-		SpecificId: id,
+		ThreadId:  tid,
+		CommentId: coid,
+		Id:        id,
 	}
 
 	c.Header("Content-Type", "application/json")
