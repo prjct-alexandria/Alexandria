@@ -31,12 +31,13 @@ func (r PgCommitThreadRepository) createCommitThreadTable() error {
 }
 
 func (r PgCommitThreadRepository) CreateCommitThread(thread models.ThreadNoId, tid string) (int64, error) {
-	var id int64
-	_, err := r.Db.Exec("INSERT INTO commitThread (commitId, threadId) " +
+	row := r.Db.QueryRow("INSERT INTO commitThread (commitId, threadId) " +
 		"VALUES ('" +
 		strconv.FormatInt(thread.CommitId, 10) + "', '" +
 		tid + "')" +
 		"RETURNING commitThreadId")
+	var id int64
+	err := row.Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("CreateThread: %v", err)
 	}

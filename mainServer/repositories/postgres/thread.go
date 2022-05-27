@@ -22,11 +22,11 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 }
 
 func (r PgThreadRepository) CreateThread(aid string) (int64, error) {
-	var tid int64
-	_, err := r.Db.Exec("INSERT INTO thread (articleId) " +
+	row := r.Db.QueryRow("INSERT INTO thread (articleId) " +
 		"VALUES ('" + aid + "')" +
 		"RETURNING threadId")
-
+	var tid int64
+	err := row.Scan(&tid)
 	if err != nil {
 		fmt.Println(err)
 		return 0, fmt.Errorf("CreateThread: %v", err)

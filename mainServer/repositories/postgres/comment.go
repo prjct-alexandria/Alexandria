@@ -34,15 +34,15 @@ func (r PgCommentRepository) createCommentTable() error {
 }
 
 func (r PgCommentRepository) SaveComment(comment models.CommentNoId) (int64, error) {
-	var id int64
-	_, err := r.Db.Exec("INSERT INTO comment (authorId, content, threadId, creationDate) " +
+	row := r.Db.QueryRow("INSERT INTO comment (authorId, content, threadId, creationDate) " +
 		"VALUES ('" + comment.AuthorId + "', '" +
 		comment.Content + "', '" +
 		strconv.FormatInt(comment.ThreadId, 10) + "', '" +
 		comment.CreationDate +
 		"')" +
 		"RETURNING commentId")
-
+	var id int64
+	err := row.Scan(&id)
 	if err != nil {
 		fmt.Println(err)
 		return 0, fmt.Errorf("SaveComment: %v", err)
