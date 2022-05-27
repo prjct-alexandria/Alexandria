@@ -8,6 +8,15 @@ definitions:
       pwd:
         type: string
     type: object
+  httperror.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
   models.ArticleCreationForm:
     properties:
       owners:
@@ -35,6 +44,21 @@ definitions:
       versionID:
         type: integer
     type: object
+  models.VersionCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      sourceVersionID:
+        type: integer
+      title:
+        type: string
+    required:
+    - owners
+    - sourceVersionID
+    - title
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -48,7 +72,7 @@ paths:
       consumes:
       - application/json
       description: Creates new article, including main article version. Returns main
-        version
+        version. Owners must be specified as email addresses, not usernames.
       parameters:
       - description: Article info
         in: body
@@ -64,6 +88,39 @@ paths:
           schema:
             $ref: '#/definitions/models.Version'
       summary: Create new article
+  /articles/{articleID}/versions:
+    post:
+      consumes:
+      - application/json
+      description: Creates new version from an existing one of the same article
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version info
+        in: body
+        name: version
+        required: true
+        schema:
+          $ref: '#/definitions/models.VersionCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Create new version
   /articles/{articleID}/versions/{versionID}:
     get:
       description: Gets the version content + metadata from the database + filesystem.

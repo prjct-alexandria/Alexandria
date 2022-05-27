@@ -7,3 +7,9 @@ type Version struct {
 	Owners    []string `json:"owners"`
 	Content   string   `json:"content"`
 }
+
+type VersionCreationForm struct {
+	SourceVersionID int64    `json:"sourceVersionID" binding:"required"`
+	Title           string   `json:"title" binding:"required"`
+	Owners          []string `json:"owners" binding:"required"`
+}

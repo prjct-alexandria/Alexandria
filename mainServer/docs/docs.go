@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version. Returns main version",
+                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,6 +42,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Version"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/versions": {
+            "post": {
+                "description": "Creates new version from an existing one of the same article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Version info",
+                        "name": "version",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VersionCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
                         }
                     }
                 }
@@ -167,6 +217,19 @@ const docTemplate = `{
                 }
             }
         },
+        "httperror.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
+                }
+            }
+        },
         "models.ArticleCreationForm": {
             "type": "object",
             "required": [
@@ -205,6 +268,28 @@ const docTemplate = `{
                 },
                 "versionID": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.VersionCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "sourceVersionID",
+                "title"
+            ],
+            "properties": {
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         }
