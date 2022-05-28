@@ -16,6 +16,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/articles": {
+            "post": {
+                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new article",
+                "parameters": [
+                    {
+                        "description": "Article info",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ArticleCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/versions/{versionID}": {
             "get": {
                 "description": "Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.",
@@ -43,10 +86,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.Version"
-                            }
+                            "$ref": "#/definitions/models.Version"
                         }
                     },
                     "404": {
@@ -122,52 +162,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/login": {
-            "post": {
-                "description": "Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token",
-                "consumes": [
-                    "application/json"
-                ],
-                "summary": "Endpoint for user logging in",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "400": {
-                        "description": "Invalid JSON provided"
-                    },
-                    "403": {
-                        "description": "Invalid password"
-                    },
-                    "500": {
-                        "description": "Could not create token"
-                    }
-                }
-            }
-        },
-        "/users": {
-            "post": {
-                "description": "Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.",
-                "consumes": [
-                    "application/json"
-                ],
-                "summary": "Endpoint for user registration",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "400": {
-                        "description": "Invalid user JSON provided"
-                    },
-                    "403": {
-                        "description": "Could not generate password hash"
-                    },
-                    "409": {
-                        "description": "Could not save user to database"
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -185,23 +179,57 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.Version": {
+        "httperror.HTTPError": {
             "type": "object",
             "properties": {
-                "authors": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
+                }
+            }
+        },
+        "models.ArticleCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "owners": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Version": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
                 "content": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "title": {
                     "type": "string"
+                },
+                "versionID": {
+                    "type": "integer"
                 }
             }
         }

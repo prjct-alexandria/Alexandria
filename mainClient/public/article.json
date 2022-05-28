@@ -2,7 +2,7 @@
   {
     "id":"1",
     "title":"Modern Web-Development using ReactJS",
-    "authors":["Sanchit Aggarwal", "Sanchet Aggarwol"],
+    "owners":["Sanchit Aggarwal", "Sanchet Aggarwol"],
     "content":"Modern Web-Development using ReactJS Sanchit Aggarwal Department of Information Technology, Northern India Engineering College, New Delhi, India sanchit.niec@gmail.com Abstract — ReactJS is a component based library which is deployed for the development of interactive user interfaces. Currently it is the most popular front-end JS library. It incorporates the view (V) layer in M-V-C (Model View Controller) pattern. It is supported by Facebook, Instagram and a community of individual developers and organisations. React basically enables development of large and complex web based applications which can change its data without subsequent page refreshes. It targets to provide better user experiences and with blazing fast and robust web apps development. ReactJS can also integrated with other JavaScript libraries or frameworks in MVC, such as AngularJS. Keywords — Application development, React, ReactJS, MVC, virtual DOM, Front-end development."
   }
 ]

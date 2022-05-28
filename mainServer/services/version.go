@@ -3,31 +3,54 @@ package services
 import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"mainServer/entities"
+	"mainServer/models"
 	"mainServer/repositories"
+	"mainServer/repositories/interfaces"
 	"mime/multipart"
 	"path/filepath"
 )
 
 type VersionService struct {
-	Gitrepo repositories.GitRepository
+	Gitrepo     repositories.GitRepository
+	Versionrepo interfaces.VersionRepository
 }
 
 // GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
-// For now versiondata isn't fetched from database, but this should be implemented once the functionality for article / version creation is there.
-func (serv VersionService) GetVersion(c *gin.Context, article string, version string) (entities.Version, error) {
+func (serv VersionService) GetVersion(article int64, version int64) (models.Version, error) {
+
+	// Get file contents from Git
 	err := serv.Gitrepo.CheckoutBranch(article, version)
+	if err != nil {
+		return models.Version{}, err
+	}
 
 	path, err := serv.Gitrepo.GetArticlePath(article)
-	fileContent, err := ioutil.ReadFile(path + "\\main.qmd")
+	if err != nil {
+		return models.Version{}, err
+	}
 
-	//TODO get version data from database after article creation has been added
-	fullVersion := entities.Version{Id: version, Title: article, Authors: []string{"John Doe", "Jane Doe"}, Content: string(fileContent)}
+	fileContent, err := ioutil.ReadFile(filepath.Join(path, "main.qmd"))
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Get other version info from database
+	entity, err := serv.Versionrepo.GetVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	fullVersion := models.Version{
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
+		Content:   string(fileContent)}
 	return fullVersion, err
 }
 
 // UpdateVersion overwrites file of specified article version and commits
-func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 	// TODO: check if user of authenticated session is version owner
 
 	// Checkout

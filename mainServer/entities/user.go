@@ -8,11 +8,6 @@ type User struct {
 	Pwd   string `json:"pwd"`
 }
 
-type StrippedUser struct {
-	Name  string
-	Email string
-}
-
 func (u User) Hash() (User, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Pwd), bcrypt.DefaultCost)
 	u.Pwd = string(hash)
