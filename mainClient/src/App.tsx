@@ -8,7 +8,7 @@ import Signup from "./Components/User/Signup";
 import Login from "./Components/User/Login";
 import FileUpload from "./Components/Article/FileUpload";
 import ArticleList from "./Components/Article/ArticleList";
-import ArticlePage from "./Components/Article/ArticlePage";
+import ArticleVersionPage from "./Components/Article/ArticleVersionPage";
 import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -31,7 +31,7 @@ function App() {
               ></Route>
               <Route
                 path="/articles/:articleId/versions/:versionId"
-                element={<ArticlePage />}
+                element={<ArticleVersionPage />}
               ></Route>
               <Route path="/signup" element={<Signup />}></Route>
               <Route path="/login" element={<Login />}></Route>

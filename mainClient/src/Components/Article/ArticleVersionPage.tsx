@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 
-type Article = {
-  authors: Array<string>;
+type ArticleVersion = {
+  owners: Array<string>;
   title: string;
   content: string;
 };
 
-export default function ArticlePage() {
-  let [articleData, setData] = useState<Article>();
+export default function ArticleVersionPage() {
+  let [versionData, setData] = useState<ArticleVersion>();
   let [isLoaded, setLoaded] = useState(false);
   let [error, setError] = useState(null);
 
@@ -41,21 +41,21 @@ export default function ArticlePage() {
           setError(error);
         }
       );
-  }, []);
+  }, [url]);
 
   return (
     <div className={"wrapper"}>
       {!isLoaded && <LoadingSpinner />}
       {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-      {articleData != null && (
+      {versionData != null && (
         <div className="article">
           <ul>
-            {articleData.authors.map((author, i) => (
-              <li key={i}>{author}</li>
+            {versionData.owners.map((owner, i) => (
+              <li key={i}>{owner}</li>
             ))}
           </ul>
-          <h1>{articleData.title}</h1>
-          <div>{articleData.content}</div>
+          <h1>{versionData.title}</h1>
+          <div>{versionData.content}</div>
         </div>
       )}
     </div>
