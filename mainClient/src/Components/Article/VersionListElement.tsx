@@ -16,7 +16,9 @@ export default function VersionListElement(props: VListProps) {
   return (
     <div className="row row-no-gutters col-md-12 text-wrap">
       <div className="col-md-9 text-start">
-        <Link to={"/articles/" + params.aid + "/versions/" + props.version.id}>
+        <Link
+          to={"/articles/" + params.articleId + "/versions/" + props.version.id}
+        >
           {props.version.title}
         </Link>
       </div>

@@ -16,7 +16,10 @@ export default function ArticlePage() {
 
   let params = useParams();
   const url =
-    "http://localhost:8080/articles/" + params.aid + "versions/" + params.vId;
+    "http://localhost:8080/articles/" +
+    params.articleId +
+    "/versions/" +
+    params.versionId;
 
   useEffect(() => {
     fetch(url, {

@@ -13,7 +13,10 @@ export default function FileUpload() {
 
   let params = useParams();
   const url =
-    "http://localhost:8080/articles/" + params.aid + "/versions/" + params.vId;
+    "http://localhost:8080/articles/" +
+    params.articleId +
+    "/versions/" +
+    params.versionId;
 
   // Send an HTTP POST request with file to /articles/#id/versions/#id
   const uploadFileHandler = () => {

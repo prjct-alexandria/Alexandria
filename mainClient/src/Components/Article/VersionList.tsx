@@ -16,7 +16,7 @@ type Version = {
 export default function VersionList() {
   let params = useParams();
   const url = "/versionList.json"; // Placeholder
-  //const url = "http://localhost:8080/articles/" + params.aid + "/versions";
+  //const url = "http://localhost:8080/articles/" + params.articleId + "/versions";
 
   let [data, setData] = useState<Version[]>();
   let [isLoaded, setLoaded] = useState(false);
