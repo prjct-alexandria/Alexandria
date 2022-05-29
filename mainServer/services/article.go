@@ -58,3 +58,31 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		Content:   "",
 	}, nil
 }
+
+func (serv ArticleService) GetArticleList() ([]models.ArticleListElement, error) {
+	articleList, err := serv.articlerepo.GetAllArticles()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var res []models.ArticleListElement
+
+	for _, element := range articleList {
+		versionData, err := serv.versionrepo.GetVersion(element.MainVersionID)
+		if err != nil {
+			continue
+		}
+
+		listElement := models.ArticleListElement{
+			Id:     element.Id,
+			Title:  versionData.Title,
+			Owners: versionData.Owners,
+			//TODO: Get owners name instead of email?
+			//CreatedAt = ??
+			//Description = ??
+		}
+		res = append(res, listElement)
+	}
+	return res, nil
+}

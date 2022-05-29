@@ -17,6 +17,27 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/articles": {
+            "get": {
+                "description": "Gets a list of all articles in the database + some metadata about the main version.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a list of all articles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ArticleListElement"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "server could not retrieve article list"
+                    }
+                }
+            },
             "post": {
                 "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
@@ -199,6 +220,28 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ArticleListElement": {
+            "type": "object",
+            "required": [
+                "articleId",
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
                 "owners": {
                     "type": "array",
                     "items": {

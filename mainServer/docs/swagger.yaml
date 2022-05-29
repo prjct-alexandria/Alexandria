@@ -29,6 +29,21 @@ definitions:
     - owners
     - title
     type: object
+  models.ArticleListElement:
+    properties:
+      articleId:
+        type: integer
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - articleId
+    - owners
+    - title
+    type: object
   models.Version:
     properties:
       articleID:
@@ -53,6 +68,21 @@ info:
   version: 1.0.0
 paths:
   /articles:
+    get:
+      description: Gets a list of all articles in the database + some metadata about
+        the main version.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ArticleListElement'
+            type: array
+        "500":
+          description: server could not retrieve article list
+      summary: Get a list of all articles
     post:
       consumes:
       - application/json
