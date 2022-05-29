@@ -51,3 +51,18 @@ func (r PgArticleRepository) createArticleTable() error {
     )`)
 	return err
 }
+
+func (r PgArticleRepository) GetAllArticles() ([]entities.Article, error) {
+	stmt, err := r.Db.Prepare(`SELECT id, mainversionid FROM article`)
+
+	var list []entities.Article
+	rows, err := stmt.Query()
+
+	for rows.Next() {
+		var entity entities.Article
+		err = rows.Scan(&entity.Id, &entity.MainVersionID)
+		list = append(list, entity)
+	}
+
+	return list, err
+}
