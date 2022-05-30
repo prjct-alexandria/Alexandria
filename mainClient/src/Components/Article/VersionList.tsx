@@ -15,15 +15,15 @@ type Version = {
 
 export default function VersionList() {
   let params = useParams();
-  const url = "/versionList.json"; // Placeholder
+  const urlVersions = "/versionList.json"; // Placeholder
   //const url = "http://localhost:8080/articles/" + params.articleId + "/versions";
 
-  let [data, setData] = useState<Version[]>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [dataVersions, setDataVersions] = useState<Version[]>();
+  let [isLoadedVersions, setLoadedVersions] = useState(false);
+  let [errorVersions, setErrorVersions] = useState(null);
 
   useEffect(() => {
-    fetch(url, {
+    fetch(urlVersions, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -34,25 +34,59 @@ export default function VersionList() {
       .then((res) => res.json())
       .then(
         (result) => {
-          setData(result);
-          setError(null);
-          setLoaded(true);
+          setDataVersions(result);
+          setErrorVersions(null);
+          setLoadedVersions(true);
         },
         (error) => {
-          setError(error.message);
-          setData(error);
-          setLoaded(true);
+          setErrorVersions(error.message);
+          setDataVersions(error);
+          setLoadedVersions(true);
         }
       );
-  }, [url]);
+  }, [urlVersions]);
 
+  const urlMain = "/mainVersion.json"; // Placeholder
+  //const url = ...?
+
+  let [dataMain, setDataMain] = useState<string>();
+  let [isLoadedMain, setLoadedMain] = useState(false);
+  let [errorMain, setErrorMain] = useState(null);
+
+  useEffect(() => {
+    fetch(urlMain, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+        .then((res) => res.json())
+        .then(
+            (result) => {
+              setDataMain(result);
+              setErrorMain(null);
+              setLoadedMain(true);
+            },
+            (error) => {
+              setErrorMain(error.message);
+              setDataMain(error);
+              setLoadedMain(true);
+            }
+        );
+  }, [urlVersions]);
+
+  console.log(dataMain)
+  console.log(dataVersions)
+  console.log(dataMain)
   return (
     <div>
-      {!isLoaded && <LoadingSpinner />}
-      {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-      {data != null &&
-        data.map((version, i) => (
-          <VersionListElement key={i} version={version} />
+      {!isLoadedVersions || !isLoadedMain && <LoadingSpinner />}
+      {errorVersions || errorMain && <div>{`There is a problem fetching the data - ${errorVersions} ${errorMain}`}</div>}
+      {(dataVersions != null && dataMain != null) &&
+        dataVersions.map((version, i) => (
+          <VersionListElement key={i} version={version} mv={dataMain} />
         ))}
     </div>
   );
