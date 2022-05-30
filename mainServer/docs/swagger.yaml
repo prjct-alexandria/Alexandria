@@ -29,6 +29,39 @@ definitions:
     - owners
     - title
     type: object
+  models.Request:
+    properties:
+      articleID:
+        type: integer
+      requestID:
+        type: integer
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      state:
+        type: string
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    type: object
+  models.RequestCreationForm:
+    properties:
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    required:
+    - sourceHistoryID
+    - sourceVersionID
+    - targetHistoryID
+    - targetVersionID
+    type: object
   models.Version:
     properties:
       articleID:
@@ -81,6 +114,35 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
+  /articles/{articleID}/requests:
+    post:
+      consumes:
+      - application/json
+      description: Creates request to merge one article versions' changes into another
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Request'
+        "400":
+          description: Invalid article ID or request creation data
+        "500":
+          description: Error creating request on server
+      summary: Create request
   /articles/{articleID}/versions/{versionID}:
     get:
       description: Gets the version content + metadata from the database + filesystem.
