@@ -48,7 +48,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
-	id, err := int64(0), nil
+	var id int64
 	switch threadType {
 	case "commit":
 		id, err = contr.CommitThreadService.StartCommitThread(thread, tid)
