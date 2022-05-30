@@ -30,6 +30,7 @@ export default function FileUpload() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+        credentials: 'include',
       body: formData,
     }).then(
       (response) => {
