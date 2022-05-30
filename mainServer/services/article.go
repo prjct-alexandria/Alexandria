@@ -1,10 +1,12 @@
 package services
 
 import (
+	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"path/filepath"
 )
 
 type ArticleService struct {
@@ -49,7 +51,13 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		return models.Version{}, err
 	}
 
-	// Return frontend-readable description of created data
+	// Place a default file and create the initial commit
+	err = serv.commitDefaultFile(article.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Return frontend-readable description of created data, (excluding file contents)
 	return models.Version{
 		ArticleID: version.ArticleID,
 		Id:        version.Id,
@@ -57,4 +65,39 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		Owners:    version.Owners,
 		Content:   "",
 	}, nil
+}
+
+// commitDefaultFile copies the template file from the resource folder to the given article
+// intended for article creation. does not check out any branch.
+func (serv ArticleService) commitDefaultFile(article int64) error {
+
+	// Get the path to the repo
+	repo, err := serv.gitrepo.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+
+	// Read the template file
+	source, err := filepath.Abs("./resources/defaultArticle.qmd")
+	if err != nil {
+		return err
+	}
+	input, err := ioutil.ReadFile(source)
+	if err != nil {
+		return err
+	}
+
+	// Write contents to the main.qmd file in the repo
+	target := filepath.Join(repo, "main.qmd")
+	err = ioutil.WriteFile(target, input, 0644)
+	if err != nil {
+		return err
+	}
+
+	// Commit the file to the currently checked out branch
+	err = serv.gitrepo.Commit(article)
+	if err != nil {
+		return err
+	}
+	return nil
 }
