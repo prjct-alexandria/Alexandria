@@ -48,14 +48,14 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 		return nil
 	}
 
 	// set request url
-	const article = "42"
-	const version = "123456"
-	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
+	const article int64 = 42
+	const version int64 = 123456
+	url := fmt.Sprintf("/articles/%d/versions/%d", article, version)
 
 	// create request
 	req, err := fileUploadHelper(url)
@@ -89,14 +89,14 @@ func TestUpdateVersionFail(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 		return errors.New("oh no, the version coulnd't be updated")
 	}
 
 	// set request url
-	const article = "42"
-	const version = "123456"
-	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
+	const article int64 = 42
+	const version int64 = 123456
+	url := fmt.Sprintf("/articles/%d/versions/%d", article, version)
 
 	// create request
 	req, err := fileUploadHelper(url)
@@ -130,7 +130,7 @@ func TestUpdateVersionNoFile(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 		return nil
 	}
 

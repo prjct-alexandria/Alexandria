@@ -5,6 +5,7 @@ import (
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "mainServer/docs"
+	"mainServer/middlewares"
 )
 
 // @title API documentation
@@ -15,11 +16,19 @@ import (
 
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
+	router.Use(middlewares.AuthMiddleware())
+	router.Use(middlewares.Options)
 
+	router.POST("/articles", contrs.article.CreateArticle)
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
 
+	router.POST("/users", contrs.user.Register)
+	router.POST("/login", contrs.user.Login)
+
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
+
+	//Example of how to make an endpoint use the authentication
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
 	//Groups can be used for nested paths, maybe add example later

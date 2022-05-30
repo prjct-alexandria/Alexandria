@@ -2,12 +2,12 @@ package services
 
 import (
 	"github.com/gin-gonic/gin"
-	"mainServer/entities"
+	"mainServer/models"
 	"mime/multipart"
 )
 
 // UpdateVersionMock is a declared function whose behaviour can be modified by individual tests
-var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article string, version string) error
+var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error
 
 // VersionServiceMock mocks class using publicly modifiable mock functions
 type VersionServiceMock struct {
@@ -16,7 +16,7 @@ type VersionServiceMock struct {
 	Params *map[string]map[string]interface{}
 }
 
-func (m VersionServiceMock) GetVersion(c *gin.Context, article string, version string) (entities.Version, error) {
+func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Version, error) {
 	// added to solve merge conflicts after the testing issue was finished
 	// TODO: implement for future testing
 	panic("implement me")
@@ -33,7 +33,7 @@ func NewVersionServiceMock() VersionServiceMock {
 
 // UpdateVersion implements the corresponding version from the VersionService interface.
 // Stores in the mock that it was called, including the arguments, and executes the custom UpdateVersionMock function
-func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article string, version string) error {
+func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
 	(*m.Called)["UpdateVersion"] = true
 	(*m.Params)["UpdateVersion"] = map[string]interface{}{
 		"article": article,
