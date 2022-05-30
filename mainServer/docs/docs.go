@@ -16,6 +16,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/articles": {
+            "post": {
+                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new article",
+                "parameters": [
+                    {
+                        "description": "Article info",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ArticleCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/requests": {
             "post": {
                 "description": "Creates request to merge one article versions' changes into another",
@@ -87,10 +130,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entities.Version"
-                            }
+                            "$ref": "#/definitions/models.Version"
                         }
                     },
                     "404": {
@@ -183,20 +223,31 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.Version": {
+        "httperror.HTTPError": {
             "type": "object",
             "properties": {
-                "authors": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
+                }
+            }
+        },
+        "models.ArticleCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "owners": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
-                },
-                "content": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -248,6 +299,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Version": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionID": {
                     "type": "integer"
                 }
             }

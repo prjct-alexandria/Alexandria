@@ -8,7 +8,7 @@ export default class ArticlePage extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            items: []
+            version: null
         };
     }
 
@@ -20,7 +20,7 @@ export default class ArticlePage extends React.Component {
         fetch(
             url, {
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
                 }
             }
         )
@@ -29,7 +29,7 @@ export default class ArticlePage extends React.Component {
                 (result) => {
                     this.setState({
                         isLoaded: true,
-                        items: result
+                        version: result
                     });
                 },
                 (error) => {
@@ -43,27 +43,23 @@ export default class ArticlePage extends React.Component {
     }
 
     render() {
-        const { error, isLoaded, items } = this.state;
-        return (
-            <>
-                <div className="article">
-                    {items.map((data, key) => {
-                        return (
-                            <div key={key}>
-                                <ul key={1}>
-                                    {data.Authors.map((a, i) => (<li key={i}>{a}</li>))}
-                                </ul>
-                                <h1 key={2}>
-                                    {data.Title}
-                                </h1>
-                                <div key={3}>
-                                    {data.Content}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </>
-        );
+        const { error, isLoaded, version } = this.state;
+        if(isLoaded) {
+            return (
+                <>
+                    <div className="article">
+                        <ul key={1}>
+                            {version.owners.map((a, i) => (<li key={i}>{a}</li>))}
+                        </ul>
+                        <h1 key={2}>
+                            {version.title}
+                        </h1>
+                        <div key={3}>
+                            {version.content}
+                        </div>
+                    </div>
+                </>
+            );
+        }
     };
 }

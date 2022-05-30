@@ -8,22 +8,25 @@ import (
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
 	"mainServer/services"
-	"os"
 )
 
 type RepoEnv struct {
-	git  repositories.GitRepository
-	user interfaces.UserRepository
-	req  interfaces.RequestRepository
+	git     repositories.GitRepository
+	article interfaces.ArticleRepository
+	user    interfaces.UserRepository
+	version interfaces.VersionRepository
+	req     interfaces.RequestRepository
 }
 
 type ServiceEnv struct {
-	version services.VersionService
+	article services.ArticleService
 	user    services.UserService
 	req     services.RequestService
+	version services.VersionService
 }
 
 type ControllerEnv struct {
+	article controllers.ArticleController
 	version controllers.VersionController
 	user    controllers.UserController
 	req     controllers.RequestController
@@ -33,8 +36,7 @@ func initRepoEnv() (RepoEnv, error) {
 	// TODO: gitfiles path in config file
 	gitpath := "../../gitfiles"
 
-	// make folder for git files
-	err := os.MkdirAll(gitpath, os.ModePerm)
+	gitrepo, err := repositories.NewGitRepository(gitpath)
 	if err != nil {
 		return RepoEnv{}, err
 	}
@@ -42,9 +44,10 @@ func initRepoEnv() (RepoEnv, error) {
 	database := db.Connect()
 
 	return RepoEnv{
-		git:  repositories.NewGitRepository(gitpath),
-		user: postgres.NewPgUserRepository(database),
-		req:  postgres.NewPgRequestRepository(database),
+		git:     gitrepo,
+		article: postgres.NewPgArticleRepository(database),
+		user:    postgres.NewPgUserRepository(database),
+		version: postgres.NewPgVersionRepository(database),
 	}, nil
 }
 
@@ -55,9 +58,10 @@ func initServiceEnv() (ServiceEnv, error) {
 	}
 
 	return ServiceEnv{
-		version: services.VersionService{Gitrepo: repos.git},
+		article: services.NewArticleService(repos.article, repos.version, repos.git),
 		user:    services.UserService{UserRepository: repos.user},
 		req:     services.RequestService{Repo: repos.req},
+		version: services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
 	}, nil
 }
 
@@ -68,9 +72,10 @@ func initControllerEnv() (ControllerEnv, error) {
 	}
 
 	return ControllerEnv{
-		version: controllers.VersionController{Serv: servs.version},
+		article: controllers.NewArticleController(servs.article),
 		user:    controllers.UserController{UserService: servs.user},
 		req:     controllers.RequestController{Serv: servs.req},
+		version: controllers.VersionController{Serv: servs.version},
 	}, nil
 }
 
