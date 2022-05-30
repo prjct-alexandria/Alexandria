@@ -29,6 +29,7 @@ export default function ArticleVersionPage() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then(

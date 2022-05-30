@@ -16,6 +16,7 @@ import (
 
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
+	router.Use(middlewares.AuthMiddleware())
 	router.Use(middlewares.Options)
 
 	router.POST("/articles", contrs.article.CreateArticle)
@@ -23,7 +24,12 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
 	router.GET("/articles/:articleID/versions", contrs.version.ListVersions)
 
+	router.POST("/users", contrs.user.Register)
+	router.POST("/login", contrs.user.Login)
+
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
+
+	//Example of how to make an endpoint use the authentication
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
 	//Groups can be used for nested paths, maybe add example later

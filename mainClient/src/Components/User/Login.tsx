@@ -33,6 +33,7 @@ export default function Login() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       mode: "cors",
+      credentials: 'include',
       body: JSON.stringify(body),
     }).then(
       // Success; set response in state
