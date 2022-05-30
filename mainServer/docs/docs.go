@@ -43,6 +43,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Version"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -197,6 +209,52 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/entities.User"
                         }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging in",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "403": {
+                        "description": "Invalid password"
+                    },
+                    "500": {
+                        "description": "Could not create token"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "description": "Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user registration",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid user JSON provided"
+                    },
+                    "403": {
+                        "description": "Could not generate password hash"
+                    },
+                    "409": {
+                        "description": "Could not save user to database"
                     }
                 }
             }

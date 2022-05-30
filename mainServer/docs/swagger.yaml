@@ -87,6 +87,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
   /articles/{articleID}/versions:
     post:
@@ -195,4 +203,36 @@ paths:
           schema:
             $ref: '#/definitions/entities.User'
       summary: Get test user from database endpoint
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user email and password from a JSON body, verifies if
+        they are correct with the database and returns a JWT token
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "403":
+          description: Invalid password
+        "500":
+          description: Could not create token
+      summary: Endpoint for user logging in
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user credentials from a JSON body, and makes sure they
+        are securely stored in the database.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid user JSON provided
+        "403":
+          description: Could not generate password hash
+        "409":
+          description: Could not save user to database
+      summary: Endpoint for user registration
 swagger: "2.0"
