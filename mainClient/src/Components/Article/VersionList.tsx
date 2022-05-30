@@ -15,8 +15,8 @@ type Version = {
 
 export default function VersionList() {
   let params = useParams();
-  //const urlVersions = "/versionList.json"; // Placeholder
-  const urlVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
+  const urlVersions = "/versionList.json"; // Placeholder
+  //const urlVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
   let [isLoadedVersions, setLoadedVersions] = useState(false);
@@ -78,10 +78,6 @@ export default function VersionList() {
         );
   }, [urlVersions]);
 
-  console.log("dataMain:")
-  console.log(dataMain)
-  console.log("dataVersions:")
-  console.log(dataVersions)
   return (
     <div>
       {!isLoadedVersions || !isLoadedMain && <LoadingSpinner />}

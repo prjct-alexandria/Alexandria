@@ -68,6 +68,7 @@ func (contr ArticleController) GetMainVersion(c *gin.Context) {
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot get main version ID"))
 		return
 	}
-
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, strconv.FormatInt(mv, 10))
 }
