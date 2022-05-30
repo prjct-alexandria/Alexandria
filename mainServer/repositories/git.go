@@ -128,11 +128,13 @@ func (r GitRepository) CreateBranch(article int64, source int64, target int64) e
 	err = w.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(sourceName),
 	})
+	if err != nil {
+		return err
+	}
 
 	// Create new branch reference
 	targetName := strconv.FormatInt(target, 10)
 	targetRef := plumbing.NewBranchReferenceName(targetName)
-
 	if err != nil {
 		return err
 	}
