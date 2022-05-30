@@ -58,3 +58,11 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		Content:   "",
 	}, nil
 }
+
+func (serv ArticleService) GetMainVersion(article int64) (int64, error) {
+	mv, err := serv.articlerepo.GetMainVersion(article)
+	if err != nil {
+		return 0, err
+	}
+	return mv, nil
+}

@@ -26,7 +26,7 @@ function App() {
               <Route path="/articles" element={<ArticleList />}></Route>
               <Route path="/upload" element={<FileUpload />}></Route>
               <Route
-                path="/articles/:aid/versions"
+                path="/articles/:articleId/versions"
                 element={<VersionList />}
               ></Route>
               <Route
