@@ -8,6 +8,15 @@ definitions:
       pwd:
         type: string
     type: object
+  httperror.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
   models.ArticleCreationForm:
     properties:
       owners:
@@ -65,6 +74,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
   /articles/{articleID}/versions:
     get:
@@ -86,9 +103,13 @@ paths:
               $ref: '#/definitions/models.Version'
             type: array
         "400":
-          description: Bad request input
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
         "500":
-          description: Could not get versions from server
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: List article versions
   /articles/{articleID}/versions/{versionID}:
     get:
@@ -112,8 +133,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Version'
-        "404":
-          description: Version not found
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Get version content + metadata
     post:
       consumes:
@@ -136,9 +159,9 @@ paths:
         "200":
           description: Success
         "400":
-          description: Bad request, possibly bad file data or permissions
-        "404":
-          description: Specified article version not found
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
   /createExampleUser:
     post:

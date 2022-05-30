@@ -43,6 +43,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Version"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -74,10 +86,16 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request input"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     },
                     "500": {
-                        "description": "Could not get versions from server"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -112,8 +130,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Version"
                         }
                     },
-                    "404": {
-                        "description": "Version not found"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             },
@@ -144,10 +165,10 @@ const docTemplate = `{
                         "description": "Success"
                     },
                     "400": {
-                        "description": "Bad request, possibly bad file data or permissions"
-                    },
-                    "404": {
-                        "description": "Specified article version not found"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -199,6 +220,19 @@ const docTemplate = `{
                 },
                 "pwd": {
                     "type": "string"
+                }
+            }
+        },
+        "httperror.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
                 }
             }
         },

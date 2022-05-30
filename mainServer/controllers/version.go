@@ -20,7 +20,7 @@ type VersionController struct {
 // @Param		versionID	path	string	true	"Version ID"
 // @Produce		json
 // @Success		200 {object} models.Version
-// @Failure		404 "Version not found"
+// @Failure 	400 {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
@@ -60,8 +60,8 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Param		articleID	path	string	true	"Article ID"
 // @Produce		json
 // @Success		200 {object} []models.Version
-// @Failure		400 "Bad request input"
-// @Failure		500 "Could not get versions from server"
+// @Failure 	400  {object} httperror.HTTPError
+// @Failure 	500  {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions [get]
 func (contr VersionController) ListVersions(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
@@ -93,8 +93,7 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 // @Param		articleID	path	string	true "Article ID"
 // @Param		versionID	path	string	true "Version ID"
 // @Success     200 "Success"
-// @Failure     400 "Bad request, possibly bad file data or permissions"
-// @Failure     404 "Specified article version not found"
+// @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
 

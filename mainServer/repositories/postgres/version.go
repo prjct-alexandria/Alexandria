@@ -135,6 +135,7 @@ func (r PgVersionRepository) createVersionOwnersTable() error {
 func (r PgVersionRepository) getVersion(version int64) (entities.Version, error) {
 	// Prepare and execute query
 	stmt, err := r.Db.Prepare("SELECT articleid, id, title, status FROM version WHERE id=$1")
+
 	if err != nil {
 		return entities.Version{}, err
 	}

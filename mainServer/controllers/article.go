@@ -25,6 +25,8 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 // @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
 // @Produce      json
 // @Success      200  {object} models.Version
+// @Failure 	 400  {object} httperror.HTTPError
+// @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles [post]
 func (contr ArticleController) CreateArticle(c *gin.Context) {
 
