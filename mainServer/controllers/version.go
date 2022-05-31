@@ -3,14 +3,14 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
 
 type VersionController struct {
-	Serv services.VersionService
+	Serv interfaces.VersionService
 }
 
 // GetVersion 	godoc
