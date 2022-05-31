@@ -92,7 +92,8 @@ paths:
       consumes:
       - application/json
       description: Creates new article, including main article version. Returns main
-        version. Owners must be specified as email addresses, not usernames.
+        version info, excluding contents. Owners must be specified as email addresses,
+        not usernames.
       parameters:
       - description: Article info
         in: body

@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
+                "description": "Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
                     "application/json"
                 ],
