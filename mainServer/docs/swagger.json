@@ -95,6 +95,47 @@
                 }
             }
         },
+        "/articles/{articleID}/versions": {
+            "get": {
+                "description": "Gets all versions belonging to a specific article. Does not include version contents.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Version"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/versions/{versionID}": {
             "get": {
                 "description": "Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.",
@@ -125,8 +166,11 @@
                             "$ref": "#/definitions/models.Version"
                         }
                     },
-                    "404": {
-                        "description": "Version not found"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             },
@@ -157,10 +201,10 @@
                         "description": "Success"
                     },
                     "400": {
-                        "description": "Bad request, possibly bad file data or permissions"
-                    },
-                    "404": {
-                        "description": "Specified article version not found"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -355,6 +399,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "status": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

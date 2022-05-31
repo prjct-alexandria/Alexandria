@@ -13,4 +13,7 @@ type VersionService interface {
 
 	// GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
 	GetVersion(article int64, version int64) (models.Version, error)
+
+	// ListVersions returns a list of models for all versions of the specified article
+	ListVersions(article int64) ([]models.Version, error)
 }

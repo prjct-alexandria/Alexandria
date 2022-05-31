@@ -6,17 +6,16 @@ import VersionListElement from "./VersionListElement";
 import LoadingSpinner from "../LoadingSpinner";
 
 type Version = {
-  id: string;
-  author: string;
+  articleID: string;
+  versionID: string;
   title: string;
-  date_created: string;
+  owners: string[];
   status: string;
 };
 
 export default function VersionList() {
   let params = useParams();
-  const url = "/versionList.json"; // Placeholder
-  //const url = "http://localhost:8080/articles/" + params.articleId + "/versions";
+  const url = "http://localhost:8080/articles/" + params.articleId + "/versions";
 
   let [data, setData] = useState<Version[]>();
   let [isLoaded, setLoaded] = useState(false);
