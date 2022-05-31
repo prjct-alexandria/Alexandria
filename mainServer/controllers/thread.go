@@ -20,7 +20,7 @@ type ThreadController struct {
 // @Summary      Creates thread entity
 // @Description  Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment
 // @Accept		 json
-// @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
+// @Param		 thread 		body	models.Thread		true 	"Thread"
 // @Produce      json
 // @Success      200  {object} models.ReturnIds
 // @Failure 	 400  {object} httperror.HTTPError
