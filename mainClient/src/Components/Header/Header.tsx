@@ -1,5 +1,8 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
+import CreateArticle from "../Article/CreateArticle";
+import Login from "../User/Login";
+import Signup from "../User/Signup";
 
 export default function Header() {
   return (
@@ -29,23 +32,41 @@ export default function Header() {
             </li>
             <li className="nav-item">
               <Link to="/articles" className="nav-link">
-                All Articles
+                Browse Articles
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/upload" className="nav-link">
-                Upload article
-              </Link>
+              <button
+                type="button"
+                className="nav-link btn"
+                data-bs-toggle="modal"
+                data-bs-target="#publishArticle"
+              >
+                Publish article
+              </button>
+              <CreateArticle />
             </li>
             <li className="nav-item">
-              <Link to="/signup" className="nav-link">
-                Signup
-              </Link>
+              <button
+                type="button"
+                className="nav-link btn"
+                data-bs-toggle="modal"
+                data-bs-target="#signUp"
+              >
+                Sign up
+              </button>
+              <Signup />
             </li>
             <li className="nav-item">
-              <Link to="/login" className="nav-link">
-                Login
-              </Link>
+              <button
+                type="button"
+                className="nav-link btn"
+                data-bs-toggle="modal"
+                data-bs-target="#login"
+              >
+                Log in
+              </button>
+              <Login />
             </li>
           </ul>
         </div>
