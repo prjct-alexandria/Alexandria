@@ -28,7 +28,6 @@ type RequestController struct {
 // @Router      /articles/{articleID}/requests [post]
 func (contr RequestController) CreateRequest(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	// read path parameter
 	aid := c.Param("articleID")
