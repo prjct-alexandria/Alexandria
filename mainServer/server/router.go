@@ -23,9 +23,9 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
 
+	router.POST("/articles/:articleID/requests", contrs.req.CreateRequest)
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
-
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 
 	//Example of how to make an endpoint use the authentication

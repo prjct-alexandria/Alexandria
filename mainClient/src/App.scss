@@ -2,6 +2,10 @@
 $primary-color: #282c34;
 $primary-accent-color: cornflowerblue;
 $link-hover-color: #0a58ca;
+$added-color: green;
+$added-background-color: #b5efdb;
+$removed-color:red;
+$removed-background-color: #fec4c0;
 
 .text-primary {
   color: $primary-accent-color;
@@ -61,3 +65,16 @@ a:hover {
 //    transform: rotate(360deg);
 //  }
 //}
+
+
+.added {
+  color: $added-color;
+  background-color: $added-background-color;
+  text-shadow: none;
+}
+
+.removed {
+  color: $removed-color;
+  background-color: $removed-background-color;
+  text-shadow: none;
+}
