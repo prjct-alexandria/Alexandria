@@ -33,13 +33,12 @@ export default function CreateArticle() {
 
     // Make list of strings from input string separated by ","
     const tagList: string[] = mainVersionTags.split(",");
-    let ownerList: string[] = [];
+    let ownerList: string[] = mainVersionOwners.split(",");
 
     // Remove extra spaces
     tagList.map((tag) => tag.trim());
 
     if (ownerList.length > 0) {
-      ownerList = mainVersionOwners.split(",");
       ownerList.map((owner) => owner.trim());
     }
 
