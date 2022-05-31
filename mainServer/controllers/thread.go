@@ -16,8 +16,16 @@ type ThreadController struct {
 	CommentService       services.CommentService
 }
 
-// CreateThread creates thread entity, and specific thread entity.
-// returns id's of thread, specific thread and comment
+// CreateThread godoc
+// @Summary      Creates thread entity
+// @Description  Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment
+// @Accept		 json
+// @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
+// @Produce      json
+// @Success      200  {object} models.ReturnIds
+// @Failure 	 400  {object} httperror.HTTPError
+// @Failure 	 500  {object} httperror.HTTPError
+// @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
 func (contr *ThreadController) CreateThread(c *gin.Context) {
 	var thread models.Thread
 	err := c.BindJSON(&thread)
