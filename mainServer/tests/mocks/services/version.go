@@ -28,6 +28,11 @@ func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Ver
 	panic("implement me")
 }
 
+func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewVersionServiceMock initializes a mock with variables that are passed by reference,
 // so the values can be retrieved from anywhere in the program
 func NewVersionServiceMock() VersionServiceMock {
