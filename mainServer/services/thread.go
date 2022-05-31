@@ -14,7 +14,7 @@ type ThreadService struct {
 
 // StartThread creates thread entity in db
 // returns thread id
-func (serv ThreadService) StartThread(thread models.ThreadNoId, aid string, sid string) (int64, error) {
+func (serv ThreadService) StartThread(thread models.Thread, aid string, sid string) (int64, error) {
 	// TODO: check if user is authenticated
 
 	// check model has same aid and cid as params

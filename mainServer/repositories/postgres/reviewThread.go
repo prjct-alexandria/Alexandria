@@ -30,7 +30,7 @@ func (r PgReviewThreadRepository) createReviewThreadTable() error {
 	return err
 }
 
-func (r PgReviewThreadRepository) CreateReviewThread(thread models.ThreadNoId, tid string) (int64, error) {
+func (r PgReviewThreadRepository) CreateReviewThread(thread models.Thread, tid string) (int64, error) {
 	row := r.Db.QueryRow("INSERT INTO ReviewThread (reviewId, threadId) " +
 		"VALUES ('" +
 		strconv.FormatInt(thread.SpecificId, 10) + "', '" +

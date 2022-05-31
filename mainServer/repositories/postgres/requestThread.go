@@ -30,7 +30,7 @@ func (r PgRequestThreadRepository) createRequestThreadTable() error {
 	return err
 }
 
-func (r PgRequestThreadRepository) CreateRequestThread(thread models.ThreadNoId, tid string) (int64, error) {
+func (r PgRequestThreadRepository) CreateRequestThread(thread models.Thread, tid string) (int64, error) {
 	row := r.Db.QueryRow("INSERT INTO RequestThread (requestId, threadId) " +
 		"VALUES ('" +
 		strconv.FormatInt(thread.SpecificId, 10) + "', '" +

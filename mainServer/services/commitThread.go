@@ -10,7 +10,7 @@ type CommitThreadService struct {
 	CommitThreadRepository interfaces.CommitThreadRepository
 }
 
-func (serv CommitThreadService) StartCommitThread(thread models.ThreadNoId, tid int64) (int64, error) {
+func (serv CommitThreadService) StartCommitThread(thread models.Thread, tid int64) (int64, error) {
 	// create commitThread
 	id, err := serv.CommitThreadRepository.CreateCommitThread(thread, strconv.FormatInt(tid, 10))
 	if err != nil {

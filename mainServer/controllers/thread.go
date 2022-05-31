@@ -19,7 +19,7 @@ type ThreadController struct {
 // CreateThread creates thread entity, and specific thread entity.
 // returns id's of thread, specific thread and comment
 func (contr *ThreadController) CreateThread(c *gin.Context) {
-	var thread models.ThreadNoId
+	var thread models.Thread
 	err := c.BindJSON(&thread)
 	if err != nil {
 		fmt.Println(err)

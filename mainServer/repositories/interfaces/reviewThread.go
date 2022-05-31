@@ -3,5 +3,5 @@ package interfaces
 import "mainServer/models"
 
 type ReviewThreadRepository interface {
-	CreateReviewThread(thread models.ThreadNoId, tid string) (int64, error)
+	CreateReviewThread(thread models.Thread, tid string) (int64, error)
 }

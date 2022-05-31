@@ -18,7 +18,7 @@ func (serv CommentService) SaveComment(comment entities.Comment, tid int64) (int
 	var err error
 
 	id, err := serv.CommentRepository.SaveComment(
-		models.CommentNoId{
+		models.Comment{
 			AuthorId:     comment.AuthorId,
 			ThreadId:     tid,
 			Content:      comment.Content,
