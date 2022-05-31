@@ -21,7 +21,6 @@ export default function HomepageHeader() {
                 href="/articles"
                 role="button"
                 rel="nofollow"
-                target="_blank"
               >
                 Browse articles
               </a>

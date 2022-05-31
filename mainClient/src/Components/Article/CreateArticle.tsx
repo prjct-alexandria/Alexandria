@@ -2,9 +2,9 @@ import * as React from "react";
 import { useState } from "react";
 
 export default function CreateArticle() {
-  let [articleTitle, setArticleTitle] = useState<string>("");
-  let [articleOwners, setArticleOwners] = useState<string>("");
-  let [articleTags, setArticleTags] = useState<string>("");
+  let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
+  let [mainVersionOwners, setMainVersionOwners] = useState<string>("");
+  let [mainVersionTags, setMainVersionTags] = useState<string>("");
   let [error, setError] = useState(null);
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
 
@@ -12,19 +12,19 @@ export default function CreateArticle() {
   let areTagsImplemented = false;
 
   const onChangeTitle = (e: { target: { value: any } }) => {
-    setArticleTitle(e.target.value);
+    setMainVersionTitle(e.target.value);
     setIsTitleChanged(true);
   };
 
   const onChangeOwners = (e: { target: { value: any } }) => {
-    setArticleOwners(e.target.value);
+    setMainVersionOwners(e.target.value);
   };
 
   const onChangeTags = (e: { target: { value: any } }) => {
-    setArticleTags(e.target.value);
+    setMainVersionTags(e.target.value);
   };
 
-  // Send an HTTP POST request to /register with user info
+  // Send an HTTP POST request to /articles with new article's info
   const submitHandler = (e: { preventDefault: () => void }) => {
     // Prevent unwanted default browser behavior
     e.preventDefault();
@@ -32,23 +32,26 @@ export default function CreateArticle() {
     const url = "http://localhost:8080/articles";
 
     // Make list of strings from input string separated by ","
-    const tagList: string[] = articleTags.split(",");
+    const tagList: string[] = mainVersionTags.split(",");
     let ownerList: string[] = [];
 
     // Remove extra spaces
     tagList.map((tag) => tag.trim());
 
     if (ownerList.length > 0) {
-      ownerList = articleOwners.split(",");
+      ownerList = mainVersionOwners.split(",");
       ownerList.map((owner) => owner.trim());
     }
 
     let loggedUser = localStorage.getItem("loggedUserEmail");
-    ownerList[ownerList.length] = loggedUser == undefined ? "" : loggedUser;
+    ownerList[ownerList.length] =
+      loggedUser === null || typeof loggedUser === "undefined"
+        ? ""
+        : loggedUser;
 
     // Construct request body
     const body = {
-      title: articleTitle,
+      title: mainVersionTitle,
       owners: ownerList,
     };
 
@@ -122,7 +125,7 @@ export default function CreateArticle() {
                   className="create-article-input"
                   onChange={onChangeTitle}
                 />
-                {articleTitle.length == 0 && isTitleChanged && (
+                {mainVersionTitle.length === 0 && isTitleChanged && (
                   <span className="input-validation">
                     This field is mandatory.
                   </span>
@@ -137,7 +140,7 @@ export default function CreateArticle() {
                     className="create-article-input"
                     onChange={onChangeTags}
                   />
-                  {articleTags.length == 0 && (
+                  {mainVersionTags.length === 0 && (
                     <span className="input-validation">
                       This field is mandatory.
                     </span>
@@ -145,7 +148,7 @@ export default function CreateArticle() {
                 </div>
               )}
               <div>
-                <h5 className="form-label">Other owners *</h5>
+                <h5 className="form-label">Other owners (optional)</h5>
                 <span>Separate owner emails by ",".</span>
                 <input
                   name="owners"
@@ -153,7 +156,6 @@ export default function CreateArticle() {
                   onChange={onChangeOwners}
                 />
               </div>
-              <span>Fields marked with * are optional.</span>
             </div>
             <div className="modal-footer">
               <button
@@ -166,7 +168,7 @@ export default function CreateArticle() {
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={articleTitle.length == 0}
+                disabled={mainVersionTitle.length === 0}
               >
                 Submit
               </button>

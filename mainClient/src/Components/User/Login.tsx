@@ -32,7 +32,7 @@ export default function Login() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       mode: "cors",
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(body),
     }).then(
       // Success; set response in state
@@ -45,6 +45,8 @@ export default function Login() {
           // Redirect to homepage; Comment this to debug the form submission
           if (typeof window !== "undefined") {
             window.location.href = "http://localhost:3000/";
+          } else {
+            console.log("Error: Undefined window");
           }
         }
       },
