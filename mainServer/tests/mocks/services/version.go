@@ -16,6 +16,12 @@ type VersionServiceMock struct {
 	Params *map[string]map[string]interface{}
 }
 
+func (m VersionServiceMock) ListVersions(article int64) ([]models.Version, error) {
+	// added to solve merge conflicts after the testing issue was finished
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Version, error) {
 	// added to solve merge conflicts after the testing issue was finished
 	// TODO: implement for future testing

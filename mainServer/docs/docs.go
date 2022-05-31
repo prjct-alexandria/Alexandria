@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
+                "description": "Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
                     "application/json"
                 ],
@@ -104,6 +104,45 @@ const docTemplate = `{
             }
         },
         "/articles/{articleID}/versions": {
+            "get": {
+                "description": "Gets all versions belonging to a specific article. Does not include version contents.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Version"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Creates new version from an existing one of the same article",
                 "consumes": [
@@ -183,8 +222,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Version"
                         }
                     },
-                    "404": {
-                        "description": "Version not found"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             },
@@ -215,10 +257,10 @@ const docTemplate = `{
                         "description": "Success"
                     },
                     "400": {
-                        "description": "Bad request, possibly bad file data or permissions"
-                    },
-                    "404": {
-                        "description": "Specified article version not found"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -413,6 +455,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "status": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

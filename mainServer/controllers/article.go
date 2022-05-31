@@ -20,7 +20,7 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 
 // CreateArticle godoc
 // @Summary      Create new article
-// @Description  Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.
+// @Description  Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.
 // @Accept		 json
 // @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
 // @Produce      json

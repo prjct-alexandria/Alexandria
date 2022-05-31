@@ -16,4 +16,7 @@ type VersionService interface {
 
 	// CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
 	CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error)
+
+	// ListVersions returns a list of models for all versions of the specified article
+	ListVersions(article int64) ([]models.Version, error)
 }

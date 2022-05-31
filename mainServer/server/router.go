@@ -23,6 +23,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.POST("/articles/:articleID/versions", contrs.version.CreateVersionFrom)
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
+	router.GET("/articles/:articleID/versions", contrs.version.ListVersions)
 
 	router.POST("/articles/:articleID/requests", contrs.req.CreateRequest)
 	router.POST("/users", contrs.user.Register)

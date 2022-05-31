@@ -72,6 +72,8 @@ definitions:
         items:
           type: string
         type: array
+      status:
+        type: string
       title:
         type: string
       versionID:
@@ -105,7 +107,8 @@ paths:
       consumes:
       - application/json
       description: Creates new article, including main article version. Returns main
-        version. Owners must be specified as email addresses, not usernames.
+        version info, excluding contents. Owners must be specified as email addresses,
+        not usernames.
       parameters:
       - description: Article info
         in: body
@@ -159,6 +162,33 @@ paths:
           description: Error creating request on server
       summary: Create request
   /articles/{articleID}/versions:
+    get:
+      description: Gets all versions belonging to a specific article. Does not include
+        version contents.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Version'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: List article versions
     post:
       consumes:
       - application/json
@@ -213,8 +243,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Version'
-        "404":
-          description: Version not found
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Get version content + metadata
     post:
       consumes:
@@ -237,9 +269,9 @@ paths:
         "200":
           description: Success
         "400":
-          description: Bad request, possibly bad file data or permissions
-        "404":
-          description: Specified article version not found
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
   /createExampleUser:
     post:
