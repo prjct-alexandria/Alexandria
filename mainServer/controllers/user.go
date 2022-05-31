@@ -27,8 +27,6 @@ type UserController struct {
 // @Failure		409 "Could not save user to database"
 // @Router		/users	[post]
 func (u *UserController) Register(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-
 	var user entities.User
 
 	err := c.BindJSON(&user)
@@ -63,9 +61,6 @@ func (u *UserController) Register(c *gin.Context) {
 // @Failure		500 "Could not create token"
 // @Router		/login	[post]
 func (u *UserController) Login(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-	c.Header("Access-Control-Allow-Credentials", "true")
-
 	var cred models.LoginForm
 
 	err := c.BindJSON(&cred)
@@ -97,8 +92,6 @@ func (u *UserController) Login(c *gin.Context) {
 // @Success      200  {object} string
 // @Router       /createExampleUser [post]
 func (u *UserController) CreateExampleUser(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-
 	user := entities.User{
 		Name:  "Pietje",
 		Email: "pietjepuk@gmail.com",
@@ -122,7 +115,7 @@ func (u *UserController) CreateExampleUser(c *gin.Context) {
 // @Router       /getExampleUser [get]
 func (u *UserController) GetExampleUser(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
+
 	user, err := u.UserService.GetUserByEmail("pietjepuk@gmail.com")
 
 	if err != nil {

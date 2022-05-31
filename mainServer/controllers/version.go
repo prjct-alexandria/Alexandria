@@ -24,7 +24,6 @@ type VersionController struct {
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	// extract article id
 	aid := c.Param("articleID")
@@ -98,7 +97,5 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.Status(http.StatusOK)
 }
