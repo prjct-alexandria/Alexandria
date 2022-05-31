@@ -162,33 +162,31 @@ export default function VersionList() {
                     {deleteButton()}
                 </div>
 
-                <h1>See changes</h1>
-
-                {/*Accept and reject button*/}
-                <div className='row justify-content-center'>
-                    <div className='col-1' id='AcceptButton'>
-                        {acceptButton()}
-                    </div>
-                    <div className='col-1'>
-                        {rejectButton()}
-                    </div>
-                </div>
-
+                <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Changes</h1>
 
                 <div className='row justify-content-center'>
                     {/*Version names*/}
-                    <div className='col-4'>
-                        Version: {dataSource !== undefined && dataSource.title}
-                    </div>
-                    <div className='col-4' >
-                        Version: {dataTarget !== undefined && dataTarget.title}
+                    <div className='row' style={{margin:"15px"}}>
+                        <div className='col-6' style={{textAlign:'center'}}>
+                            <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
+                        </div>
+                        <div className='col-4' style={{textAlign:'center'}}>
+                            <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
+                        </div>
+                        {/*Accept and reject button*/}
+                        <div className='col-1' id='AcceptButton'>
+                            {acceptButton()}
+                        </div>
+                        <div className='col-1'>
+                            {rejectButton()}
+                        </div>
                     </div>
 
                     {/*Content of versions*/}
-                    <div className='col-8 '  >
-                        <div className='row overflow-scroll' style={{height:'500px'}}>
+                    <div>
+                        <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
                             {/*Source version, including changes that are made*/}
-                            <div className='col-6' style={{border: 'black solid 3px'}}>
+                            <div className='col-6'>
                                 {(dataSource !== undefined && dataTarget !== undefined) &&
                                     <PrismDiff
                                         sourceContent={dataSource.content}
@@ -197,13 +195,14 @@ export default function VersionList() {
                                 }
                             </div>
                             {/*Target version*/}
-                            <div className='col-6' style={{border: 'black solid 3px'}}>
+                            <div className='col-6'>
                                 {dataTarget !== undefined && dataTarget.content}
                             </div>
+
                         </div>
                     </div>
                     {/*Space for threads regarding this request*/}
-                    <div className='col-8 ' style={{border: 'black solid 1px', height: '100px'}}>
+                    <div style={{border: 'black solid 1px', height: '100px'}}>
                         Threads
                     </div>
                 </div>
