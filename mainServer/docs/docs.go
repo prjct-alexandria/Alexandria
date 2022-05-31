@@ -59,6 +59,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/{articleID}/requests": {
+            "post": {
+                "description": "Creates request to merge one article versions' changes into another",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Request"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid article ID or request creation data"
+                    },
+                    "500": {
+                        "description": "Error creating request on server"
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/versions": {
             "get": {
                 "description": "Gets all versions belonging to a specific article. Does not include version contents.",
@@ -297,6 +341,55 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Request": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "requestID": {
+                    "type": "integer"
+                },
+                "sourceHistoryID": {
+                    "type": "string"
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "targetHistoryID": {
+                    "type": "string"
+                },
+                "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RequestCreationForm": {
+            "type": "object",
+            "required": [
+                "sourceHistoryID",
+                "sourceVersionID",
+                "targetHistoryID",
+                "targetVersionID"
+            ],
+            "properties": {
+                "sourceHistoryID": {
+                    "type": "string"
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "targetHistoryID": {
+                    "type": "string"
+                },
+                "targetVersionID": {
+                    "type": "integer"
                 }
             }
         },

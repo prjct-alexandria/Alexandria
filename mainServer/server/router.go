@@ -17,16 +17,16 @@ import (
 func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
 	router.Use(middlewares.AuthMiddleware())
-	router.Use(middlewares.Options)
+	router.Use(middlewares.CorsHeaders())
 
 	router.POST("/articles", contrs.article.CreateArticle)
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
 	router.GET("/articles/:articleID/versions", contrs.version.ListVersions)
 
+	router.POST("/articles/:articleID/requests", contrs.req.CreateRequest)
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
-
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 
 	//Example of how to make an endpoint use the authentication
