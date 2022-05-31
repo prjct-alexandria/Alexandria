@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/articles": {
             "post": {
-                "description": "Creates new article, including main article version. Returns main version. Owners must be specified as email addresses, not usernames.",
+                "description": "Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,6 +42,91 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests": {
+            "post": {
+                "description": "Creates request to merge one article versions' changes into another",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Request"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid article ID or request creation data"
+                    },
+                    "500": {
+                        "description": "Error creating request on server"
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/versions": {
+            "get": {
+                "description": "Gets all versions belonging to a specific article. Does not include version contents.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Version"
+                            }
                         }
                     },
                     "400": {
@@ -89,8 +174,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Version"
                         }
                     },
-                    "404": {
-                        "description": "Version not found"
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             },
@@ -121,10 +209,10 @@ const docTemplate = `{
                         "description": "Success"
                     },
                     "400": {
-                        "description": "Bad request, possibly bad file data or permissions"
-                    },
-                    "404": {
-                        "description": "Specified article version not found"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -159,6 +247,52 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/entities.User"
                         }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging in",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "403": {
+                        "description": "Invalid password"
+                    },
+                    "500": {
+                        "description": "Could not create token"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "description": "Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user registration",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid user JSON provided"
+                    },
+                    "403": {
+                        "description": "Could not generate password hash"
+                    },
+                    "409": {
+                        "description": "Could not save user to database"
                     }
                 }
             }
@@ -250,6 +384,55 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Request": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "requestID": {
+                    "type": "integer"
+                },
+                "sourceHistoryID": {
+                    "type": "string"
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "targetHistoryID": {
+                    "type": "string"
+                },
+                "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RequestCreationForm": {
+            "type": "object",
+            "required": [
+                "sourceHistoryID",
+                "sourceVersionID",
+                "targetHistoryID",
+                "targetVersionID"
+            ],
+            "properties": {
+                "sourceHistoryID": {
+                    "type": "string"
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "targetHistoryID": {
+                    "type": "string"
+                },
+                "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Version": {
             "type": "object",
             "properties": {
@@ -264,6 +447,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "status": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

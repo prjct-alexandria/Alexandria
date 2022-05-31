@@ -6,4 +6,5 @@ type Version struct {
 	Title     string   `json:"title"`
 	Owners    []string `json:"owners"`
 	Content   string   `json:"content"`
+	Status    string   `json:"status"`
 }
