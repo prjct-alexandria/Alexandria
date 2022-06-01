@@ -20,15 +20,22 @@ func NewPgThreadRepository(db *sql.DB) PgThreadRepository {
 	return repo
 }
 
-func (r PgThreadRepository) CreateThread(aid string) (int64, error) {
-	row := r.Db.QueryRow("INSERT INTO thread (articleId) " +
-		"VALUES ('" + aid + "')" +
-		"RETURNING threadId")
-	var tid int64
-	err := row.Scan(&tid)
+func (r PgThreadRepository) CreateThread(aid int64) (int64, error) {
+	stmt, err := r.Db.Prepare("INSERT INTO thread (threadid, articleid) VALUES (DEFAULT, $1) RETURNING threadid")
 	if err != nil {
 		fmt.Println(err)
-		return 0, fmt.Errorf("CreateThread: %v", err)
+		return -1, fmt.Errorf("CreateThread: %v", err)
+	}
+	row := stmt.QueryRow(aid)
+
+	//row := r.Db.QueryRow("INSERT INTO thread (articleId) " +
+	//	"VALUES ('" + aid + "')" +
+	//	"RETURNING threadId")
+	var tid int64
+	err = row.Scan(&tid)
+	if err != nil {
+		fmt.Println(err)
+		return -1, fmt.Errorf("CreateThread: %v", err)
 	}
 
 	return tid, err

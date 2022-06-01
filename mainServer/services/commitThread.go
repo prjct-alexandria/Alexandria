@@ -3,7 +3,6 @@ package services
 import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"strconv"
 )
 
 type CommitThreadService struct {
@@ -12,7 +11,7 @@ type CommitThreadService struct {
 
 func (serv CommitThreadService) StartCommitThread(thread models.Thread, tid int64) (int64, error) {
 	// create commitThread
-	id, err := serv.CommitThreadRepository.CreateCommitThread(thread, strconv.FormatInt(tid, 10))
+	id, err := serv.CommitThreadRepository.CreateCommitThread(thread, tid)
 	if err != nil {
 		return 0, err
 	}

@@ -6,6 +6,7 @@ import (
 	"mainServer/models"
 	"mainServer/services"
 	"net/http"
+	"strconv"
 )
 
 type ThreadController struct {
@@ -39,8 +40,21 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	sid := c.Param("specificID")
 	threadType := c.Param("threadType")
 
+	intSid, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
 	// save threat in the db
-	tid, err := contr.ThreadService.StartThread(thread, aid, sid)
+	tid, err := contr.ThreadService.StartThread(thread, intAid, intSid)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)

@@ -1,5 +1,5 @@
 package interfaces
 
 type ThreadRepository interface {
-	CreateThread(aid string) (int64, error)
+	CreateThread(aid int64) (int64, error)
 }

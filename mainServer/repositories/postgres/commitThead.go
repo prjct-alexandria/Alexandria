@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"mainServer/models"
-	"strconv"
 )
 
 type PgCommitThreadRepository struct {
@@ -30,17 +29,18 @@ func (r PgCommitThreadRepository) createCommitThreadTable() error {
 	return err
 }
 
-func (r PgCommitThreadRepository) CreateCommitThread(thread models.Thread, tid string) (int64, error) {
-	row := r.Db.QueryRow("INSERT INTO commitThread (commitId, threadId) " +
-		"VALUES ('" +
-		strconv.FormatInt(thread.SpecificId, 10) + "', '" +
-		tid + "')" +
-		"RETURNING commitThreadId")
-	var id int64
-	err := row.Scan(&id)
+func (r PgCommitThreadRepository) CreateCommitThread(thread models.Thread, tid int64) (int64, error) {
+	stmt, err := r.Db.Prepare("INSERT INTO committhread (committhreadid, commitid, threadid) VALUES (DEFAULT, $1, $2) RETURNING committhreadid")
 	if err != nil {
-		return 0, fmt.Errorf("CreateThread: %v", err)
+		return -1, fmt.Errorf("CreateThread: %v", err)
+	}
+	row := stmt.QueryRow(thread.SpecificId, tid)
+
+	var id int64
+	err = row.Scan(&id)
+	if err != nil {
+		return -1, fmt.Errorf("CreateThread: %v", err)
 	}
 
-	return id, err
+	return id, nil
 }

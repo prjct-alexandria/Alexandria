@@ -3,7 +3,6 @@ package services
 import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"strconv"
 )
 
 type ReviewThreadService struct {
@@ -12,7 +11,7 @@ type ReviewThreadService struct {
 
 func (serv ReviewThreadService) StartReviewThread(thread models.Thread, tid int64) (int64, error) {
 	// create reviewThread
-	id, err := serv.ReviewThreadRepository.CreateReviewThread(thread, strconv.FormatInt(tid, 10))
+	id, err := serv.ReviewThreadRepository.CreateReviewThread(thread, tid)
 	if err != nil {
 		return 0, err
 	}
