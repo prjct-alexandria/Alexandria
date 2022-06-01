@@ -90,6 +90,7 @@ func (r GitRepository) Commit(article int64) error {
 	return nil
 }
 
+// CheckoutBranch checks out the specified version in the specified article repo
 func (r GitRepository) CheckoutBranch(article int64, version int64) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
@@ -103,6 +104,49 @@ func (r GitRepository) CheckoutBranch(article int64, version int64) error {
 	})
 
 	return err
+}
+
+// CreateBranch creates a new branch based on the source one, named as target. Will automatically check out source branch.
+func (r GitRepository) CreateBranch(article int64, source int64, target int64) error {
+
+	// Open repository and get worktree
+	dir, err := r.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+	repo, err := git.PlainOpen(dir)
+	if err != nil {
+		return err
+	}
+	w, err := repo.Worktree()
+	if err != nil {
+		return err
+	}
+
+	// Checkout source branch
+	sourceName := strconv.FormatInt(source, 10)
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.NewBranchReferenceName(sourceName),
+	})
+	if err != nil {
+		return err
+	}
+
+	// Create new branch reference
+	targetName := strconv.FormatInt(target, 10)
+	targetRef := plumbing.NewBranchReferenceName(targetName)
+	if err != nil {
+		return err
+	}
+
+	// Store the new branch reference to head
+	headRef, err := repo.Head()
+	ref := plumbing.NewHashReference(targetRef, headRef.Hash())
+	err = repo.Storer.SetReference(ref)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetArticlePath returns the path to an article git repository

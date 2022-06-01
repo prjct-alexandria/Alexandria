@@ -1,0 +1,29 @@
+[
+  {
+    "requestID": 100,
+    "articleID": 200,
+    "sourceVersionID": "1",
+    "sourceHistoryID": "2",
+    "targetVersionID": "3",
+    "targetHistoryID": "4",
+    "state": "pending"
+  },
+  {
+    "requestID": 300,
+    "articleID": 400,
+    "sourceVersionID": "5",
+    "sourceHistoryID": "6",
+    "targetVersionID": "7",
+    "targetHistoryID": "8",
+    "state": "accepted"
+  },
+  {
+    "requestID": 500,
+    "articleID": 600,
+    "sourceVersionID": "9",
+    "sourceHistoryID": "10",
+    "targetVersionID": "11",
+    "targetHistoryID": "12",
+    "state": "rejected"
+  }
+]

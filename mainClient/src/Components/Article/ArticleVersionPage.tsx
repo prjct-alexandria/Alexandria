@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
+import FileUpload from "./FileUpload";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -49,14 +50,27 @@ export default function ArticleVersionPage() {
       {!isLoaded && <LoadingSpinner />}
       {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
       {versionData != null && (
-        <div className="article">
-          <ul>
-            {versionData.owners.map((owner, i) => (
-              <li key={i}>{owner}</li>
-            ))}
-          </ul>
-          <h1>{versionData.title}</h1>
-          <div>{versionData.content}</div>
+        <div>
+          <div className="article col-10">
+            <ul>
+              {versionData.owners.map((owner, i) => (
+                <li key={i}>{owner}</li>
+              ))}
+            </ul>
+            <h1>{versionData.title}</h1>
+            <div>{versionData.content}</div>
+          </div>
+          <div className="col-2">
+            <button
+              type="button"
+              className="btn btn-primary btn-lg"
+              data-bs-toggle="modal"
+              data-bs-target="#uploadFile"
+            >
+              Upload File
+            </button>
+            <FileUpload />
+          </div>
         </div>
       )}
     </div>

@@ -3,10 +3,9 @@ import { useState } from "react";
 import LoginForm from "./LoginForm";
 
 export default function Login() {
-  let [email, setEmail] = useState<string>();
+  let [email, setEmail] = useState<string>("");
   let [password, setPassword] = useState<string>();
   let [error, setError] = useState(null);
-  let [httpResponse, setHttpResponse] = useState<Response>();
 
   const onChangeEmail = (e: { target: { value: any } }) => {
     setEmail(e.target.value);
@@ -33,17 +32,22 @@ export default function Login() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       mode: "cors",
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(body),
     }).then(
       // Success; set response in state
       (response) => {
         console.log("Success:", response);
-        setHttpResponse(response);
 
-        // Redirect to homepage; Comment this to debug the form submission
-        if (typeof window !== "undefined") {
-          window.location.href = "http://localhost:3000/";
+        if (response.ok) {
+          localStorage.setItem("loggedUserEmail", email);
+
+          // Redirect to homepage; Comment this to debug the form submission
+          if (typeof window !== "undefined") {
+            window.location.href = "http://localhost:3000/";
+          } else {
+            console.log("Error: Undefined window");
+          }
         }
       },
       (error) => {

@@ -1,16 +1,18 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"mainServer/services"
+	"mainServer/models"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
 
 type VersionController struct {
-	Serv services.VersionService
+	Serv interfaces.VersionService
 }
 
 // GetVersion 	godoc
@@ -20,11 +22,10 @@ type VersionController struct {
 // @Param		versionID	path	string	true	"Version ID"
 // @Produce		json
 // @Success		200 {object} models.Version
-// @Failure		404 "Version not found"
+// @Failure 	400 {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	// extract article id
 	aid := c.Param("articleID")
@@ -54,6 +55,37 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, res)
 }
 
+// ListVersions 	godoc
+// @Summary		List article versions
+// @Description	Gets all versions belonging to a specific article. Does not include version contents.
+// @Param		articleID	path	string	true	"Article ID"
+// @Produce		json
+// @Success		200 {object} []models.Version
+// @Failure 	400  {object} httperror.HTTPError
+// @Failure 	500  {object} httperror.HTTPError
+// @Router		/articles/{articleID}/versions [get]
+func (contr VersionController) ListVersions(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	// extract article id
+	aid := c.Param("articleID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// get versions
+	res, err := contr.Serv.ListVersions(article)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get versions of aid=%d", article))
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
+}
+
 // UpdateVersion godoc
 // @Summary     Update article version
 // @Description Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field "file"
@@ -61,8 +93,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Param		articleID	path	string	true "Article ID"
 // @Param		versionID	path	string	true "Version ID"
 // @Success     200 "Success"
-// @Failure     400 "Bad request, possibly bad file data or permissions"
-// @Failure     404 "Specified article version not found"
+// @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
 
@@ -98,7 +129,49 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.Status(http.StatusOK)
+}
+
+// CreateVersionFrom godoc
+// @Summary      Create new version
+// @Description  Creates new version from an existing one of the same article
+// @Accept		 json
+// @Param		 articleID		path	string							true 	"Article ID"
+// @Param		 version 		body	models.VersionCreationForm		true 	"Version info"
+// @Produce      json
+// @Success      200  {object} models.Version
+// @Failure      400  {object} httperror.HTTPError
+// @Failure      500  {object} httperror.HTTPError
+// @Router       /articles/{articleID}/versions [post]
+func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+
+	// Extract article id
+	aid := c.Param("articleID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%s", aid))
+		return
+	}
+
+	// Read version creation JSON
+	form := models.VersionCreationForm{}
+	err = c.BindJSON(&form)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, errors.New("cannot bind version creation form"))
+		return
+	}
+
+	// Create version
+	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create new version on server"))
+		return
+	}
+
+	// Return version
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, version)
 }
