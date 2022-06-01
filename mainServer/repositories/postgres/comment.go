@@ -4,14 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"mainServer/models"
+	"mainServer/utils/clock"
 )
 
 type PgCommentRepository struct {
-	Db *sql.DB
+	Db    *sql.DB
+	Clock clock.Clock
 }
 
-func NewPgCommentRepository(db *sql.DB) PgCommentRepository {
-	repo := PgCommentRepository{db}
+func NewPgCommentRepository(db *sql.DB, clock clock.Clock) PgCommentRepository {
+	repo := PgCommentRepository{db, clock}
 	err := repo.createCommentTable()
 	if err != nil {
 		fmt.Println(err)
@@ -26,7 +28,7 @@ func (r PgCommentRepository) createCommentTable() error {
     	authorId varchar(64) NOT NULL,
     	content varchar(64) NOT NULL,
         threadId BIGINT NOT NULL,
-        creationDate varchar(64) NOT NULL,
+        creationDate BIGINT NOT NULL,
     	PRIMARY KEY (commentId)
     )`)
 	return err
@@ -39,13 +41,13 @@ func (r PgCommentRepository) SaveComment(comment models.Comment) (int64, error) 
 		fmt.Println(err)
 		return -1, fmt.Errorf("SaveComment: %v", err)
 	}
-	row := stmt.QueryRow(comment.AuthorId, comment.Content, comment.ThreadId, comment.CreationDate)
+	row := stmt.QueryRow(comment.AuthorId, comment.Content, comment.ThreadId, r.Clock.Now().Unix())
 
 	var id int64
 	err = row.Scan(&id)
 	if err != nil {
 		fmt.Println(err)
-		return 0, fmt.Errorf("SaveComment: %v", err)
+		return -1, fmt.Errorf("SaveComment: %v", err)
 	}
 
 	return id, nil
