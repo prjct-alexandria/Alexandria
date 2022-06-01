@@ -121,6 +121,44 @@
                 }
             }
         },
+        "/comments/thread/:threadID": {
+            "post": {
+                "description": "Save all types (commit/request/review) of comments to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Save comment",
+                "parameters": [
+                    {
+                        "description": "Comment",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Comment"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "threadID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "failed saving comment"
+                    }
+                }
+            }
+        },
         "/createExampleUser": {
             "post": {
                 "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
@@ -157,6 +195,26 @@
         }
     },
     "definitions": {
+        "entities.Comment": {
+            "type": "object",
+            "properties": {
+                "authorId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
         "entities.User": {
             "type": "object",
             "properties": {

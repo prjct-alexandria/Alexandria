@@ -1,4 +1,17 @@
 definitions:
+  entities.Comment:
+    properties:
+      authorId:
+        type: string
+      content:
+        type: string
+      creationDate:
+        type: string
+      id:
+        type: integer
+      threadId:
+        type: integer
+    type: object
   entities.User:
     properties:
       email:
@@ -131,6 +144,31 @@ paths:
         "404":
           description: Specified article version not found
       summary: Update article version
+  /comments/thread/:threadID:
+    post:
+      consumes:
+      - application/json
+      description: Save all types (commit/request/review) of comments to the database
+      parameters:
+      - description: Comment
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Comment'
+      - description: Thread ID
+        in: path
+        name: threadID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad request
+        "500":
+          description: failed saving comment
+      summary: Save comment
   /createExampleUser:
     post:
       description: Creates a hardcoded user entity and adds it to the database, demonstrates

@@ -129,6 +129,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/comments/thread/:threadID": {
+            "post": {
+                "description": "Save all types (commit/request/review) of comments to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Save comment",
+                "parameters": [
+                    {
+                        "description": "Comment",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Comment"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "threadID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "failed saving comment"
+                    }
+                }
+            }
+        },
         "/createExampleUser": {
             "post": {
                 "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
@@ -163,48 +201,28 @@ const docTemplate = `{
                 }
             }
         }
-		"/articles/{articleID}/thread/{threadType}/id/{specificID}": {
-			"post": {
-				"description": "Start a new request-, review- or commit Thread. The thread is saved in the specific table, the comment in the comment table",
-				"consumes": [
-					"multipart/form-data"
-				],
-				"summary": "Update article version",
-				"parameters": [
-					{
-						"type": "int",
-						"description": "Article ID",
-						"name": "articleID",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "thread Type",
-						"name": " threadType ",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "int",
-						"description": " specific ID ",
-						"name": " specificID ",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Success"
-					},
-					"400": {
-						"description": "Bad request, possibly bad file data or permissions"
-					},
-				}
-			}
-		}
     },
     "definitions": {
+        "entities.Comment": {
+            "type": "object",
+            "properties": {
+                "authorId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
         "entities.User": {
             "type": "object",
             "properties": {
