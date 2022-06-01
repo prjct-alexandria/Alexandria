@@ -86,13 +86,12 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// return tid and specific id
-	ids := models.ReturnIds{
+	ids := models.ReturnThreadIds{
 		ThreadId:  tid,
 		CommentId: coid,
 		Id:        id,
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.IndentedJSON(http.StatusOK, ids)
 }
