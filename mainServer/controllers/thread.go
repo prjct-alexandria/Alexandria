@@ -54,7 +54,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
-	// save threat in the db
+	// save thread in the db
 	tid, err := contr.ThreadService.StartThread(thread, intAid, intSid)
 	if err != nil {
 		fmt.Println(err)
