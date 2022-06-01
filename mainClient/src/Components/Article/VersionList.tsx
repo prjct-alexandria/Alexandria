@@ -63,6 +63,7 @@ export default function VersionList() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: 'include',
     })
         .then((res) => res.json())
         .then(
