@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"mainServer/models"
+	"mainServer/entities"
 	"strconv"
 )
 
@@ -33,7 +33,7 @@ func (r PgCommentRepository) createCommentTable() error {
 	return err
 }
 
-func (r PgCommentRepository) SaveComment(comment models.CommentNoId) (int64, error) {
+func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
 	row := r.Db.QueryRow("INSERT INTO comment (authorId, content, threadId, creationDate) " +
 		"VALUES ('" + comment.AuthorId + "', '" +
 		comment.Content + "', '" +
