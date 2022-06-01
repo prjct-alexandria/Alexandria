@@ -59,6 +59,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/:articleID/mainVersion": {
+            "get": {
+                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get main version id of article",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/requests": {
             "post": {
                 "description": "Creates request to merge one article versions' changes into another",
