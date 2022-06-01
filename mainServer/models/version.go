@@ -8,3 +8,9 @@ type Version struct {
 	Content   string   `json:"content"`
 	Status    string   `json:"status"`
 }
+
+type VersionCreationForm struct {
+	SourceVersionID int64    `json:"sourceVersionID" binding:"required"`
+	Title           string   `json:"title" binding:"required"`
+	Owners          []string `json:"owners" binding:"required"`
+}

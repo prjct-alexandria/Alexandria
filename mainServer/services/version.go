@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
@@ -72,6 +73,38 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 		Status:    entity.Status,
 	}
 	return fullVersion, nil
+}
+
+// CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
+func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+
+	// Create entity to store in db
+	version := entities.Version{
+		ArticleID: article,
+		Title:     title,
+		Owners:    owners,
+	}
+
+	// Store entity in db and receive one with an ID attached
+	entity, err := serv.Versionrepo.CreateVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Use ID to create new branch in git
+	err = serv.Gitrepo.CreateBranch(article, source, entity.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Return model, made from entity
+	return models.Version{
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
+		Content:   "",
+	}, nil
 }
 
 // UpdateVersion overwrites file of specified article version and commits

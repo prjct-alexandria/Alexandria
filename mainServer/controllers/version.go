@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mainServer/models"
 	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -129,4 +131,49 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusOK)
+}
+
+// CreateVersionFrom godoc
+// @Summary      Create new version
+// @Description  Creates new version from an existing one of the same article
+// @Accept		 json
+// @Param		 articleID		path	string							true 	"Article ID"
+// @Param		 version 		body	models.VersionCreationForm		true 	"Version info"
+// @Produce      json
+// @Success      200  {object} models.Version
+// @Failure      400  {object} httperror.HTTPError
+// @Failure      500  {object} httperror.HTTPError
+// @Router       /articles/{articleID}/versions [post]
+func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+
+	// Extract article id
+	aid := c.Param("articleID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%s", aid))
+		return
+	}
+
+	// Read version creation JSON
+	form := models.VersionCreationForm{}
+	err = c.BindJSON(&form)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, errors.New("cannot bind version creation form"))
+		return
+	}
+
+	// Create version
+	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create new version on server"))
+		return
+	}
+
+	// Return version
+	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.JSON(http.StatusOK, version)
 }
