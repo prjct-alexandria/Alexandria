@@ -85,7 +85,26 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ReturnIds"
+                        },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
                         }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/mainVersion": {
+            "get": {
+                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get main version id of article",
+                "responses": {
+                    "200": {
+                        "description": "Success"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -93,11 +112,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/httperror.HTTPError"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
                     }
                 }
             }
