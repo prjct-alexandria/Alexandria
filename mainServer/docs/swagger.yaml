@@ -75,7 +75,7 @@ definitions:
     - targetHistoryID
     - targetVersionID
     type: object
-  models.ReturnIds:
+  models.ReturnThreadIds:
     properties:
       commentId:
         type: integer
@@ -167,6 +167,20 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
+  /articles/:articleID/mainVersion:
+    get:
+      description: Get main version of an article by specifying the article id. Returns
+        the version id of the main version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get main version id of article
   /articles/:articleID/thread/:threadType/id/:specificID/:
     post:
       consumes:
@@ -176,37 +190,26 @@ paths:
       parameters:
       - description: Thread
         in: body
-        name: article
+        name: thread
         required: true
         schema:
-          $ref: '#/definitions/models.Thread        
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ReturnIds'  
-          "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httperror.HTTPError'
-      summary: Creates thread entity
-
-  /articles/:articleID/mainVersion:
-    get:
-      description: Get main version of an article by specifying the article id. Returns
-        the version id of the main version
+          $ref: '#/definitions/models.Thread'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ReturnIds'
+            $ref: '#/definitions/models.ReturnThreadIds'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/httperror.HTTPError'
-      summary: Get main version id of article
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Creates thread entity
   /articles/{articleID}/requests:
     post:
       consumes:
@@ -236,6 +239,41 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
+  /articles/{articleID}/requests/{requestID}reject:
+    put:
+      consumes:
+      - text/plain
+      description: Rejects request request to merge one article versions' changes
+        into another.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Reject request
   /articles/{articleID}/versions:
     get:
       description: Gets all versions belonging to a specific article. Does not include

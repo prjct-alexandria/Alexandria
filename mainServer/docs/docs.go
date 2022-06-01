@@ -59,42 +59,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/:articleID/thread/:threadType/id/:specificID/": {
-            "post": {
-                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Creates thread entity",
-                "parameters": [
-                    {
-                        "description": "Thread",
-                        "name": "article",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Thread"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ReturnIds"
-                        },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/articles/:articleID/mainVersion": {
             "get": {
                 "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
@@ -111,7 +75,49 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/httperror.HTTPError"
                         }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/thread/:threadType/id/:specificID/": {
+            "post": {
+                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Creates thread entity",
+                "parameters": [
+                    {
+                        "description": "Thread",
+                        "name": "thread",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReturnThreadIds"
+                        }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -156,6 +162,57 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Error creating request on server"
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests/{requestID}reject": {
+            "put": {
+                "description": "Rejects request request to merge one article versions' changes into another.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Reject request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -518,7 +575,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ReturnIds": {
+        "models.ReturnThreadIds": {
             "type": "object",
             "properties": {
                 "commentId": {

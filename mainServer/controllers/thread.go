@@ -24,7 +24,7 @@ type ThreadController struct {
 // @Accept		 json
 // @Param		 thread 		body	models.Thread		true 	"Thread"
 // @Produce      json
-// @Success      200  {object} models.ReturnIds
+// @Success      200  {object} models.ReturnThreadIds
 // @Failure 	 400  {object} httperror.HTTPError
 // @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
@@ -82,7 +82,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	default:
 		id, err = -1, errors.New("invalid thread type")
 	}
-	
+
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
