@@ -34,6 +34,8 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	//Example of how to make an endpoint use the authentication
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
+	router.POST("/articles/:articleID/thread/:threadType/id/:specificID/", contrs.thread.CreateThread)
+
 	//Groups can be used for nested paths, maybe add example later
 	// Path for accessing the API documentation
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
