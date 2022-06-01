@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
@@ -78,7 +79,10 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
 	case "review":
 		id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
+	default:
+		id, err = -1, errors.New("invalid thread type")
 	}
+	
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
