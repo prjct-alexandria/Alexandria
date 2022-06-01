@@ -54,7 +54,7 @@ export default function Signup() {
 
         // Redirect to login page; Comment this to debug the form submission
         if (typeof window !== "undefined") {
-          window.location.href = "http://localhost:3000/login";
+          window.location.href = "http://localhost:3000/";
         }
       },
       (error) => {

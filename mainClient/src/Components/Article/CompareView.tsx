@@ -24,7 +24,7 @@ export default function VersionList() {
     let params = useParams();
 
     // const urlRequest = '/request.json'
-    const urlRequest = 'localhost:8080/articles/' + params.articleId + "/versions/" + params.versionId + "/requests/" + params.requestId;
+    const urlRequest = 'http://localhost:8080/articles/' + params.articleId  + "/requests/" + params.requestId;
 
     let [dataRequest, setDataRequest] = useState<Request>();
     let [isLoadedRequest, setLoadedRequest] = useState(false);
@@ -52,9 +52,9 @@ export default function VersionList() {
 
     if (dataRequest !== undefined) {
         // urlArticleSource = '/article_version1.json'; // Placeholder source version
-        urlArticleSource = 'localhost:8080/articles/' + params.articleId + '/versions/' + params.versionId + '/history/' + dataRequest.sourceHistoryID;
+        urlArticleSource = 'http://localhost:8080/articles/' + params.articleId + '/versions/' + params.versionId + '/history/' + dataRequest.sourceHistoryID;
         // urlArticleTarget = '/article_version2.json'; // Placeholder target version
-        urlArticleTarget = 'localhost:8080/articles/' + params.articleId + '/versions/' + dataRequest.targetVersionID + '/history/' + dataRequest.targetHistoryID;
+        urlArticleTarget = 'http://localhost:8080/articles/' + params.articleId + '/versions/' + dataRequest.targetVersionID + '/history/' + dataRequest.targetHistoryID;
     }
 
     let [dataSource, setDataSource] = useState<ArticleVersion>();
