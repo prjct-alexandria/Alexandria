@@ -1,4 +1,17 @@
 definitions:
+  entities.Comment:
+    properties:
+      authorId:
+        type: string
+      content:
+        type: string
+      creationDate:
+        type: string
+      id:
+        type: integer
+      threadId:
+        type: integer
+    type: object
   entities.User:
     properties:
       email:
@@ -61,6 +74,28 @@ definitions:
     - sourceVersionID
     - targetHistoryID
     - targetVersionID
+    type: object
+  models.ReturnIds:
+    properties:
+      commentId:
+        type: integer
+      id:
+        type: integer
+      threadId:
+        type: integer
+    type: object
+  models.Thread:
+    properties:
+      articleId:
+        type: integer
+      comment:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      id:
+        type: integer
+      specificId:
+        type: integer
     type: object
   models.Version:
     properties:
@@ -132,6 +167,46 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
+  /articles/:articleID/thread/:threadType/id/:specificID/:
+    post:
+      consumes:
+      - application/json
+      description: Creates thread entity, and specific thread entity. Returns id's
+        of thread, specific thread and comment
+      parameters:
+      - description: Thread
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.Thread        
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReturnIds'  
+          "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Creates thread entity
+
+  /articles/:articleID/mainVersion:
+    get:
+      description: Get main version of an article by specifying the article id. Returns
+        the version id of the main version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReturnIds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get main version id of article
   /articles/{articleID}/requests:
     post:
       consumes:

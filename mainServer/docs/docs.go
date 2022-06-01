@@ -59,6 +59,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/:articleID/thread/:threadType/id/:specificID/": {
+            "post": {
+                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Creates thread entity",
+                "parameters": [
+                    {
+                        "description": "Thread",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReturnIds"
+                        },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/mainVersion": {
+            "get": {
+                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get main version id of article",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/requests": {
             "post": {
                 "description": "Creates request to merge one article versions' changes into another",
@@ -347,6 +404,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entities.Comment": {
+            "type": "object",
+            "properties": {
+                "authorId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
         "entities.User": {
             "type": "object",
             "properties": {
@@ -437,6 +514,40 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ReturnIds": {
+            "type": "object",
+            "properties": {
+                "commentId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Thread": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Comment"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "specificId": {
                     "type": "integer"
                 }
             }

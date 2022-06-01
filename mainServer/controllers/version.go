@@ -173,6 +173,5 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 
 	// Return version
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, version)
 }

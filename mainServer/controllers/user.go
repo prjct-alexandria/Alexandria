@@ -103,7 +103,7 @@ func (u *UserController) CreateExampleUser(c *gin.Context) {
 		fmt.Println(err)
 		c.String(http.StatusBadRequest, "Fail")
 	} else {
-		c.String(http.StatusOK, "Succes")
+		c.String(http.StatusOK, "Success")
 	}
 }
 
