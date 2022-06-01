@@ -11,13 +11,7 @@ type Thread struct {
 	Comment    []entities.Comment
 }
 
-type ThreadNoId struct {
-	ArticleId  int64
-	SpecificId int64
-	Comment    []entities.Comment
-}
-
-type ReturnIds struct {
+type ReturnThreadIds struct {
 	Id        int64
 	ThreadId  int64
 	CommentId int64

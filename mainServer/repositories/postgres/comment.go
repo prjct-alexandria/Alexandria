@@ -4,15 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"mainServer/entities"
-	"strconv"
+	"mainServer/utils/clock"
 )
 
 type PgCommentRepository struct {
-	Db *sql.DB
+	Db    *sql.DB
+	Clock clock.Clock
 }
 
-func NewPgCommentRepository(db *sql.DB) PgCommentRepository {
-	repo := PgCommentRepository{db}
+func NewPgCommentRepository(db *sql.DB, clock clock.Clock) PgCommentRepository {
+	repo := PgCommentRepository{db, clock}
 	err := repo.createCommentTable()
 	if err != nil {
 		fmt.Println(err)
@@ -27,26 +28,38 @@ func (r PgCommentRepository) createCommentTable() error {
     	authorId varchar(64) NOT NULL,
     	content varchar(64) NOT NULL,
         threadId BIGINT NOT NULL,
-        creationDate varchar(64) NOT NULL,
+        creationDate BIGINT NOT NULL,
     	PRIMARY KEY (commentId)
     )`)
 	return err
 }
 
+//
+//<<<<<<< HEAD
+//func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
+//	row := r.Db.QueryRow("INSERT INTO comment (authorId, content, threadId, creationDate) " +
+//		"VALUES ('" + comment.AuthorId + "', '" +
+//		comment.Content + "', '" +
+//		strconv.FormatInt(comment.ThreadId, 10) + "', '" +
+//		comment.CreationDate +
+//		"')" +
+//		"RETURNING commentId")
+//=======
 func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
-	row := r.Db.QueryRow("INSERT INTO comment (authorId, content, threadId, creationDate) " +
-		"VALUES ('" + comment.AuthorId + "', '" +
-		comment.Content + "', '" +
-		strconv.FormatInt(comment.ThreadId, 10) + "', '" +
-		comment.CreationDate +
-		"')" +
-		"RETURNING commentId")
-	var id int64
-	err := row.Scan(&id)
+	stmt, err := r.Db.Prepare("INSERT INTO comment (commentid, authorid, content, threadid, creationdate) " +
+		"VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid")
 	if err != nil {
 		fmt.Println(err)
-		return 0, fmt.Errorf("SaveComment: %v", err)
+		return -1, fmt.Errorf("SaveComment: %v", err)
+	}
+	row := stmt.QueryRow(comment.AuthorId, comment.Content, comment.ThreadId, r.Clock.Now().Unix())
+
+	var id int64
+	err = row.Scan(&id)
+	if err != nil {
+		fmt.Println(err)
+		return -1, fmt.Errorf("SaveComment: %v", err)
 	}
 
-	return id, err
+	return id, nil
 }

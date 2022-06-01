@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
@@ -13,6 +14,29 @@ import (
 type VersionService struct {
 	Gitrepo     repositories.GitRepository
 	Versionrepo interfaces.VersionRepository
+}
+
+func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
+
+	// Get entities from database
+	entities, err := serv.Versionrepo.GetVersionsByArticle(article)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert entities to models to send to frontend
+	result := make([]models.Version, len(entities))
+	for i, e := range entities {
+		result[i] = models.Version{
+			ArticleID: article,
+			Id:        e.Id,
+			Title:     e.Title,
+			Owners:    e.Owners,
+			Content:   "",
+			Status:    e.Status,
+		}
+	}
+	return result, nil
 }
 
 // GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
@@ -45,8 +69,42 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 		Id:        entity.Id,
 		Title:     entity.Title,
 		Owners:    entity.Owners,
-		Content:   string(fileContent)}
-	return fullVersion, err
+		Content:   string(fileContent),
+		Status:    entity.Status,
+	}
+	return fullVersion, nil
+}
+
+// CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
+func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+
+	// Create entity to store in db
+	version := entities.Version{
+		ArticleID: article,
+		Title:     title,
+		Owners:    owners,
+	}
+
+	// Store entity in db and receive one with an ID attached
+	entity, err := serv.Versionrepo.CreateVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Use ID to create new branch in git
+	err = serv.Gitrepo.CreateBranch(article, source, entity.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Return model, made from entity
+	return models.Version{
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
+		Content:   "",
+	}, nil
 }
 
 // UpdateVersion overwrites file of specified article version and commits

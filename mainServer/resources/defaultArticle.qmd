@@ -1,0 +1,12 @@
+---
+title: <insert title here>
+author: <insert authors here>
+date: <insert date here>
+toc: true
+format:
+  html:
+    html-math-method: katex
+    code-tools: true
+    self-contained: true
+execute:
+  warning: false

@@ -20,10 +20,18 @@ type ThreadController struct {
 	CommentService       services.CommentService
 }
 
-// CreateThread creates thread entity, and specific thread entity.
-// returns id's of thread, specific thread and comment
+// CreateThread godoc
+// @Summary      Creates thread entity
+// @Description  Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment
+// @Accept		 json
+// @Param		 thread 		body	models.Thread		true 	"Thread"
+// @Produce      json
+// @Success      200  {object} models.ReturnThreadIds
+// @Failure 	 400  {object} httperror.HTTPError
+// @Failure 	 500  {object} httperror.HTTPError
+// @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
 func (contr *ThreadController) CreateThread(c *gin.Context) {
-	var thread models.ThreadNoId
+	var thread models.Thread
 	err := c.BindJSON(&thread)
 	if err != nil {
 		fmt.Println(err)
@@ -35,8 +43,21 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	sid := c.Param("specificID")
 	threadType := c.Param("threadType")
 
-	// save threat in the db
-	tid, err := contr.ThreadService.StartThread(thread, aid, sid)
+	intSid, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	// save thread in the db
+	tid, err := contr.ThreadService.StartThread(thread, intAid, intSid)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
@@ -52,7 +73,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
-	id, err := int64(0), nil
+	var id int64
 	switch threadType {
 	case "commit":
 		id, err = contr.CommitThreadService.StartCommitThread(thread, tid)
@@ -60,7 +81,10 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
 	case "review":
 		id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
+	default:
+		id, err = -1, errors.New("invalid thread type")
 	}
+
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
@@ -68,14 +92,13 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// return tid and specific id
-	ids := models.ReturnIds{
+	ids := models.ReturnThreadIds{
 		ThreadId:  tid,
 		CommentId: coid,
 		Id:        id,
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.IndentedJSON(http.StatusOK, ids)
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"strconv"
 )
 
 type ThreadService struct {
@@ -14,19 +13,10 @@ type ThreadService struct {
 
 // StartThread creates thread entity in db
 // returns thread id
-func (serv ThreadService) StartThread(thread models.ThreadNoId, aid string, sid string) (int64, error) {
+func (serv ThreadService) StartThread(thread models.Thread, aid int64, sid int64) (int64, error) {
 	// TODO: check if user is authenticated
-
 	// check model has same aid and cid as params
-	intSid, err := strconv.ParseInt(sid, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	intAid, err := strconv.ParseInt(aid, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	if thread.SpecificId != intSid || thread.ArticleId != intAid {
+	if thread.SpecificId != sid || thread.ArticleId != aid {
 		return 0, errors.New("parameters in url not equal to the thread object")
 	}
 

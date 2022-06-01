@@ -42,6 +42,61 @@ definitions:
     - owners
     - title
     type: object
+  models.Request:
+    properties:
+      articleID:
+        type: integer
+      requestID:
+        type: integer
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      state:
+        type: string
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    type: object
+  models.RequestCreationForm:
+    properties:
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    required:
+    - sourceHistoryID
+    - sourceVersionID
+    - targetHistoryID
+    - targetVersionID
+    type: object
+  models.ReturnThreadIds:
+    properties:
+      commentId:
+        type: integer
+      id:
+        type: integer
+      threadId:
+        type: integer
+    type: object
+  models.Thread:
+    properties:
+      articleId:
+        type: integer
+      comment:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      id:
+        type: integer
+      specificId:
+        type: integer
+    type: object
   models.Version:
     properties:
       articleID:
@@ -52,10 +107,27 @@ definitions:
         items:
           type: string
         type: array
+      status:
+        type: string
       title:
         type: string
       versionID:
         type: integer
+    type: object
+  models.VersionCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      sourceVersionID:
+        type: integer
+      title:
+        type: string
+    required:
+    - owners
+    - sourceVersionID
+    - title
     type: object
 host: localhost:8080
 info:
@@ -70,7 +142,8 @@ paths:
       consumes:
       - application/json
       description: Creates new article, including main article version. Returns main
-        version. Owners must be specified as email addresses, not usernames.
+        version info, excluding contents. Owners must be specified as email addresses,
+        not usernames.
       parameters:
       - description: Article info
         in: body
@@ -94,6 +167,138 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
+  /articles/:articleID/mainVersion:
+    get:
+      description: Get main version of an article by specifying the article id. Returns
+        the version id of the main version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get main version id of article
+  /articles/:articleID/thread/:threadType/id/:specificID/:
+    post:
+      consumes:
+      - application/json
+      description: Creates thread entity, and specific thread entity. Returns id's
+        of thread, specific thread and comment
+      parameters:
+      - description: Thread
+        in: body
+        name: thread
+        required: true
+        schema:
+          $ref: '#/definitions/models.Thread'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReturnThreadIds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Creates thread entity
+  /articles/{articleID}/requests:
+    post:
+      consumes:
+      - application/json
+      description: Creates request to merge one article versions' changes into another
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Request'
+        "400":
+          description: Invalid article ID or request creation data
+        "500":
+          description: Error creating request on server
+      summary: Create request
+  /articles/{articleID}/versions:
+    get:
+      description: Gets all versions belonging to a specific article. Does not include
+        version contents.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Version'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: List article versions
+    post:
+      consumes:
+      - application/json
+      description: Creates new version from an existing one of the same article
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version info
+        in: body
+        name: version
+        required: true
+        schema:
+          $ref: '#/definitions/models.VersionCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Create new version
   /articles/{articleID}/versions/{versionID}:
     get:
       description: Gets the version content + metadata from the database + filesystem.
@@ -116,8 +321,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Version'
-        "404":
-          description: Version not found
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Get version content + metadata
     post:
       consumes:
@@ -140,9 +347,9 @@ paths:
         "200":
           description: Success
         "400":
-          description: Bad request, possibly bad file data or permissions
-        "404":
-          description: Specified article version not found
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
   /comments/thread/:threadID:
     post:
@@ -193,4 +400,36 @@ paths:
           schema:
             $ref: '#/definitions/entities.User'
       summary: Get test user from database endpoint
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user email and password from a JSON body, verifies if
+        they are correct with the database and returns a JWT token
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "403":
+          description: Invalid password
+        "500":
+          description: Could not create token
+      summary: Endpoint for user logging in
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user credentials from a JSON body, and makes sure they
+        are securely stored in the database.
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid user JSON provided
+        "403":
+          description: Could not generate password hash
+        "409":
+          description: Could not save user to database
+      summary: Endpoint for user registration
 swagger: "2.0"
