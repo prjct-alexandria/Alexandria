@@ -22,12 +22,12 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 // CreateArticle godoc
 // @Summary      Create new article
 // @Description  Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.
-// @Accept		 json
-// @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
+// @Accept       json
+// @Param        article      body   models.ArticleCreationForm    true   "Article info"
 // @Produce      json
 // @Success      200  {object} models.Version
-// @Failure 	 400  {object} httperror.HTTPError
-// @Failure 	 500  {object} httperror.HTTPError
+// @Failure      400  {object} httperror.HTTPError
+// @Failure      500  {object} httperror.HTTPError
 // @Router       /articles [post]
 func (contr ArticleController) CreateArticle(c *gin.Context) {
 
@@ -52,6 +52,13 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, version)
 }
 
+// GetMainVersion godoc
+// @Summary      Get main version id of article
+// @Description  Get main version of an article by specifying the article id. Returns the version id of the main version
+// @Produce      json
+// @Success		 200 "Success"
+// @Failure 	 400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/mainVersion [get]
 func (contr ArticleController) GetMainVersion(c *gin.Context) {
 	// extract article id
 	aid := c.Param("articleID")
@@ -69,6 +76,5 @@ func (contr ArticleController) GetMainVersion(c *gin.Context) {
 		return
 	}
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, strconv.FormatInt(mv, 10))
 }
