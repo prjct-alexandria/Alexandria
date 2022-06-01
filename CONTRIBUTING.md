@@ -10,20 +10,21 @@ The back-end server can be developed in any IDE that supports Go. It was mostly 
 
 ### API Documentation
 The API documentation is generated from annotations int the Go code using [swag](https://github.com/swaggo/swag).
-If annotations change in the code, the docs must be generated again with a command. From working directory `./mainServer`, First install `swag` once.
+If annotations change in the code, the docs must be generated again with a command. First install `swag` once.
 
+    cd ./mainServer
     go install github.com/swaggo/swag/cmd/swag@latest
 
-Then, after every update to the comment annotations in the code, generate the documentation again.
+After every update to the comment annotations in the code, update the documentation. (from the `/mainServer` folder).
 
     swag init -g server/router.go
 
-Make sure to restart the Go server after this, before trying to access the updated API documentation. 
+Make sure to restart the Go server after this, before trying to access the updated API documentation. So, terminate the server if it's running (Ctr+C) and use `build` and `run` again as described in [README.md](README.md).
 
 ### Run configuration
-The full steps can be incorporated in a single command if necessary. Below is an example of a Powershell command, that works combined with the `./mainServer` as working directory.
+The full steps can be incorporated in a single command if necessary. Below is an example of a Powershell command.
 
-    swag init -g server/router.go; if($?) {go build mainServer}; if($?) {go run mainServer}
+    cd ./mainServer; swag init -g server/router.go; if($?) {go build mainServer}; if($?) {go run mainServer}
 
 ## Front-end
 

@@ -13,14 +13,16 @@ A postgreSQL database should be running on port 5432, with user `postgres` and (
 A database should be created with the name `AlexandriaPG`. When running the system later, the program will automatically add the necessary tables.
 
 ## Back-end
-To start up the backend server, have Go version 1.18 installed. Then, from working directory `./mainServer` run:
+To start up the backend server, have Go version 1.18 installed. Then, the project root, run:
     
+    cd ./mainServer 
     go build mainServer
     go run mainServer
 
 ## Front-end
-To start up the frontend server, with npm installed, from working directory `./mainClient` run:
-    
+To start up the frontend server, with npm installed, from the project root, run:
+
+    cd ./mainClient
     npm install
     npm run start-win
 
