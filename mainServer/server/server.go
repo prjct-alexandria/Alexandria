@@ -62,6 +62,7 @@ func initRepoEnv() (RepoEnv, error) {
 		article:       postgres.NewPgArticleRepository(database),
 		user:          postgres.NewPgUserRepository(database),
 		version:       postgres.NewPgVersionRepository(database),
+		req:     	   postgres.NewPgRequestRepository(database),
 		thread:        postgres.NewPgThreadRepository(database),
 		comment:       postgres.NewPgCommentRepository(database, clock),
 		commitThread:  postgres.NewPgCommitThreadRepository(database),
