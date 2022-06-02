@@ -1,6 +1,6 @@
 import * as React from "react";
 import { fireEvent, render } from "@testing-library/react";
-import LoginForm from "../../src/Components/User/LoginForm";
+import LoginForm from "../../Components/User/LoginForm";
 
 type LoginFormProps = {
   email: string | undefined;
@@ -52,7 +52,8 @@ describe("<LoginForm />", () => {
     fireEvent.change(email, { target: { value: "user@gmail.com" } });
 
     // Expect the onChangeEmail to have been called with the given value
-    expect(onChangeEmail).toHaveBeenCalledWith("email");
+    expect(onChangeEmail).toHaveBeenCalled();
+    expect(email).toHaveValue("user@gmail.com");
   });
 
   test("Enter a password", async () => {
@@ -67,7 +68,8 @@ describe("<LoginForm />", () => {
     fireEvent.change(password, { target: { value: "password" } });
 
     // Expect the onChangePassword to have been called with the given value
-    expect(onChangePassword).toHaveBeenCalledWith("password");
+    expect(onChangePassword).toHaveBeenCalled();
+    expect(password).toHaveValue("password");
   });
 });
 
