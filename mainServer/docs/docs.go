@@ -166,7 +166,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/{articleID}/requests/{requestID}reject": {
+        "/articles/{articleID}/requests/{requestID}/reject": {
             "put": {
                 "description": "Rejects request request to merge one article versions' changes into another.",
                 "consumes": [
@@ -555,20 +555,12 @@ const docTemplate = `{
         "models.RequestCreationForm": {
             "type": "object",
             "required": [
-                "sourceHistoryID",
                 "sourceVersionID",
-                "targetHistoryID",
                 "targetVersionID"
             ],
             "properties": {
-                "sourceHistoryID": {
-                    "type": "string"
-                },
                 "sourceVersionID": {
                     "type": "integer"
-                },
-                "targetHistoryID": {
-                    "type": "string"
                 },
                 "targetVersionID": {
                     "type": "integer"

@@ -69,7 +69,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 // @Failure     400 {object} httperror.HTTPError
 // @Failure     403 {object} httperror.HTTPError
 // @Failure     500 {object} httperror.HTTPError
-// @Router      /articles/{articleID}/requests/{requestID}reject [put]
+// @Router      /articles/{articleID}/requests/{requestID}/reject [put]
 func (contr RequestController) RejectRequest(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 

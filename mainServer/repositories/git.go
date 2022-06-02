@@ -1,16 +1,20 @@
 package repositories
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	git2 "github.com/ldez/go-git-cmd-wrapper/v2/git"
 	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
+	"github.com/ldez/go-git-cmd-wrapper/v2/types"
 	"mainServer/utils/clock"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type GitRepository struct {
@@ -220,9 +224,24 @@ func (r GitRepository) GetLatestCommit(article int64, version int64) (string, er
 		return "", err
 	}
 	versionStr := strconv.FormatInt(version, 10)
-	commitHash, err := git2.RevParse(revparse.GitPath(path), revparse.Args(versionStr))
+	commitHash, err := git2.RevParse(revparse.Args(versionStr), runGitIn(path))
 	if err != nil {
 		return "", err
 	}
 	return commitHash, nil
+}
+
+// custom option made for use with the go-git-cmd-wrapper library,
+// enables execution in specific paths, without using os change dir, which possibly interferes with other operations
+func runGitIn(path string) types.Option {
+	return git2.CmdExecutor(
+		func(ctx context.Context, name string, debug bool, args ...string) (string, error) {
+
+			// insert -C "path" before the other arguments
+			args = append([]string{"-C", path}, args...)
+
+			output, err := exec.Command(name, args...).CombinedOutput()
+			return strings.TrimSuffix(string(output), "\n"), err
+		},
+	)
 }

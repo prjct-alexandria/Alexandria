@@ -61,18 +61,12 @@ definitions:
     type: object
   models.RequestCreationForm:
     properties:
-      sourceHistoryID:
-        type: string
       sourceVersionID:
         type: integer
-      targetHistoryID:
-        type: string
       targetVersionID:
         type: integer
     required:
-    - sourceHistoryID
     - sourceVersionID
-    - targetHistoryID
     - targetVersionID
     type: object
   models.ReturnThreadIds:
@@ -239,7 +233,7 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
-  /articles/{articleID}/requests/{requestID}reject:
+  /articles/{articleID}/requests/{requestID}/reject:
     put:
       consumes:
       - text/plain

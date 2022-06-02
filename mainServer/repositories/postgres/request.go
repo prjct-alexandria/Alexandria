@@ -44,7 +44,7 @@ func (r PgRequestRepository) CreateRequest(req entities.Request) (entities.Reque
 func (r PgRequestRepository) UpdateRequest(req entities.Request) error {
 
 	// update all fields of request entity by id
-	stmt, err := r.Db.Prepare("UPDATE request SET articleID=$2, sourceVersionID=$3, sourceHistoryID=$4, targetVersionID=$5, targetHistoryID=$5 WHERE id=$1")
+	stmt, err := r.Db.Prepare("UPDATE request SET articleID=$2, sourceVersionID=$3, sourceHistoryID=$4, targetVersionID=$5, targetHistoryID=$6 WHERE id=$1")
 	if err != nil {
 		return err
 	}
