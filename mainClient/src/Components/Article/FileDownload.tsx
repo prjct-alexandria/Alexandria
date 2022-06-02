@@ -5,7 +5,7 @@ import * as React from "react";
 export default function FileDownload() {
   let [isLoaded, setLoaded] = useState(false);
   let [error, setError] = useState(null);
-  let [fileZip, setFileZip] = useState<string | Blob>("file");
+  let [fileZip, setFileZip] = useState<Blob | MediaSource>();
 
   let params = useParams();
   const url =
@@ -25,11 +25,22 @@ export default function FileDownload() {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
+      .then((res) => res.blob())
       .then(
         (result) => {
           setLoaded(true);
           setFileZip(result);
+
+          const url = window.URL.createObjectURL(result);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          // the filename you want
+          a.download = "todo-1.json";
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          alert("your file has downloaded!"); // or you know, something with better UX...
         },
         (error) => {
           setLoaded(true);
@@ -44,13 +55,13 @@ export default function FileDownload() {
       id="uploadFile"
       data-bs-backdrop="static"
       data-bs-keyboard="false"
-      aria-labelledby="uploadLabel"
+      aria-labelledby="downloadLabel"
       aria-hidden="true"
     >
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title" id="uploadLabel">
+            <h5 className="modal-title" id="downloadLabel">
               Download source files
             </h5>
 
