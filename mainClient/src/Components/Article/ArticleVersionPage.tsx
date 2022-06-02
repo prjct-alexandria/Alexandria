@@ -69,6 +69,9 @@ export default function ArticleVersionPage() {
               <FileUpload />
             </div>
             <div className="col-2">
+              <FileDownload />
+            </div>
+            <div className="col-2">
               <button
                 type="button"
                 className="btn btn-primary btn-lg"
@@ -78,9 +81,6 @@ export default function ArticleVersionPage() {
                 Make Request
               </button>
               <CreateMR />
-            </div>
-            <div className="col-2">
-              <FileDownload />
             </div>
           </div>
           <div>

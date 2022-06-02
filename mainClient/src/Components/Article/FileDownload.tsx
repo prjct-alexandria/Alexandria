@@ -7,15 +7,18 @@ export default function FileDownload() {
   let [error, setError] = useState(null);
   let [fileZip, setFileZip] = useState<Blob | MediaSource>();
 
-  let params = useParams();
-  const url =
-    "http://localhost:8080/articles/" +
-    params.articleId +
-    "/versions/" +
-    params.versionId +
-    "/files";
+  // Handler triggered on Download button click
+  const downloadFileHandler = () => {
+    // Make url for request to access ../files endpoint
+    let params = useParams();
+    const url =
+      "http://localhost:8080/articles/" +
+      params.articleId +
+      "/versions/" +
+      params.versionId +
+      "/files";
 
-  useEffect(() => {
+    // GET request to get the files as a ZIP
     fetch(url, {
       method: "GET",
       mode: "cors",
@@ -27,6 +30,7 @@ export default function FileDownload() {
     })
       .then((res) => res.blob())
       .then(
+        // Process the response as a BLOB (Binary large object)
         (result) => {
           setLoaded(true);
           setFileZip(result);
@@ -35,47 +39,24 @@ export default function FileDownload() {
           const a = document.createElement("a");
           a.style.display = "none";
           a.href = url;
-          // the filename you want
-          a.download = "todo-1.json";
+
+          // the filename
+          a.download = "source.zip";
           document.body.appendChild(a);
           a.click();
           window.URL.revokeObjectURL(url);
-          alert("your file has downloaded!"); // or you know, something with better UX...
+          alert("your file has downloaded!"); // replace by something with better UX
         },
         (error) => {
           setLoaded(true);
           setError(error);
         }
       );
-  }, [url]);
+  };
 
   return (
-    <div
-      className="modal fade"
-      id="uploadFile"
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
-      aria-labelledby="downloadLabel"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title" id="downloadLabel">
-              Download source files
-            </h5>
-
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div className="modal-body"></div>
-          <div className="modal-footer"></div>
-        </div>
-      </div>
-    </div>
+    <button className="btn btn-primary" onClick={downloadFileHandler}>
+      Download source files
+    </button>
   );
 }
