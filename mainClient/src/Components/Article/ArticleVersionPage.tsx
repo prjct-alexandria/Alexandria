@@ -51,39 +51,45 @@ export default function ArticleVersionPage() {
       {!isLoaded && <LoadingSpinner />}
       {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
       {versionData != null && (
-        <div>
-          <div className="article col-10">
-            <ul>
-              {versionData.owners.map((owner, i) => (
-                <li key={i}>{owner}</li>
-              ))}
-            </ul>
-            <h1>{versionData.title}</h1>
-            <div>{versionData.content}</div>
-          </div>
-          <div className="col-2">
-            <button
-              type="button"
-              className="btn btn-primary btn-lg"
-              data-bs-toggle="modal"
-              data-bs-target="#uploadFile"
-            >
-              Upload File
-            </button>
-            <FileUpload />
-          </div>
-          <div className="col-2">
-            <button
-                type="button"
-                className="btn btn-primary btn-lg"
-                data-bs-toggle="modal"
-                data-bs-target="#createMR"
-            >
-              Request owner to apply changes
-            </button>
-            <CreateMR />
-          </div>
-
+          <div>
+            <div className={"row"}>
+              <div className="col-8">
+              <h1>{versionData.title}</h1>
+              </div>
+              <div className="col-2">
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#uploadFile"
+                >
+                  Upload File
+                </button>
+                <FileUpload />
+              </div>
+              <div className="col-2">
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createMR"
+                >
+                  Make Request
+                </button>
+                <CreateMR />
+              </div>
+            </div>
+            <div>
+              <h4>Owners:</h4>
+              <ul>
+                {versionData.owners.map((owner, i) => (
+                    <li key={i}>{owner}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="articleContent">
+              <div style={{whiteSpace: 'pre-line'}}>{versionData.content}</div>
+            </div>
         </div>
       )}
     </div>
