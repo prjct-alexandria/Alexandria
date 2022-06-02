@@ -68,6 +68,14 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 	}, nil
 }
 
+func (serv ArticleService) GetMainVersion(article int64) (int64, error) {
+	mv, err := serv.articlerepo.GetMainVersion(article)
+	if err != nil {
+		return 0, err
+	}
+	return mv, nil
+}
+
 // commitDefaultFile copies the template file from the resource folder to the given article
 // intended for article creation. does not check out any branch.
 func (serv ArticleService) commitDefaultFile(article int64) error {
