@@ -95,8 +95,8 @@ export default function CreateMR() {
             },
             credentials: 'include',
             body: JSON.stringify({
-                sourceVersionID: params.versionId,
-                targetVersionID: selectedVersion,
+                sourceVersionID: parseInt(params.versionId as string),
+                targetVersionID: parseInt(selectedVersion as string),
             }),
         }).then(
             (response) => {
@@ -149,6 +149,7 @@ export default function CreateMR() {
                                 {/*list of other versions*/}
                                 <select className="form-select" aria-label="Default select example"
                                         value={selectedVersion} onChange={handleSelectChange}>
+                                    <option value='' disabled={true}></option>
                                     {dataVersions != null &&
                                         dataVersions.map((version, i) => (
                                             (dataCurVersion !== undefined &&
@@ -162,7 +163,7 @@ export default function CreateMR() {
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary" onClick={submitMR}>Save changes</button>
+                        <button type="button" className="btn btn-primary" onClick={submitMR} disabled={selectedVersion == ""}>Create request</button>
                     </div>
                 </div>
             </div>}
