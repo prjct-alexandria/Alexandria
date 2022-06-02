@@ -11,10 +11,3 @@ code, .articleContent {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.articleContent {
-  background-color: #eee;
-  padding: 15px;
-  border: #ccc solid;
-  border-radius: 5px;
-}

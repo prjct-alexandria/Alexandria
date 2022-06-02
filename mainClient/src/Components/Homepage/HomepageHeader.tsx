@@ -45,6 +45,7 @@ export default function HomepageHeader() {
                       className="btn btn-outline-dark btn-lg"
                       data-bs-toggle="modal"
                       data-bs-target="#login"
+                      id="btn-open-login-form"
                     >
                       Log in
                     </button>
