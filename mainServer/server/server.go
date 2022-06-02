@@ -58,12 +58,11 @@ func initRepoEnv() (RepoEnv, error) {
 	clock := clock.RealClock{}
 
 	return RepoEnv{
-<<<<<<< mainServer/server/server.go
-		git:     gitrepo,
-		article: postgres.NewPgArticleRepository(database),
-		user:    postgres.NewPgUserRepository(database),
-		version: postgres.NewPgVersionRepository(database),
-		req:     postgres.NewPgRequestRepository(database),
+		git:           gitrepo,
+		article:       postgres.NewPgArticleRepository(database),
+		user:          postgres.NewPgUserRepository(database),
+		version:       postgres.NewPgVersionRepository(database),
+		req:           postgres.NewPgRequestRepository(database),
 		thread:        postgres.NewPgThreadRepository(database),
 		comment:       postgres.NewPgCommentRepository(database, clock),
 		commitThread:  postgres.NewPgCommitThreadRepository(database),
