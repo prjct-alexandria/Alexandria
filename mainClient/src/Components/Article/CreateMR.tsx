@@ -20,6 +20,10 @@ export default function CreateMR() {
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
 
+    let [dataVersions, setDataVersions] = useState<Version[]>();
+
+    const [selectedVersion,setSelectedVersion] = useState("");
+
     // const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
     const urlCurrentArticle = "/article_version1.json"
     // retrieving the list of versions
@@ -46,7 +50,7 @@ export default function CreateMR() {
             );
     }, [urlCurrentArticle]);
 
-    let [dataVersions, setDataVersions] = useState<Version[]>();
+
 
     // const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
     const urlArticleVersions = "/versionList.json"
@@ -73,17 +77,11 @@ export default function CreateMR() {
             );
     }, [urlArticleVersions]);
 
-    const [selectedVersion,setSelectedVersion] = useState("");
-
     function handleSelectChange(event: { target: { value: React.SetStateAction<string>; }; }) {
         setSelectedVersion(event.target.value);
     }
 
-    const urlSubmitMR =
-        "http://localhost:8080/articles/" +
-        params.articleId +
-        "/requests";
-
+    const urlSubmitMR = "http://localhost:8080/articles/" + params.articleId + "/requests";
     // post the new merge request
     const submitMR = () => {
         fetch(urlSubmitMR, {
@@ -119,7 +117,7 @@ export default function CreateMR() {
             id="createMR"
             data-bs-backdrop="static"
             data-bs-keyboard="false"
-            aria-labelledby="publishArticleLabel"
+            aria-labelledby="createMRlabel"
             aria-hidden="true"
         >
             {error != null && <span>{error}</span>}
@@ -130,8 +128,8 @@ export default function CreateMR() {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="publishArticleLabel">
-                            Create request to apply changes
+                        <h5 className="modal-title" id="createMRlabel">
+                            Request to apply changes:
                         </h5>
                     </div>
                     <div className="modal-body">

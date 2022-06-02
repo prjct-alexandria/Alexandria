@@ -79,7 +79,7 @@ export default function ArticleVersionPage() {
                 data-bs-toggle="modal"
                 data-bs-target="#createMR"
             >
-              Create MR
+              Request owner to apply changes
             </button>
             <CreateMR />
           </div>
