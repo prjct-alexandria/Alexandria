@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
+import CreateMR from "./CreateMR"
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -16,11 +17,11 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
-  const url =
-    "http://localhost:8080/articles/" +
-    params.articleId +
-    "/versions/" +
-    params.versionId;
+  const url = "/article_version1.json"
+    // "http://localhost:8080/articles/" +
+    // params.articleId +
+    // "/versions/" +
+    // params.versionId;
 
   useEffect(() => {
     fetch(url, {
@@ -52,7 +53,7 @@ export default function ArticleVersionPage() {
       {versionData != null && (
           <div>
             <div className={"row"}>
-              <div className="col-10">
+              <div className="col-8">
               <h1>{versionData.title}</h1>
               </div>
               <div className="col-2">
@@ -65,6 +66,17 @@ export default function ArticleVersionPage() {
                   Upload File
                 </button>
                 <FileUpload />
+              </div>
+              <div className="col-2">
+                <button
+                    type="button"
+                    className="btn btn-primary btn-lg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createMR"
+                >
+                  Make Request
+                </button>
+                <CreateMR />
               </div>
             </div>
             <div>

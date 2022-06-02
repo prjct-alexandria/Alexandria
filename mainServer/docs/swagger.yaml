@@ -42,6 +42,16 @@ definitions:
     - owners
     - title
     type: object
+  models.LoginForm:
+    properties:
+      email:
+        type: string
+      pwd:
+        type: string
+    required:
+    - email
+    - pwd
+    type: object
   models.Request:
     properties:
       articleID:
@@ -378,6 +388,13 @@ paths:
       - application/json
       description: Takes in user email and password from a JSON body, verifies if
         they are correct with the database and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginForm'
       responses:
         "200":
           description: Success
@@ -394,6 +411,13 @@ paths:
       - application/json
       description: Takes in user credentials from a JSON body, and makes sure they
         are securely stored in the database.
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
       responses:
         "200":
           description: Success
