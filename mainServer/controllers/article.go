@@ -8,6 +8,7 @@ import (
 	"mainServer/services"
 	"mainServer/utils/httperror"
 	"net/http"
+	"strconv"
 )
 
 type ArticleController struct {
@@ -21,12 +22,12 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 // CreateArticle godoc
 // @Summary      Create new article
 // @Description  Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.
-// @Accept		 json
-// @Param		 article 		body	models.ArticleCreationForm		true 	"Article info"
+// @Accept       json
+// @Param        article      body   models.ArticleCreationForm    true   "Article info"
 // @Produce      json
 // @Success      200  {object} models.Version
-// @Failure 	 400  {object} httperror.HTTPError
-// @Failure 	 500  {object} httperror.HTTPError
+// @Failure      400  {object} httperror.HTTPError
+// @Failure      500  {object} httperror.HTTPError
 // @Router       /articles [post]
 func (contr ArticleController) CreateArticle(c *gin.Context) {
 
@@ -49,4 +50,31 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 
 	// Respond with a frontend-readable description of the created version
 	c.JSON(http.StatusOK, version)
+}
+
+// GetMainVersion godoc
+// @Summary      Get main version id of article
+// @Description  Get main version of an article by specifying the article id. Returns the version id of the main version
+// @Produce      json
+// @Success		 200 "Success"
+// @Failure 	 400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/mainVersion [get]
+func (contr ArticleController) GetMainVersion(c *gin.Context) {
+	// extract article id
+	aid := c.Param("articleID")
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	mv, err := contr.serv.GetMainVersion(article)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot get main version ID"))
+		return
+	}
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, strconv.FormatInt(mv, 10))
 }

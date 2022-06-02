@@ -66,7 +66,6 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Router		/articles/{articleID}/versions [get]
 func (contr VersionController) ListVersions(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	// extract article id
 	aid := c.Param("articleID")

@@ -20,6 +20,7 @@ type UserController struct {
 // @Summary		Endpoint for user registration
 // @Description	Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.
 // @Accept		json
+// @Param		credentials	body	entities.User true "User credentials"
 // @Success		200 "Success"
 // @Failure		400 "Could not read request body"
 // @Failure		400 "Invalid user JSON provided"
@@ -54,6 +55,7 @@ func (u *UserController) Register(c *gin.Context) {
 // @Summary		Endpoint for user logging in
 // @Description	Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token
 // @Accept		json
+// @Param		credentials	body	models.LoginForm true "User credentials"
 // @Success		200 "Success"
 // @Failure		400 "Could not read request body"
 // @Failure		400 "Invalid JSON provided"
@@ -103,7 +105,7 @@ func (u *UserController) CreateExampleUser(c *gin.Context) {
 		fmt.Println(err)
 		c.String(http.StatusBadRequest, "Fail")
 	} else {
-		c.String(http.StatusOK, "Succes")
+		c.String(http.StatusOK, "Success")
 	}
 }
 
