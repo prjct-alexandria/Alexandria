@@ -5,6 +5,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	git2 "github.com/ldez/go-git-cmd-wrapper/v2/git"
+	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
 	"mainServer/utils/clock"
 	"os"
 	"path/filepath"
@@ -209,4 +211,18 @@ func (r GitRepository) renameInitialBranch(article int64, version int64) error {
 	}
 
 	return nil
+}
+
+// GetLatestCommit returns the commit ID of the latest commit on the specified article version
+func (r GitRepository) GetLatestCommit(article int64, version int64) (string, error) {
+	path, err := r.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+	versionStr := strconv.FormatInt(version, 10)
+	commitHash, err := git2.RevParse(revparse.GitPath(path), revparse.Args(versionStr))
+	if err != nil {
+		return "", err
+	}
+	return commitHash, nil
 }

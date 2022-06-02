@@ -13,4 +13,7 @@ type RequestRepository interface {
 
 	// GetRequest returns the request entity with the specified ID
 	GetRequest(request int64) (entities.Request, error)
+
+	// UpdateRequest replaces all the fields with the entity specified, in the row with matching id
+	UpdateRequest(req entities.Request) error
 }

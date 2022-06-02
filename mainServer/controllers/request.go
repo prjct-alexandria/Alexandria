@@ -48,7 +48,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 	}
 
 	// create request with service
-	req, err := contr.Serv.CreateRequest(article, form.SourceVersionID, form.TargetVersionID, form.SourceHistoryID, form.TargetHistoryID)
+	req, err := contr.Serv.CreateRequest(article, form.SourceVersionID, form.TargetVersionID)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed creating article on server"))
