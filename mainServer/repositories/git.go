@@ -276,11 +276,10 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 func runGitIn(path string) types.Option {
 	return git2.CmdExecutor(
 		func(ctx context.Context, name string, debug bool, args ...string) (string, error) {
+			cmd := exec.CommandContext(ctx, name, args...)
+			cmd.Dir = path
 
-			// insert -C "path" before the other arguments
-			args = append([]string{"-C", path}, args...)
-
-			output, err := exec.Command(name, args...).CombinedOutput()
+			output, err := cmd.CombinedOutput()
 			return strings.TrimSuffix(string(output), "\n"), err
 		},
 	)
