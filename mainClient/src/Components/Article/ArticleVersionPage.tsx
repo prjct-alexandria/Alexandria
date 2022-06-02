@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
+import CreateArticle from "./CreateArticle";
+import CreateArticleVersion from "./CreateArticleVersion";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -70,6 +72,16 @@ export default function ArticleVersionPage() {
               Upload File
             </button>
             <FileUpload />
+
+            <button
+                type="button"
+                className="nav-link btn"
+                data-bs-toggle="modal"
+                data-bs-target="#createNewVersion"
+            >
+              Clone this version
+            </button>
+            <CreateArticleVersion />
           </div>
         </div>
       )}
