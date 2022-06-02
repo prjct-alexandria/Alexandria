@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import VersionListElement from "./VersionListElement";
 import {isDisabled} from "@testing-library/user-event/dist/utils";
+import LoadingSpinner from "../LoadingSpinner";
 
 type Version = {
     articleID: string;
@@ -15,13 +16,13 @@ type Version = {
 export default function CreateMR() {
     let params = useParams();
 
-    // const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
-    const urlCurrentArticle = "/article_version1.json"
-
     let [dataCurVersion, setDataCurVersion] = useState<Version>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
 
+    // const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
+    const urlCurrentArticle = "/article_version1.json"
+    // retrieving the list of versions
     useEffect(() => {
         fetch(urlCurrentArticle, {
             method: "GET",
@@ -45,11 +46,10 @@ export default function CreateMR() {
             );
     }, [urlCurrentArticle]);
 
-    // const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
-    const urlArticleVersions = "/versionList.json"
-
     let [dataVersions, setDataVersions] = useState<Version[]>();
 
+    // const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
+    const urlArticleVersions = "/versionList.json"
     useEffect(() => {
         fetch(urlArticleVersions, {
             method: "GET",
@@ -73,10 +73,10 @@ export default function CreateMR() {
             );
     }, [urlArticleVersions]);
 
-    const [selectedClient,setSelectedClient] = useState(""); //default value
+    const [selectedVersion,setSelectedVersion] = useState("");
 
     function handleSelectChange(event: { target: { value: React.SetStateAction<string>; }; }) {
-        setSelectedClient(event.target.value);
+        setSelectedVersion(event.target.value);
     }
 
     const urlSubmitMR =
@@ -84,6 +84,7 @@ export default function CreateMR() {
         params.articleId +
         "/requests";
 
+    // post the new merge request
     const submitMR = () => {
         fetch(urlSubmitMR, {
             method: "POST",
@@ -95,7 +96,7 @@ export default function CreateMR() {
             credentials: 'include',
             body: JSON.stringify({
                 sourceVersionID: params.versionId,
-                targetVersionID: selectedClient,
+                targetVersionID: selectedVersion,
             }),
         }).then(
             (response) => {
@@ -121,7 +122,11 @@ export default function CreateMR() {
             aria-labelledby="publishArticleLabel"
             aria-hidden="true"
         >
-            {/*{error != null && <span>{error}</span>}*/}
+            {error != null && <span>{error}</span>}
+            {!isLoaded && <LoadingSpinner />}
+            {dataCurVersion !== undefined && dataVersions !== undefined &&
+
+
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -141,8 +146,9 @@ export default function CreateMR() {
                                 {dataCurVersion !== undefined && dataCurVersion.title}
                             </div>
                             <div className='col-6'>
+                                {/*list of other versions*/}
                                 <select className="form-select" aria-label="Default select example"
-                                        value={selectedClient} onChange={handleSelectChange}>
+                                        value={selectedVersion} onChange={handleSelectChange}>
                                     {dataVersions != null &&
                                         dataVersions.map((version, i) => (
                                             (dataCurVersion !== undefined &&
@@ -159,7 +165,7 @@ export default function CreateMR() {
                         <button type="button" className="btn btn-primary" onClick={submitMR}>Save changes</button>
                     </div>
                 </div>
-            </div>
+            </div>}
         </div>
     );
 }
