@@ -46,8 +46,8 @@ export default function CreateArticleVersion() {
         ownerList = ownerList.map((owner) => owner.trim());
 
         // Remove empty elements
-        tagList = tagList.filter((tag) => tag!= '')
-        ownerList = ownerList.filter((owner) => owner!= '')
+        tagList = tagList.filter((tag) => tag!== '')
+        ownerList = ownerList.filter((owner) => owner!== '')
 
         let loggedUser = localStorage.getItem("loggedUserEmail");
         ownerList[ownerList.length] =
@@ -106,15 +106,15 @@ export default function CreateArticleVersion() {
             id="createNewVersion"
             data-bs-backdrop="static"
             data-bs-keyboard="false"
-            aria-labelledby="publishArticleLabel"
+            aria-labelledby="createNewVersionLabel"
             aria-hidden="true"
         >
             {error != null && <span>{error}</span>}
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="publishArticleLabel">
-                            Create new article
+                        <h5 className="modal-title" id="createNewVersionLabel">
+                            Create new version based off this one
                         </h5>
 
                         <button
