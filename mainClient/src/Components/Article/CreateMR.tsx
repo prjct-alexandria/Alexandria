@@ -79,7 +79,38 @@ export default function CreateMR() {
         setSelectedClient(event.target.value);
     }
 
-    //post
+    const urlSubmitMR =
+        "http://localhost:8080/articles/" +
+        params.articleId +
+        "/requests";
+
+    const submitMR = () => {
+        fetch(urlSubmitMR, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                sourceVersionID: params.versionId,
+                targetVersionID: selectedClient,
+            }),
+        }).then(
+            (response) => {
+                let message: string =
+                    response.status === 200
+                        ? "Merge request successfully created"
+                        : "Error: " + response.status + " " + response.statusText;
+                console.log(message);
+            },
+            (error) => {
+                console.error("Error: ", error);
+                setError(error);
+            }
+        );
+    };
 
     return (
         <div
@@ -114,16 +145,18 @@ export default function CreateMR() {
                                         value={selectedClient} onChange={handleSelectChange}>
                                     {dataVersions != null &&
                                         dataVersions.map((version, i) => (
-                                            <option value={version.versionID}>{version.title}</option>
+                                            (dataCurVersion !== undefined &&
+                                                dataCurVersion.versionID !== version.versionID) // do not show version if it is the same as the source version
+                                            ? <option value={version.versionID} key={i}>{version.title}</option>
+                                            : null
                                     ))}
                                 </select>
-                                <p>You selected {selectedClient}</p>
                             </div>
                         </div>
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary">Save changes</button>
+                        <button type="button" className="btn btn-primary" onClick={submitMR}>Save changes</button>
                     </div>
                 </div>
             </div>
