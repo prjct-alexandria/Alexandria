@@ -29,7 +29,7 @@ function renderLoginForm(props: Partial<LoginFormProps> = {}) {
 
 describe("<LoginForm />", () => {
   test("Display a blank login form", async () => {
-    //Arrange: Asynchroniously find element by given attribute
+    //Arrange: Asynchronously find element by given attribute
     const { findByTestId } = renderLoginForm();
     const loginForm = await findByTestId("login-form");
 
@@ -45,7 +45,7 @@ describe("<LoginForm />", () => {
     // Mock the onChangeEmail
     const onChangeEmail = jest.fn();
 
-    // Asynchroniously find element by given attribute
+    // Asynchronously find element by given attribute
     const { findByTestId } = renderLoginForm({ onChangeEmail });
     const email = await findByTestId("email");
 
@@ -61,7 +61,7 @@ describe("<LoginForm />", () => {
     // Arrange: Mock the onChangePassword
     const onChangePassword = jest.fn();
 
-    // Asynchroniously find element by given attribute
+    // Asynchronously find element by given attribute
     const { findByTestId } = renderLoginForm({ onChangePassword });
     const password = await findByTestId("password");
 
@@ -75,9 +75,9 @@ describe("<LoginForm />", () => {
 
   test("Submit form", async () => {
     // Arrange: Mock the submitHandler
-    const submitHandler = jest.fn();
+    const submitHandler = jest.fn((e) => e.preventDefault());
 
-    // Asynchroniously find elements by given attribute
+    // Asynchronously find elements by given attribute
     const { findByTestId } = renderLoginForm({
       submitHandler,
     });
