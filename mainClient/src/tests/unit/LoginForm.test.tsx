@@ -71,30 +71,32 @@ describe("<LoginForm />", () => {
     expect(onChangePassword).toHaveBeenCalled();
     expect(password).toHaveValue("password");
   });
-});
 
-test("Submit form", async () => {
-  // Mock the submitHandler
-  const submitHandler = jest.fn();
+  test("Submit form", async () => {
+    // Mock the submitHandler
+    const submitHandler = jest.fn();
 
-  // Asynchroniously find elements by given attribute
-  const { findByTestId } = renderLoginForm({
-    submitHandler,
+    // Asynchroniously find elements by given attribute
+    const { findByTestId } = renderLoginForm({
+      submitHandler,
+    });
+
+    const email = await findByTestId("email");
+    const password = await findByTestId("password");
+    const submit = await findByTestId("submit");
+
+    // Modify form state to have the given value in the email field
+    fireEvent.change(email, { target: { value: "user@gmail.com" } });
+
+    // Modify form state to have the given value in the password field
+    fireEvent.change(password, { target: { value: "password" } });
+
+    // Modify form state to click the submit button
+    fireEvent.click(submit);
+
+    // Expect the submitHandler to have been called with the given values
+    expect(submitHandler).toHaveBeenCalled();
+    expect(email).toHaveValue("user@gmail.com");
+    expect(password).toHaveValue("password");
   });
-
-  const email = await findByTestId("email");
-  const password = await findByTestId("password");
-  const submit = await findByTestId("submit");
-
-  // Modify form state to have the given value in the email field
-  fireEvent.change(email, { target: { value: "user@gmail.com" } });
-
-  // Modify form state to have the given value in the password field
-  fireEvent.change(password, { target: { value: "password" } });
-
-  // Modify form state to click the submit button
-  fireEvent.click(submit);
-
-  // Expect the submitHandler to have been called with the given values
-  expect(submitHandler).toHaveBeenCalledWith("user@gmail.com", "password");
 });

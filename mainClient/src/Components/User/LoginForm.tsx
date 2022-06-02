@@ -56,7 +56,11 @@ export default function LoginForm(props: LoginFormProps) {
               </div>
             </div>
             <div className="modal-footer">
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                data-testid="submit"
+              >
                 Login
               </button>
               <div>
