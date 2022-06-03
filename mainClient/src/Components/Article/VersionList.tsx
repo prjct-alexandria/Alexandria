@@ -81,7 +81,7 @@ export default function VersionList() {
   }, [urlVersions]);
 
   return (
-    <div>
+    <div className="wrapper col-8 m-auto">
       {!isLoadedVersions || !isLoadedMain && <LoadingSpinner />}
       {errorVersions || errorMain && <div>{`There is a problem fetching the data - ${errorVersions} ${errorMain}`}</div>}
       {(dataVersions != null && dataMain != null) &&

@@ -1,0 +1,14 @@
+{
+  "articleId": 4,
+  "comment": [
+    {
+      "authorId": "myauthorid",
+      "content": "mycontent",
+      "creationDate": "mycreationdate",
+      "id": 1,
+      "threadId": 3
+    }
+  ],
+  "id": 3,
+  "specificId": 1
+}

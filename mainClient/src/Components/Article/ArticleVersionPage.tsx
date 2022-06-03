@@ -47,7 +47,7 @@ export default function ArticleVersionPage() {
   }, [url]);
 
   return (
-    <div className={"wrapper"}>
+    <div className="wrapper col-8 m-auto">
       {!isLoaded && <LoadingSpinner />}
       {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
       {versionData != null && (

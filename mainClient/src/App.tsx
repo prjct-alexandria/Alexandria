@@ -22,7 +22,7 @@ function App() {
       <Router>
         <div className="App d-flex flex-column min-vh-100">
           <Header />
-          <div className="wrapper col-8 m-auto">
+          <div>
             <Routes>
               <Route path="/" element={<Homepage />}></Route>
               <Route path="/articles" element={<ArticleList />}></Route>
