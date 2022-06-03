@@ -146,12 +146,12 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 
 	// get the current logged-in user
 	val, exists := c.Get("Email")
-	email := fmt.Sprintf("%v", val) // convert email interface{} type to string
-	if !exists {
+	if val == nil || exists == false {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusUnauthorized, fmt.Errorf("you have to be logged-in to accepting a request"))
 		return
 	}
+	email := fmt.Sprintf("%v", val) // convert email interface{} type to string
 
 	// accept request with service
 	err = contr.Serv.AcceptRequest(request, email)
