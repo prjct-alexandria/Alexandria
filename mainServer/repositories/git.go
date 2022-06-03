@@ -297,13 +297,12 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 	return nil
 }
 
-// StoreRequestSnapshot performs a merge without committing.
+// StoreRequestPreview performs a merge without committing.
 // Stores the before-and-after in a cache folder
-// Stores in the persistent db whether there are conflicts.
 // Requires the commit/history ID's to be specified in the req struct
 // Might leave the repo behind with a detached HEAD
 // Returns true iff there are no conflicts
-func (r GitRepository) StoreRequestSnapshot(req entities.Request) (bool, error) {
+func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	// get paths
 	repo, err := r.GetArticlePath(req.ArticleID)
 	if err != nil {
@@ -315,9 +314,9 @@ func (r GitRepository) StoreRequestSnapshot(req entities.Request) (bool, error) 
 	}
 
 	// checkout target commit, (possibly creating a detached head)
-	_, err = git2.Checkout(checkout.Branch(req.TargetHistoryID), runGitIn(repo))
+	res, err := git2.Checkout(checkout.Branch(req.TargetHistoryID), runGitIn(repo))
 	if err != nil {
-		return false, err
+		return false, errors.New(res)
 	}
 
 	// copy files to cache
@@ -331,9 +330,9 @@ func (r GitRepository) StoreRequestSnapshot(req entities.Request) (bool, error) 
 	}
 
 	// merge source commit into target, without committing
-	res, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, runGitIn(repo))
+	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, runGitIn(repo))
 	if err != nil {
-		return false, errors.New(res)
+		return false, errors.New(mergeRes)
 	}
 
 	// copy merged files to cache (possibly with conflicts)
@@ -353,12 +352,13 @@ func (r GitRepository) StoreRequestSnapshot(req entities.Request) (bool, error) 
 	}
 
 	// abort merge / revert
-	_, err = git2.Merge(merge.Abort, runGitIn(repo))
-	if err != nil {
-		return false, err
+	if mergeRes != "Already up to date." {
+		res, err = git2.Merge(merge.Abort, runGitIn(repo))
+		if err != nil {
+			return false, errors.New(res)
+		}
 	}
-
-	return conflicts, nil
+	return !conflicts, nil
 }
 
 // hasConflicts checks if there are conflicts in the ongoing merge

@@ -8,6 +8,7 @@ type Request struct {
 	TargetVersionID int64  `json:"targetVersionID"`
 	TargetHistoryID string `json:"targetHistoryID"`
 	State           string `json:"state"`
+	Conflicted      bool   `json:"conflicted"`
 }
 
 type RequestCreationForm struct {

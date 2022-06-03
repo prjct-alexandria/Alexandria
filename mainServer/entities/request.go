@@ -8,6 +8,7 @@ type Request struct {
 	TargetVersionID int64
 	TargetHistoryID string
 	State           string
+	Conflicted      bool
 }
 
 const (
