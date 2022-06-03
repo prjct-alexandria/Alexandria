@@ -11,7 +11,7 @@ export default function FileDownload() {
 
   // Make url for request to access ../files endpoint
   let params = useParams();
-  const url = "/source-file.txt";
+  const endpointUrl = "/source-file.txt";
   // "http://localhost:8080/articles/" +
   // params.articleId +
   // "/versions/" +
@@ -22,7 +22,7 @@ export default function FileDownload() {
   const downloadFileHandler = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // GET request to get the files as a ZIP
-    fetch(url, {
+    fetch(endpointUrl, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -36,14 +36,14 @@ export default function FileDownload() {
         // Process the response as a BLOB (Binary large object)
         (result) => {
           // Put the file in the DOM
-          const url = window.URL.createObjectURL(result);
+          const windowUrl = window.URL.createObjectURL(result);
           // Placeholder filename
           setFilename("source-file.txt");
 
           // Add a hidden <a> element to DOM, that downloads the file when clicking on it
           const a = document.createElement("a");
           a.style.display = "none";
-          a.href = url;
+          a.href = windowUrl;
           a.download = filename;
           document.body.appendChild(a);
 
@@ -51,7 +51,7 @@ export default function FileDownload() {
           a.click();
 
           // Remove <a> from DOM
-          window.URL.revokeObjectURL(url);
+          window.URL.revokeObjectURL(windowUrl);
 
           // Set success in state to show success alert
           setDownloadSuccess(true);
