@@ -13,6 +13,8 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/reset"
 	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
+	"io/ioutil"
+	"mainServer/entities"
 	"mainServer/utils/clock"
 	"os"
 	"os/exec"
@@ -162,11 +164,35 @@ func (r GitRepository) CreateBranch(article int64, source int64, target int64) e
 // GetArticlePath returns the path to an article git repository
 func (r GitRepository) GetArticlePath(article int64) (string, error) {
 	idString := strconv.FormatInt(article, 10)
-	path, err := filepath.Abs(filepath.Join(r.Path, idString))
+	path, err := filepath.Abs(filepath.Join(r.Path, "persistent", idString))
 	if err != nil {
 		return "", err
 	}
 	return filepath.Clean(path), err
+}
+
+// GetRequestCachePath returns the path to a cache folder for a request
+// makes sure that the folder is created, including nested /old and /new folders
+func (r GitRepository) GetRequestCachePath(article int64, sourceHistoryID string, targetHistoryID string) (string, error) {
+
+	// get the path by generating a unique cache id
+	id := fmt.Sprintf("%d-%s-%s", article, sourceHistoryID, targetHistoryID)
+	path, err := filepath.Abs(filepath.Join(r.Path, "cache", "requests", id))
+	if err != nil {
+		return "", err
+	}
+
+	// create nested folders
+	err = os.MkdirAll(filepath.Join(path, "old"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+	err = os.MkdirAll(filepath.Join(path, "new"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Clean(path), nil
 }
 
 // getWorktree returns the go-git worktree of an article git repository
@@ -269,6 +295,91 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 		return errors.New(res)
 	}
 	return nil
+}
+
+// StoreRequestSnapshot performs a merge without committing.
+// Stores the before-and-after in a cache folder
+// Stores in the persistent db whether there are conflicts.
+// Requires the commit/history ID's to be specified in the req struct
+// Might leave the repo behind with a detached HEAD
+// Returns true iff there are no conflicts
+func (r GitRepository) StoreRequestSnapshot(req entities.Request) (bool, error) {
+	// get paths
+	repo, err := r.GetArticlePath(req.ArticleID)
+	if err != nil {
+		return false, err
+	}
+	cache, err := r.GetRequestCachePath(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
+	if err != nil {
+		return false, err
+	}
+
+	// checkout target commit, (possibly creating a detached head)
+	_, err = git2.Checkout(checkout.Branch(req.TargetHistoryID), runGitIn(repo))
+	if err != nil {
+		return false, err
+	}
+
+	// copy files to cache
+	input, err := ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
+	if err != nil {
+		return false, err
+	}
+	err = ioutil.WriteFile(filepath.Join(cache, "old", "main.qmd"), input, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	// merge source commit into target, without committing
+	res, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, runGitIn(repo))
+	if err != nil {
+		return false, errors.New(res)
+	}
+
+	// copy merged files to cache (possibly with conflicts)
+	input, err = ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
+	if err != nil {
+		return false, err
+	}
+	err = ioutil.WriteFile(filepath.Join(cache, "new", "main.qmd"), input, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	// check for conflicts
+	conflicts, err := r.hasConflicts(req.ArticleID)
+	if err != nil {
+		return false, err
+	}
+
+	// abort merge / revert
+	_, err = git2.Merge(merge.Abort, runGitIn(repo))
+	if err != nil {
+		return false, err
+	}
+
+	return conflicts, nil
+}
+
+// hasConflicts checks if there are conflicts in the ongoing merge
+// should only be used during a merge that has not been committed yet
+func (r GitRepository) hasConflicts(article int64) (bool, error) {
+	path, err := r.GetArticlePath(article)
+	if err != nil {
+		return false, err
+	}
+
+	// check for conflicts using raw execution, because go-git-cmd-wrapper does not support the diff command
+	// should be secure even though it's raw, because the command doesn't take any user input
+	cmd := exec.Command("git", "diff", "--name-only", "--diff-filter=U")
+	cmd.Dir = path
+	output, err := cmd.CombinedOutput()
+	res := strings.TrimSuffix(string(output), "\n")
+	if err != nil {
+		return false, errors.New(res)
+	}
+
+	return res == "", nil
 }
 
 // custom option made for use with the go-git-cmd-wrapper library,
