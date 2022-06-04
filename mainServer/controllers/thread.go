@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services"
+	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
@@ -82,7 +83,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	default:
 		id, err = -1, errors.New("invalid thread type")
 	}
-	
+
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
@@ -98,4 +99,32 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 
 	c.Header("Content-Type", "application/json")
 	c.IndentedJSON(http.StatusOK, ids)
+}
+
+func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	cid := c.Param("commitID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	intCid, err := strconv.ParseInt(cid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find committhreads for this article"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
 }
