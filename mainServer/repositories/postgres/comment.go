@@ -34,17 +34,6 @@ func (r PgCommentRepository) createCommentTable() error {
 	return err
 }
 
-//
-//<<<<<<< HEAD
-//func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
-//	row := r.Db.QueryRow("INSERT INTO comment (authorId, content, threadId, creationDate) " +
-//		"VALUES ('" + comment.AuthorId + "', '" +
-//		comment.Content + "', '" +
-//		strconv.FormatInt(comment.ThreadId, 10) + "', '" +
-//		comment.CreationDate +
-//		"')" +
-//		"RETURNING commentId")
-//=======
 func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
 	stmt, err := r.Db.Prepare("INSERT INTO comment (commentid, authorid, content, threadid, creationdate) " +
 		"VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid")
