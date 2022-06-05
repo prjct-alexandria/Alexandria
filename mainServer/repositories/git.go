@@ -380,28 +380,6 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	return !conflicts, nil
 }
 
-// TODO: this helper func might be  redundant, because executing a merge will already inform about conflicts, remove func completely?
-// hasConflicts checks if there are conflicts in an ongoing merge
-// should only be used during a merge that has not been committed yet
-func (r GitRepository) hasConflicts(article int64) (bool, error) {
-	path, err := r.GetArticlePath(article)
-	if err != nil {
-		return false, err
-	}
-
-	// check for conflicts using raw execution, because go-git-cmd-wrapper does not support the diff command
-	// should be secure even though it's raw, because the command doesn't take any user input
-	cmd := exec.Command("git", "diff", "--name-only", "--diff-filter=U")
-	cmd.Dir = path
-	output, err := cmd.CombinedOutput()
-	res := strings.TrimSuffix(string(output), "\n")
-	if err != nil {
-		return false, errors.New(res)
-	}
-
-	return res != "", nil
-}
-
 // GetRequestPreview returns the before and after main article file of a request
 // requires the history ID's to be up-to-date in the req parameter
 func (r GitRepository) GetRequestPreview(article int64, sourceHistoryID string, targetHistoryID string) (string, string, error) {
