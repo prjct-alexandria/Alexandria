@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import PrismDiff from "./PrismDiff";
 import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
+import {data} from "jquery";
 
 type RequestWithComparison = {
     request: Request;
@@ -177,6 +178,13 @@ export default function VersionList() {
                             {rejectButton()}
                         </div>
                     </div>
+
+
+                    {dataRequest !== undefined && dataRequest.request.conflicted &&
+                        <div className={'alert alert-danger'} style={{whiteSpace:'pre-line'}}>
+                            <p>{"Warning: There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview below between each set of  '<<<<', '====', and '>>>>' markers."}</p>
+                        </div>
+                    }
 
                     {/*Content of versions*/}
                     <div>
