@@ -33,8 +33,12 @@ type GitRepository struct {
 // See CreateRepo instead
 func NewGitRepository(path string) (GitRepository, error) {
 
-	// make folder for git files
-	err := os.MkdirAll(path, os.ModePerm)
+	// make folders for git files
+	err := os.MkdirAll(filepath.Join(path, "persistent"), os.ModePerm)
+	if err != nil {
+		return GitRepository{}, err
+	}
+	err = os.MkdirAll(filepath.Join(path, "cache"), os.ModePerm)
 	if err != nil {
 		return GitRepository{}, err
 	}
@@ -319,7 +323,7 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 		return false, errors.New(res)
 	}
 
-	// copy files to cache
+	// copy files to "old" cache
 	input, err := ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
 	if err != nil {
 		return false, err
@@ -330,23 +334,18 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	}
 
 	// merge source commit into target, without committing
-	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, runGitIn(repo))
-	if err != nil {
+	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, merge.NoFf, runGitIn(repo))
+	conflicts := strings.Contains(mergeRes, "CONFLICT")
+	if err != nil && !conflicts { // if err is just that there are conflicts, the execution can continue as normal
 		return false, errors.New(mergeRes)
 	}
 
-	// copy merged files to cache (possibly with conflicts)
+	// copy merged files to "new" cache (possibly with conflicts)
 	input, err = ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
 	if err != nil {
 		return false, err
 	}
 	err = ioutil.WriteFile(filepath.Join(cache, "new", "main.qmd"), input, 0644)
-	if err != nil {
-		return false, err
-	}
-
-	// check for conflicts
-	conflicts, err := r.hasConflicts(req.ArticleID)
 	if err != nil {
 		return false, err
 	}
@@ -361,7 +360,8 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	return !conflicts, nil
 }
 
-// hasConflicts checks if there are conflicts in the ongoing merge
+// TODO: this helper func might be  redundant, because executing a merge will already inform about conflicts, remove func completely?
+// hasConflicts checks if there are conflicts in an ongoing merge
 // should only be used during a merge that has not been committed yet
 func (r GitRepository) hasConflicts(article int64) (bool, error) {
 	path, err := r.GetArticlePath(article)
@@ -379,7 +379,7 @@ func (r GitRepository) hasConflicts(article int64) (bool, error) {
 		return false, errors.New(res)
 	}
 
-	return res == "", nil
+	return res != "", nil
 }
 
 // custom option made for use with the go-git-cmd-wrapper library,
