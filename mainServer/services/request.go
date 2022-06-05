@@ -84,6 +84,9 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	if err != nil {
 		return err
 	}
+	if req.Conflicted {
+		return fmt.Errorf("request %d cannot be accepted, because there would be merge conflicts", request)
+	}
 
 	// check who the owner is
 	target := req.TargetVersionID
@@ -119,27 +122,53 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	return s.Repo.SetStatus(request, entities.RequestAccepted)
 }
 
-// GetRequest returns a request, including the before and after main article file
+// GetRequest returns a request, including the before and after versions
 func (s RequestService) GetRequest(request int64) (models.RequestWithComparison, error) {
+	// get request info
 	req, err := s.Repo.GetRequest(request)
 	if err != nil {
-		return models.RequestWithComparison{}, nil
+		return models.RequestWithComparison{}, err
 	}
 
+	// update and get the request preview, with the merge before and after
 	req, err = s.UpdateRequestPreview(req)
 	if err != nil {
 		return models.RequestWithComparison{}, nil
 	}
-
 	before, after, err := s.Gitrepo.GetRequestPreview(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
 	if err != nil {
 		return models.RequestWithComparison{}, nil
 	}
 
+	// get both request versions
+	source, err := s.Versionrepo.GetVersion(req.SourceVersionID)
+	if err != nil {
+		return models.RequestWithComparison{}, nil
+	}
+	target, err := s.Versionrepo.GetVersion(req.TargetVersionID)
+	if err != nil {
+		return models.RequestWithComparison{}, nil
+	}
+
+	// insert before and after contents in the version models
 	return models.RequestWithComparison{
 		Request: models.Request(req),
-		Before:  before,
-		After:   after,
+		Source: models.Version{
+			ArticleID: source.ArticleID,
+			Id:        source.Id,
+			Title:     source.Title,
+			Owners:    source.Owners,
+			Status:    source.Status,
+		},
+		Target: models.Version{
+			ArticleID: target.ArticleID,
+			Id:        target.Id,
+			Title:     target.Title,
+			Owners:    target.Owners,
+			Status:    target.Status,
+		},
+		Before: before,
+		After:  after,
 	}, nil
 }
 

@@ -5,12 +5,23 @@ import PrismDiff from "./PrismDiff";
 import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
 
+type RequestWithComparison = {
+    request: Request;
+    source: ArticleVersion;
+    target: ArticleVersion;
+    before: string;
+    after: string;
+}
+
 type Request = {
+    requestID: number;
+    articleID: number;
     sourceVersionID: number;
     sourceHistoryID: number;
     targetVersionID: number;
     targetHistoryID: number;
     status: string;
+    conflicted: boolean;
 }
 
 type ArticleVersion = {
@@ -23,10 +34,10 @@ type ArticleVersion = {
 export default function VersionList() {
     let params = useParams();
 
-    const urlRequest = '/request.json'
-    //const urlRequest = 'http://localhost:8080/articles/' + params.articleId  + "/requests/" + params.requestId;
+    //const urlRequest = '/request.json'
+    const urlRequest = 'http://localhost:8080/articles/' + params.articleId  + "/requests/" + params.requestId;
 
-    let [dataRequest, setDataRequest] = useState<Request>();
+    let [dataRequest, setDataRequest] = useState<RequestWithComparison>();
     let [isLoadedRequest, setLoadedRequest] = useState(false);
     let [errorRequest, setErrorRequest] = useState(null);
 
@@ -47,82 +58,25 @@ export default function VersionList() {
             )
     }, []);
 
-    let urlArticleSource = "";
-    let urlArticleTarget = "";
 
-    if (dataRequest !== undefined) {
-        urlArticleSource = 'http://localhost:8080/articles/' + params.articleId + '/versions/' + params.versionId + '/history/' + dataRequest.sourceHistoryID;
-        urlArticleTarget = 'http://localhost:8080/articles/' + params.articleId + '/versions/' + dataRequest.targetVersionID + '/history/' + dataRequest.targetHistoryID;
-    }
-    urlArticleSource = '/article_version1.json'; // Placeholder source version
-    urlArticleTarget = '/article_version2.json'; // Placeholder target version
-
-    let [dataSource, setDataSource] = useState<ArticleVersion>();
-    let [isLoadedSource, setLoadedSource] = useState(false);
-    let [errorSource, setErrorSource] = useState(null);
-
-    let [dataTarget, setDataTarget] = useState<ArticleVersion>();
-    let [isLoadedTarget, setLoadedTarget] = useState(false);
-    let [errorTarget, setErrorTarget] = useState(null);
-
-    // fetching the actual articles
-    useEffect(() => {
-        fetch(urlArticleSource, {
-            method: "GET",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setDataSource(result)
-                    setLoadedSource(true)
-                },
-                (error) => {
-                    setErrorSource(error.message)
-                    setLoadedSource(true)
-                },
-            )
-        fetch(urlArticleTarget, {
-            method: "GET",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setDataTarget(result)
-                    setLoadedTarget(true)
-                },
-                (error) => {
-                    setErrorTarget(error.message)
-                    setLoadedTarget(true)
-                },
-            )
-    }, []);
 
     // Disable button if it is already accepted or rejected
     const disableButton = () => {
-        return (dataRequest !== undefined && (dataRequest.status === "accepted" || dataRequest.status === "rejected"))
+        return (dataRequest !== undefined && (dataRequest.request.status === "accepted" || dataRequest.request.status === "rejected"))
     }
 
     // If already accepted, fill in the color of the button and disable. If request is pending, send HTTP request.
     const acceptButton = () => {
         let className = 'btn btn-outline-success';
-        if (dataRequest !== undefined && dataRequest.status === "accepted") {className = 'btn btn-success'}
-        return (<button className={className}  disabled={disableButton()} onClick={handleAcceptClick}>Accept</button>)
+        let disabledConflicted = dataRequest !== undefined && dataRequest.request.conflicted
+        if (dataRequest !== undefined && dataRequest.request.status === "accepted") {className = 'btn btn-success'}
+        return (<button className={className}  disabled={disableButton() || disabledConflicted} onClick={handleAcceptClick}>Accept</button>)
     }
 
-    // If already reject, fill in the color of the button and disable. If request is pending, send HTTP request.
+    // If already rejected, fill in the color of the button and disable. If request is pending, send HTTP request.
     const rejectButton = () => {
         let className = 'btn btn-outline-danger';
-        if (dataRequest !== undefined && dataRequest.status === "rejected") {className = 'btn btn-danger'}
+        if (dataRequest !== undefined && dataRequest.request.status === "rejected") {className = 'btn btn-danger'}
         return (<button className={className}  disabled={disableButton()} onClick={handleRejectClick}>Reject</button>)
     }
 
@@ -209,10 +163,10 @@ export default function VersionList() {
                     {/*Version names*/}
                     <div className='row' style={{margin:"15px"}}>
                         <div className='col-6' style={{textAlign:'center'}}>
-                            <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
+                            <h5>Changes of '{dataRequest !== undefined && dataRequest.source.title}'</h5>
                         </div>
                         <div className='col-4' style={{textAlign:'center'}}>
-                            <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
+                            <h5>Original: {dataRequest !== undefined && dataRequest.target.title}</h5>
                         </div>
                         {/*Accept and reject button*/}
                         <div className='col-1' id='AcceptButton'>
@@ -226,18 +180,18 @@ export default function VersionList() {
                     {/*Content of versions*/}
                     <div>
                         <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
-                            {/*Source version, including changes that are made*/}
+                            {/*Differences between before and after*/}
                             <div className='col-6'>
-                                {(dataSource !== undefined && dataTarget !== undefined) &&
+                                {(dataRequest !== undefined) &&
                                     <PrismDiff
-                                        sourceContent={dataSource.content}
-                                        targetContent={dataTarget.content}
+                                        sourceContent={dataRequest.before}
+                                        targetContent={dataRequest.after}
                                     />
                                 }
                             </div>
-                            {/*Target version*/}
+                            {/*Before version*/}
                             <div className='col-6'>
-                                {dataTarget !== undefined && dataTarget.content}
+                                {dataRequest !== undefined && dataRequest.before}
                             </div>
 
                         </div>
@@ -253,11 +207,9 @@ export default function VersionList() {
 
     return (
         <div>
-            {!isLoadedRequest && !isLoadedSource && !isLoadedTarget && <LoadingSpinner />}
+            {!isLoadedRequest && <LoadingSpinner/>}
             {errorRequest && (<div>{`There is a problem fetching the post data - ${errorRequest}`}</div>)}
-            {errorSource && (<div>{`There is a problem fetching the post data - ${errorSource}`}</div>)}
-            {errorTarget && (<div>{`There is a problem fetching the post data - ${errorTarget}`}</div>)}
-            {dataRequest != null && dataSource != null && dataTarget != null && view()}
+            {dataRequest != null && dataRequest.before != null && dataRequest.after != null && view()}
         </div>
 
 

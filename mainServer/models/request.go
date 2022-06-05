@@ -2,6 +2,8 @@ package models
 
 type RequestWithComparison struct {
 	Request Request `json:"request"`
+	Source  Version `json:"source"`
+	Target  Version `json:"target"`
 	Before  string  `json:"before"`
 	After   string  `json:"after"`
 }
@@ -13,7 +15,7 @@ type Request struct {
 	SourceHistoryID string `json:"sourceHistoryID"`
 	TargetVersionID int64  `json:"targetVersionID"`
 	TargetHistoryID string `json:"targetHistoryID"`
-	State           string `json:"state"`
+	Status          string `json:"status"`
 	Conflicted      bool   `json:"conflicted"`
 }
 

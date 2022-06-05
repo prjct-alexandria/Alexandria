@@ -166,7 +166,7 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 
 // GetRequest godoc
 // @Summary     Get Request
-// @Description Returns the information of a given request, including before and after of the main article file
+// @Description Returns the information of a given request, including the information of both versions. Note that comparing target and source versions directly, isn't reliable as before-and-after comparison. That's why, instead of filling in the contents of the version fields, a before and after string is included in the response.
 // @Accept      plain
 // @Produce 	json
 // @Param		articleID	path	string	true "Article ID"
