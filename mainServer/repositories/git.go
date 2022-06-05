@@ -301,6 +301,26 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 	return nil
 }
 
+// RequestPreviewExists stores whether there is already a preview of the specified request,
+// this requires the historyID's to be set in the req struct
+func (r GitRepository) RequestPreviewExists(req entities.Request) (bool, error) {
+	path, err := r.GetRequestCachePath(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
+	if err != nil {
+		return false, err
+	}
+
+	// check if the file exists, using errors because there is no direct exists function from os
+	// testing for file, because folder was automatically created by calling GetRequestCachePath
+	_, err = os.Stat(filepath.Join(path, "new", "main.qmd"))
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
 // StoreRequestPreview performs a merge without committing.
 // Stores the before-and-after in a cache folder
 // Requires the commit/history ID's to be specified in the req struct

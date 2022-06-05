@@ -69,6 +69,7 @@ export default function VersionList() {
     const acceptButton = () => {
         let className = 'btn btn-outline-success';
         let disabledConflicted = dataRequest !== undefined && dataRequest.request.conflicted
+        console.log(dataRequest !== undefined && dataRequest.request.status)
         if (dataRequest !== undefined && dataRequest.request.status === "accepted") {className = 'btn btn-success'}
         return (<button className={className}  disabled={disableButton() || disabledConflicted} onClick={handleAcceptClick}>Accept</button>)
     }
@@ -166,7 +167,7 @@ export default function VersionList() {
                             <h5>Changes of '{dataRequest !== undefined && dataRequest.source.title}'</h5>
                         </div>
                         <div className='col-4' style={{textAlign:'center'}}>
-                            <h5>Original: {dataRequest !== undefined && dataRequest.target.title}</h5>
+                            <h5>Result: {dataRequest !== undefined && dataRequest.target.title}</h5>
                         </div>
                         {/*Accept and reject button*/}
                         <div className='col-1' id='AcceptButton'>
@@ -189,9 +190,9 @@ export default function VersionList() {
                                     />
                                 }
                             </div>
-                            {/*Before version*/}
+                            {/*Result: so after only*/}
                             <div className='col-6'>
-                                {dataRequest !== undefined && dataRequest.before}
+                                {dataRequest !== undefined && dataRequest.after}
                             </div>
 
                         </div>

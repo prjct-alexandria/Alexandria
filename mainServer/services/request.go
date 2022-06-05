@@ -130,24 +130,27 @@ func (s RequestService) GetRequest(request int64) (models.RequestWithComparison,
 		return models.RequestWithComparison{}, err
 	}
 
-	// update and get the request preview, with the merge before and after
-	req, err = s.UpdateRequestPreview(req)
-	if err != nil {
-		return models.RequestWithComparison{}, nil
+	if req.Status == "pending" {
+		// If the request is still active/pending,
+		// make sure that it's up-to-date with the latest commit on both versions
+		req, err = s.UpdateRequestPreview(req)
+		if err != nil {
+			return models.RequestWithComparison{}, err
+		}
 	}
 	before, after, err := s.Gitrepo.GetRequestPreview(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
 	if err != nil {
-		return models.RequestWithComparison{}, nil
+		return models.RequestWithComparison{}, err
 	}
 
 	// get both request versions
 	source, err := s.Versionrepo.GetVersion(req.SourceVersionID)
 	if err != nil {
-		return models.RequestWithComparison{}, nil
+		return models.RequestWithComparison{}, err
 	}
 	target, err := s.Versionrepo.GetVersion(req.TargetVersionID)
 	if err != nil {
-		return models.RequestWithComparison{}, nil
+		return models.RequestWithComparison{}, err
 	}
 
 	// insert before and after contents in the version models
@@ -172,7 +175,7 @@ func (s RequestService) GetRequest(request int64) (models.RequestWithComparison,
 	}, nil
 }
 
-// UpdateRequestPreview stores the before and after of the article in a cache,
+// UpdateRequestPreview stores the before and after of the article in a cache, if it does not exist yet
 // updates the request in the db with the latest commits and the conflict status, also returns entity
 func (s RequestService) UpdateRequestPreview(req entities.Request) (entities.Request, error) {
 	var err error // declare error in advance, so multiple assignment of req fields and err works
@@ -185,6 +188,15 @@ func (s RequestService) UpdateRequestPreview(req entities.Request) (entities.Req
 	req.TargetHistoryID, err = s.Gitrepo.GetLatestCommit(req.ArticleID, req.TargetVersionID)
 	if err != nil {
 		return entities.Request{}, err
+	}
+
+	// don't do anything if it already exists
+	exists, err := s.Gitrepo.RequestPreviewExists(req)
+	if err != nil {
+		return entities.Request{}, err
+	}
+	if exists {
+		return req, nil
 	}
 
 	// store the preview using git merging and check if there will be conflicts
