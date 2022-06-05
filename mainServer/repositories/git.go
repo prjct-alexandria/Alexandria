@@ -382,6 +382,28 @@ func (r GitRepository) hasConflicts(article int64) (bool, error) {
 	return res != "", nil
 }
 
+// GetRequestPreview returns the before and after main article file of a request
+// requires the history ID's to be up-to-date in the req parameter
+func (r GitRepository) GetRequestPreview(article int64, sourceHistoryID string, targetHistoryID string) (string, string, error) {
+	// get paths
+	cache, err := r.GetRequestCachePath(article, sourceHistoryID, targetHistoryID)
+	if err != nil {
+		return "", "", err
+	}
+
+	// read both old and new file from the cache
+	oldFile, err := ioutil.ReadFile(filepath.Join(cache, "old", "main.qmd"))
+	if err != nil {
+		return "", "", err
+	}
+	newFile, err := ioutil.ReadFile(filepath.Join(cache, "new", "main.qmd"))
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(oldFile), string(newFile), nil
+}
+
 // custom option made for use with the go-git-cmd-wrapper library,
 // enables execution in specific paths, without using os change dir, which possibly interferes with other operations
 func runGitIn(path string) types.Option {

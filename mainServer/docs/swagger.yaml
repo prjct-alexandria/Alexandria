@@ -46,6 +46,8 @@ definitions:
     properties:
       articleID:
         type: integer
+      conflicted:
+        type: boolean
       requestID:
         type: integer
       sourceHistoryID:
@@ -68,6 +70,15 @@ definitions:
     required:
     - sourceVersionID
     - targetVersionID
+    type: object
+  models.RequestWithComparison:
+    properties:
+      after:
+        type: string
+      before:
+        type: string
+      request:
+        $ref: '#/definitions/models.Request'
     type: object
   models.ReturnThreadIds:
     properties:
@@ -233,6 +244,39 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
+  /articles/{articleID}/requests/{requestID}:
+    get:
+      consumes:
+      - text/plain
+      description: Returns the information of a given request, including before and
+        after of the main article file
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RequestWithComparison'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get Request
   /articles/{articleID}/requests/{requestID}/accept:
     put:
       consumes:

@@ -119,6 +119,30 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	return s.Repo.SetStatus(request, entities.RequestAccepted)
 }
 
+// GetRequest returns a request, including the before and after main article file
+func (s RequestService) GetRequest(request int64) (models.RequestWithComparison, error) {
+	req, err := s.Repo.GetRequest(request)
+	if err != nil {
+		return models.RequestWithComparison{}, nil
+	}
+
+	req, err = s.UpdateRequestPreview(req)
+	if err != nil {
+		return models.RequestWithComparison{}, nil
+	}
+
+	before, after, err := s.Gitrepo.GetRequestPreview(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
+	if err != nil {
+		return models.RequestWithComparison{}, nil
+	}
+
+	return models.RequestWithComparison{
+		Request: models.Request(req),
+		Before:  before,
+		After:   after,
+	}, nil
+}
+
 // UpdateRequestPreview stores the before and after of the article in a cache,
 // updates the request in the db with the latest commits and the conflict status, also returns entity
 func (s RequestService) UpdateRequestPreview(req entities.Request) (entities.Request, error) {

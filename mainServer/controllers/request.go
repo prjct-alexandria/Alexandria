@@ -163,3 +163,46 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+// GetRequest godoc
+// @Summary     Get Request
+// @Description Returns the information of a given request, including before and after of the main article file
+// @Accept      plain
+// @Produce 	json
+// @Param		articleID	path	string	true "Article ID"
+// @Param		requestID	path	string	true "Request ID"
+// @Success     200 {object} models.RequestWithComparison
+// @Failure     400 {object} httperror.HTTPError
+// @Failure     500 {object} httperror.HTTPError
+// @Router      /articles/{articleID}/requests/{requestID} [get]
+func (contr RequestController) GetRequest(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	// extract article id, had it in the path for consistency in endpoints, but actually ignores it
+	aid := c.Param("articleID")
+	_, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// extract request id
+	rid := c.Param("requestID")
+	request, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	// accept request with service
+	req, err := contr.Serv.GetRequest(request)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed getting request on server"))
+		return
+	}
+
+	c.JSON(http.StatusOK, req)
+}

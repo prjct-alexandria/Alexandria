@@ -1,5 +1,11 @@
 package models
 
+type RequestWithComparison struct {
+	Request Request `json:"request"`
+	Before  string  `json:"before"`
+	After   string  `json:"after"`
+}
+
 type Request struct {
 	RequestID       int64  `json:"requestID"`
 	ArticleID       int64  `json:"articleID"`
