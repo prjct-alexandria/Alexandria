@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
 import CreateMR from "./CreateMR"
+import ThreadList from "./ThreadList";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -47,51 +48,60 @@ export default function ArticleVersionPage() {
   }, [url]);
 
   return (
-    <div className="wrapper col-8 m-auto">
-      {!isLoaded && <LoadingSpinner />}
-      {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-      {versionData != null && (
-          <div>
-            <div className={"row"}>
-              <div className="col-8">
-              <h1>{versionData.title}</h1>
+    <div className="row justify-content-center">
+        {!isLoaded && <LoadingSpinner />}
+        {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
+        {versionData != null && (
+            <div className="col-10">
+              <div className={"row"}>
+                <div className="col-8">
+                <h1>{versionData.title}</h1>
+                </div>
+                <div className="col-2">
+                  <button
+                      type="button"
+                      className="btn btn-primary btn-lg"
+                      data-bs-toggle="modal"
+                      data-bs-target="#uploadFile"
+                  >
+                    Upload File
+                  </button>
+                  <FileUpload />
+                </div>
+                <div className="col-2">
+                  <button
+                      type="button"
+                      className="btn btn-primary btn-lg"
+                      data-bs-toggle="modal"
+                      data-bs-target="#createMR"
+                  >
+                    Make Request
+                  </button>
+                  <CreateMR />
+                </div>
               </div>
-              <div className="col-2">
-                <button
-                    type="button"
-                    className="btn btn-primary btn-lg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#uploadFile"
-                >
-                  Upload File
-                </button>
-                <FileUpload />
+              <div>
+                <h4>Owners:</h4>
+                <ul>
+                  {versionData.owners.map((owner, i) => (
+                      <li key={i}>{owner}</li>
+                  ))}
+                </ul>
               </div>
-              <div className="col-2">
-                <button
-                    type="button"
-                    className="btn btn-primary btn-lg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createMR"
-                >
-                  Make Request
-                </button>
-                <CreateMR />
+
+              {/*Don't know why, but without the border and extra div there is some weird effect in the dropdown*/}
+              <div className="row" style={{border: '1px solid transparent'}}>
+                <div className="row mb-2 mt-2">
+                  <div className="col-8 articleContent">
+                    <div>{versionData.content}</div>
+                  </div>
+                  <div className="col-3">
+                    <ThreadList threadType={"commit"} specificId={parseInt(params.versionId as string)} />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
-              <h4>Owners:</h4>
-              <ul>
-                {versionData.owners.map((owner, i) => (
-                    <li key={i}>{owner}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="articleContent">
-              <div style={{whiteSpace: 'pre-line'}}>{versionData.content}</div>
-            </div>
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 }
