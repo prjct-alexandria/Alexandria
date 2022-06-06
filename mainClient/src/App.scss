@@ -104,3 +104,12 @@ a:hover {
   border: $article-content-border-color solid;
   border-radius: 5px;
 }
+
+.alert {
+  position: fixed;
+  bottom: 0;
+  margin:0;
+  width: 75%;
+  left: 50%;
+  transform: translate(-50%)
+}
