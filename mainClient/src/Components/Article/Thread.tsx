@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Link, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 
 type ThreadProps = {
@@ -8,6 +8,7 @@ type ThreadProps = {
         "id": number,
         "specificId": number
     };
+    threadType: string
 };
 
 type ThreadComment = {
@@ -26,10 +27,12 @@ export default function Thread(props: ThreadProps) {
     const params = useParams();
 
     useEffect(() => {
-        // const urlThreadList = "http://localhost:8080/articles/4/thread/" + props.threadType;
-        const urlThreadList = "/commentList1.json"; // Placeholder
+        // const urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/thread/" +
+        //     props.threadType + "/id/" + props.thread.specificId + "/comments";
+        const urlCommentList = "/commentList1.json"; // Placeholder
 
-        fetch(urlThreadList, {
+        // get comments of specific thread
+        fetch(urlCommentList, {
             method: "GET",
             mode: "cors",
             headers: {
@@ -53,7 +56,7 @@ export default function Thread(props: ThreadProps) {
 
 
     return (
-        <div className="accordion-item">
+        <div className="accordion-item mb-3" style={{border: '1px solid #e9ecef'}}>
             <button className="accordion-button collapsed"
                     type="button"
                     data-bs-toggle="collapse"

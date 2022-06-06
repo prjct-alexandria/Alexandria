@@ -165,8 +165,6 @@ export default function VersionList() {
     const view = () => {
         return (
             <div className='row'>
-                {/*to do: do this in a better way*/}
-                <div className="col-1"></div>
                 <div>
                     <div>
                         <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Versions</h1>
@@ -214,7 +212,7 @@ export default function VersionList() {
                                 </div>
                             </div>
                             <div className="wrapper col-3">
-                                <ThreadList threadType={"request"}/>
+                                <ThreadList threadType={"request"} specificId={parseInt(params.requestId as string)}/>
                             </div>
                         </div>
                     </div>
