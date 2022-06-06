@@ -25,7 +25,7 @@ type ThreadController struct {
 // @Accept		 json
 // @Param		 thread 		body	models.Thread		true 	"Thread"
 // @Produce      json
-// @Success      200  {object} models.ReturnIds
+// @Success      200  {object} models.ReturnThreadIds
 // @Failure 	 400  {object} httperror.HTTPError
 // @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
@@ -101,6 +101,16 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, ids)
 }
 
+// GetCommitThreads godoc
+// @Summary      Get all threads for a commit
+// @Description  Gets a list with all threads belonging to a specific commit of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 commit ID 			path	int64		true 	"Commit ID"
+// @Produce      json
+// @Success      200  {object} models.Thread
+// @Failure      400  {object} httperror.HTTPError
+// @Failure      500  {object} httperror.HTTPError
+// @Router       /articles/:articleID/history/:commitID/threads [get]
 func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	aid := c.Param("articleID")
 	cid := c.Param("commitID")
@@ -119,7 +129,7 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	}
 
 	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
-	if err != nil {
+	if err != nil || threads == nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find committhreads for this article"))
 		return

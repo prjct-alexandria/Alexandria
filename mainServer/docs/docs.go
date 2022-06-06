@@ -59,33 +59,42 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/:articleID/thread/:threadType/id/:specificID/": {
-            "post": {
-                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
-                "consumes": [
-                    "application/json"
-                ],
+        "/articles/:articleID/history/:commitID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Creates thread entity",
+                "summary": "Get all threads for a commit",
                 "parameters": [
                     {
-                        "description": "Thread",
-                        "name": "article",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Thread"
-                        }
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ReturnIds"
-                        },
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -111,7 +120,49 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/httperror.HTTPError"
                         }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/thread/:threadType/id/:specificID/": {
+            "post": {
+                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Creates thread entity",
+                "parameters": [
+                    {
+                        "description": "Thread",
+                        "name": "thread",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReturnThreadIds"
+                        }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
                     }
                 }
             }
@@ -535,27 +586,19 @@ const docTemplate = `{
         "models.RequestCreationForm": {
             "type": "object",
             "required": [
-                "sourceHistoryID",
                 "sourceVersionID",
-                "targetHistoryID",
                 "targetVersionID"
             ],
             "properties": {
-                "sourceHistoryID": {
-                    "type": "string"
-                },
                 "sourceVersionID": {
                     "type": "integer"
-                },
-                "targetHistoryID": {
-                    "type": "string"
                 },
                 "targetVersionID": {
                     "type": "integer"
                 }
             }
         },
-        "models.ReturnIds": {
+        "models.ReturnThreadIds": {
             "type": "object",
             "properties": {
                 "commentId": {

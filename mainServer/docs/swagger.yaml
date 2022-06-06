@@ -71,21 +71,15 @@ definitions:
     type: object
   models.RequestCreationForm:
     properties:
-      sourceHistoryID:
-        type: string
       sourceVersionID:
         type: integer
-      targetHistoryID:
-        type: string
       targetVersionID:
         type: integer
     required:
-    - sourceHistoryID
     - sourceVersionID
-    - targetHistoryID
     - targetVersionID
     type: object
-  models.ReturnIds:
+  models.ReturnThreadIds:
     properties:
       commentId:
         type: integer
@@ -177,6 +171,51 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Create new article
+  /articles/:articleID/history/:commitID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific commit of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Commit ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Thread'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a commit
+  /articles/:articleID/mainVersion:
+    get:
+      description: Get main version of an article by specifying the article id. Returns
+        the version id of the main version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get main version id of article
   /articles/:articleID/thread/:threadType/id/:specificID/:
     post:
       consumes:
@@ -186,37 +225,26 @@ paths:
       parameters:
       - description: Thread
         in: body
-        name: article
+        name: thread
         required: true
         schema:
-          $ref: '#/definitions/models.Thread        
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ReturnIds'  
-          "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httperror.HTTPError'
-      summary: Creates thread entity
-
-  /articles/:articleID/mainVersion:
-    get:
-      description: Get main version of an article by specifying the article id. Returns
-        the version id of the main version
+          $ref: '#/definitions/models.Thread'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ReturnIds'
+            $ref: '#/definitions/models.ReturnThreadIds'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/httperror.HTTPError'
-      summary: Get main version id of article
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Creates thread entity
   /articles/{articleID}/requests:
     post:
       consumes:
