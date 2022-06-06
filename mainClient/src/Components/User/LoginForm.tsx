@@ -32,7 +32,7 @@ export default function LoginForm(props: LoginFormProps) {
               aria-label="Close"
             ></button>
           </div>
-          <form onSubmit={props.submitHandler}>
+          <form onSubmit={props.submitHandler} data-testid="login-form">
             <div className="modal-body">
               <div className="mb-3">
                 <label className="form-label">Email address</label>
@@ -41,6 +41,7 @@ export default function LoginForm(props: LoginFormProps) {
                   name="email"
                   type="email"
                   className="form-control"
+                  data-testid="email"
                 />
               </div>
               <div className="mb-3">
@@ -50,11 +51,16 @@ export default function LoginForm(props: LoginFormProps) {
                   name="password"
                   type="password"
                   className="form-control"
+                  data-testid="password"
                 />
               </div>
             </div>
             <div className="modal-footer">
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                data-testid="submit"
+              >
                 Login
               </button>
               <div>

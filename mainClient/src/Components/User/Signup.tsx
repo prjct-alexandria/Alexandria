@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import $ from "jquery";
 import SignupForm from "./SignupForm";
 
 export default function Signup() {
@@ -52,10 +53,10 @@ export default function Signup() {
         console.log("Success:", response);
         setHttpResponse(response);
 
-        // Redirect to login page; Comment this to debug the form submission
-        if (typeof window !== "undefined") {
-          window.location.href = "http://localhost:3000/";
-        }
+        // Use JQuery to "simulate" button presses,
+        // which close the signup modal, then open the login
+        $('#btn-close-signup-form').trigger('click');
+        $('#btn-open-login-form').trigger('click');
       },
       (error) => {
         // Request returns an error

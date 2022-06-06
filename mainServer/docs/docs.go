@@ -519,6 +519,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint for user logging in",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginForm"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -542,6 +553,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint for user registration",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.User"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -621,6 +643,21 @@ const docTemplate = `{
                     }
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginForm": {
+            "type": "object",
+            "required": [
+                "email",
+                "pwd"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "pwd": {
                     "type": "string"
                 }
             }
