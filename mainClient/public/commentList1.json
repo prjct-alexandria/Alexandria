@@ -1,0 +1,23 @@
+[
+  {
+    "authorId": "myauthorid1",
+    "content": "mycontent1",
+    "creationDate": "mycreationdate1",
+    "id": 1,
+    "threadId": 2
+  },
+  {
+    "authorId": "myauthorid2",
+    "content": "mycontent2",
+    "creationDate": "mycreationdate2",
+    "id": 3,
+    "threadId": 4
+  },
+  {
+    "authorId": "myauthorid3",
+    "content": "mycontent3",
+    "creationDate": "mycreationdate3",
+    "id": 5,
+    "threadId": 6
+  }
+]

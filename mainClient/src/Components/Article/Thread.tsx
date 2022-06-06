@@ -1,26 +1,35 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import ArticleListElement from "./ArticleListElement";
-import LoadingSpinner from "../LoadingSpinner";
+import {Link, useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
 
-type Article = {
-    id: string;
-    title: string;
-    date_created: string;
-    author: string;
-    description: string;
+type ThreadProps = {
+    thread: {
+        "articleId": number,
+        "id": number,
+        "specificId": number
+    };
 };
 
-export default function ArticleList() {
-    let [articleListData, setData] = useState<Article[]>();
+type ThreadComment = {
+    "authorId": string,
+    "content": string,
+    "creationDate": string,
+    "id": number,
+    "threadId": number
+}
+
+export default function Thread(props: ThreadProps) {
+    let [commentData, setData] = useState<ThreadComment[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
 
-    useEffect(() => {
-        // const url = "http://localhost:8080/articles/";
-        const url = "/articleList.json"; // Placeholder
+    const params = useParams();
 
-        fetch(url, {
+    useEffect(() => {
+        // const urlThreadList = "http://localhost:8080/articles/4/thread/" + props.threadType;
+        const urlThreadList = "/commentList1.json"; // Placeholder
+
+        fetch(urlThreadList, {
             method: "GET",
             mode: "cors",
             headers: {
@@ -42,14 +51,30 @@ export default function ArticleList() {
             );
     }, []);
 
+
     return (
-        <div className={"accordion"}>
-            {!isLoaded && <LoadingSpinner />}
-            {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-            {articleListData != null &&
-                articleListData.map((article, i) => (
-                    <ArticleListElement key={i} article={article} />
-                ))}
+        <div className="accordion-item">
+            <button className="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target={"#panelsStayOpen-collapse" + props.thread.id}
+                    aria-expanded="false"
+                    aria-controls={"panelsStayOpen-collapse" + props.thread.id}>
+                {commentData != null && commentData[0].content}
+            </button>
+            <div
+                id={"panelsStayOpen-collapse" + props.thread.id}
+                className="accordion-collapse collapse"
+                aria-labelledby={"panelsStayOpen-heading" + props.thread.id}
+            >
+                    {commentData != null &&
+                    commentData.map((comment, i) => (
+                        i !== 0 && // don't show first element in the list
+                        <div className="accordion-body" style={{border: '1px solid #e9ecef'}}>
+                            {comment.content}
+                        </div>
+                    ))}
+            </div>
         </div>
     );
 }

@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import PrismDiff from "./PrismDiff";
 import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
-import Thread from "./Thread"
+import ThreadList from "./ThreadList"
 
 type Request = {
     sourceVersionID: number;
@@ -20,6 +20,13 @@ type ArticleVersion = {
     owners: string[];
     content: string;
 };
+
+type Thread = {
+    "articleId": number,
+    "comment": Comment[]
+    "id": number,
+    "specificId": number
+}
 
 export default function VersionList() {
     let params = useParams();
@@ -162,7 +169,7 @@ export default function VersionList() {
                 <div className="col-1"></div>
                 <div>
                     <div>
-                        <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Changes</h1>
+                        <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Versions</h1>
                         {/*Version names*/}
                         <div className='row justify-content-center'>
                             {/*Version names*/}
@@ -206,8 +213,8 @@ export default function VersionList() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="wrapper col-3" style={{border: 'black 1px solid'}}>
-                                Threads
+                            <div className="wrapper col-3">
+                                <ThreadList threadType={"request"}/>
                             </div>
                         </div>
                     </div>
