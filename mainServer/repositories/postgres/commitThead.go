@@ -10,6 +10,13 @@ type PgCommitThreadRepository struct {
 	Db *sql.DB
 }
 
+func (r PgCommitThreadRepository) GetCommitThreads(aid int64, cid int64) (interface{}, error) {
+	// get all thread id's that belong to the article
+	// get all threads that belong to the thread id's
+	// construct list of threads
+	return nil, nil
+}
+
 func NewPgCommitThreadRepository(db *sql.DB) PgCommitThreadRepository {
 	repo := PgCommitThreadRepository{db}
 	err := repo.createCommitThreadTable()
