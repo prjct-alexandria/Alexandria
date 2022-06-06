@@ -5,6 +5,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
 import CreateMR from "./CreateMR"
 import ThreadList from "./ThreadList";
+import FileDownload from "./FileDownload";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -18,11 +19,11 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
-  const url = "/article_version1.json"
-    // "http://localhost:8080/articles/" +
-    // params.articleId +
-    // "/versions/" +
-    // params.versionId;
+  const url = "/article_version1.json";
+  // "http://localhost:8080/articles/" +
+  // params.articleId +
+  // "/versions/" +
+  // params.versionId;
 
   useEffect(() => {
     fetch(url, {
@@ -32,7 +33,7 @@ export default function ArticleVersionPage() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then(
@@ -57,28 +58,33 @@ export default function ArticleVersionPage() {
                 <div className="col-8">
                 <h1>{versionData.title}</h1>
                 </div>
-                <div className="col-2">
-                  <button
-                      type="button"
-                      className="btn btn-primary btn-lg"
-                      data-bs-toggle="modal"
-                      data-bs-target="#uploadFile"
-                  >
-                    Upload File
-                  </button>
-                  <FileUpload />
-                </div>
-                <div className="col-2">
-                  <button
-                      type="button"
-                      className="btn btn-primary btn-lg"
-                      data-bs-toggle="modal"
-                      data-bs-target="#createMR"
-                  >
-                    Make Request
-                  </button>
-                  <CreateMR />
-                </div>
+                <div className="row col-4 justify-content-between">
+                    <div className="col-1">
+                      <button
+                          type="button"
+                          className="btn btn-primary btn-lg"
+                          data-bs-toggle="modal"
+                          data-bs-target="#uploadFile"
+                      >
+                        Upload File
+                      </button>
+                      <FileUpload />
+                    </div>
+                    <div className="col-1">
+                      <FileDownload />
+                    </div>
+                    <div className="col-1">
+                      <button
+                          type="button"
+                          className="btn btn-primary btn-lg"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createMR"
+                      >
+                        Make Request
+                      </button>
+                      <CreateMR />
+                    </div>
+                  </div>
               </div>
               <div>
                 <h4>Owners:</h4>
