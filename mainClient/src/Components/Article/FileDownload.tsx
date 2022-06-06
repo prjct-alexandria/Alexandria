@@ -9,14 +9,15 @@ export default function FileDownload() {
   let [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
   let [filename, setFilename] = useState("");
 
-  // Make url for request to access ../files endpoint
+  // Make url for request to access ../files endpoint. Debug with url "/source-file.txt"
   let params = useParams();
-  const endpointUrl = "/source-file.txt";
-  // "http://localhost:8080/articles/" +
-  // params.articleId +
-  // "/versions/" +
-  // params.versionId +
-  // "/files";
+
+  const endpointUrl =
+    "http://localhost:8080/articles/" +
+    params.articleId +
+    "/versions/" +
+    params.versionId +
+    "/files";
 
   // Handler triggered on Download button click
   const downloadFileHandler = (e: { preventDefault: () => void }) => {
@@ -37,8 +38,8 @@ export default function FileDownload() {
         (result) => {
           // Put the file in the DOM
           const windowUrl = window.URL.createObjectURL(result);
-          // Placeholder filename
-          setFilename("source-file.txt");
+          // Set filename
+          setFilename("source-file.zip");
 
           // Add a hidden <a> element to DOM, that downloads the file when clicking on it
           const a = document.createElement("a");
