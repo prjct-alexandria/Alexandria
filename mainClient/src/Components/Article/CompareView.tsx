@@ -2,9 +2,7 @@ import * as React from "react"
 import { useParams } from "react-router-dom"
 import {useEffect, useState} from "react";
 import PrismDiff from "./PrismDiff";
-import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
-import {data} from "jquery";
 
 type RequestWithComparison = {
     request: Request;
