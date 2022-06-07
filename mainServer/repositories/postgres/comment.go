@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"mainServer/models"
+	"mainServer/entities"
 	"mainServer/utils/clock"
 )
 
@@ -34,9 +34,9 @@ func (r PgCommentRepository) createCommentTable() error {
 	return err
 }
 
-func (r PgCommentRepository) SaveComment(comment models.Comment) (int64, error) {
-	stmt, err := r.Db.Prepare("INSERT INTO comment (commentid, authorid, content, threadid, creationdate) " +
-		"VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid")
+func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
+	stmt, err := r.Db.Prepare(`INSERT INTO comment (commentid, authorid, content, threadid, creationdate) 
+		VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid`)
 	if err != nil {
 		fmt.Println(err)
 		return -1, fmt.Errorf("SaveComment: %v", err)
