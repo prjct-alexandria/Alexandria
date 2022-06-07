@@ -126,12 +126,13 @@ func (serv ArticleService) GetArticleList() ([]models.ArticleListElement, error)
 		}
 
 		listElement := models.ArticleListElement{
-			Id:     element.Id,
-			Title:  versionData.Title,
-			Owners: versionData.Owners,
+			Id:            element.Id,
+			MainVersionId: element.MainVersionID,
+			Title:         versionData.Title,
+			Owners:        versionData.Owners,
 			//TODO: Get owners name instead of email?
-			//CreatedAt = ??
-			//Description = ??
+			//TODO: CreatedAt = ?? (Sort by creation date)
+			//TODO: Article Description = ??
 		}
 		res = append(res, listElement)
 	}

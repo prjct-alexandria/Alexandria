@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"mainServer/entities"
+	"strconv"
 )
 
 type PgArticleRepository struct {
