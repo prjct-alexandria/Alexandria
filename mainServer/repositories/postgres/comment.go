@@ -35,8 +35,8 @@ func (r PgCommentRepository) createCommentTable() error {
 }
 
 func (r PgCommentRepository) SaveComment(comment entities.Comment) (int64, error) {
-	stmt, err := r.Db.Prepare("INSERT INTO comment (commentid, authorid, content, threadid, creationdate) " +
-		"VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid")
+	stmt, err := r.Db.Prepare(`INSERT INTO comment (commentid, authorid, content, threadid, creationdate) 
+		VALUES (DEFAULT, $1, $2, $3, $4) RETURNING commentid`)
 	if err != nil {
 		fmt.Println(err)
 		return -1, fmt.Errorf("SaveComment: %v", err)
