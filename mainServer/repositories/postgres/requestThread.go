@@ -3,11 +3,85 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"mainServer/entities"
 	"mainServer/models"
 )
 
 type PgRequestThreadRepository struct {
 	Db *sql.DB
+}
+
+func (r PgRequestThreadRepository) GetRequestThreads(aid int64, rid int64) ([]models.Thread, error) {
+	// construct list of threads
+	stmt, err := r.Db.Prepare("SELECT t.threadid, articleid, requestid, commentid, authorid, creationdate, content FROM requestthread rt JOIN thread t on rt.threadid = t.threadid JOIN comment c on t.threadid = c.threadid WHERE t.articleid = $1 AND rt.requestid = $2")
+	if err != nil {
+		return nil, fmt.Errorf("GetRequestThreads: %v", err)
+	}
+
+	rows, err := stmt.Query(aid, rid)
+	if err != nil {
+		return nil, fmt.Errorf("GetRequestThreads: %v", err)
+	}
+	defer rows.Close()
+	if err != nil {
+		return nil, fmt.Errorf("GetRequestThreads: %v", err)
+	}
+
+	var threads []models.Thread
+	for rows.Next() {
+		// declare variables
+		var tid int64
+		var aid int64
+		var rid int64
+		var coid int64
+		var auid string
+		var cd string
+		var c string
+		if err := rows.Scan(&tid, &aid, &rid, &coid, &auid, &cd, &c); err != nil {
+			return threads, fmt.Errorf("GetRequestThreads: %v", err)
+		}
+		// find index of tid in the threads list
+		index := -1
+		for i, v := range threads {
+			if v.Id == tid {
+				index = i
+				break
+			}
+		}
+		// construct comment
+		comment := entities.Comment{
+			Id:           coid,
+			AuthorId:     auid,
+			ThreadId:     tid,
+			Content:      c,
+			CreationDate: cd,
+		}
+		// if index tid isn't yet in the list, add new thread, else add comment to thread
+		if index == -1 {
+			var comments []entities.Comment
+			comments = append(comments, comment)
+			threads = append(threads, models.Thread{
+				Id:         tid,
+				ArticleId:  aid,
+				SpecificId: rid,
+				Comment:    comments,
+			})
+		} else {
+			oldThread := threads[index]
+			oldComments := oldThread.Comment
+			newComments := append(oldComments, comment)
+			threads[index] = models.Thread{
+				Id:         oldThread.Id,
+				ArticleId:  oldThread.ArticleId,
+				SpecificId: oldThread.SpecificId,
+				Comment:    newComments,
+			}
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return threads, fmt.Errorf("GetRequestThreads: %v", err)
+	}
+	return threads, nil
 }
 
 func NewPgRequestThreadRepository(db *sql.DB) PgRequestThreadRepository {

@@ -109,7 +109,6 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 // @Produce      json
 // @Success      200  {object} models.Thread
 // @Failure      400  {object} httperror.HTTPError
-// @Failure      500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/history/:commitID/threads [get]
 func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	aid := c.Param("articleID")
@@ -131,7 +130,44 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
 	if err != nil || threads == nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find committhreads for this article"))
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
+}
+
+// GetRequestThreads godoc
+// @Summary      Get all threads for a request
+// @Description  Gets a list with all threads belonging to a specific request of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 request ID 		path	int64		true 	"Request ID"
+// @Produce      json
+// @Success      200  {object} models.Thread
+// @Failure      400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/requests/:requestID/threads [get]
+func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	rid := c.Param("requestID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	intRid, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.RequestThreadService.GetRequestThreads(intAid, intRid)
+	if err != nil || threads == nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find requestthreads for this request"))
 		return
 	}
 

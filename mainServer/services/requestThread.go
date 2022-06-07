@@ -18,3 +18,12 @@ func (serv RequestThreadService) StartRequestThread(thread models.Thread, tid in
 
 	return id, err
 }
+
+func (serv RequestThreadService) GetRequestThreads(aid int64, cid int64) ([]models.Thread, error) {
+	threads, err := serv.RequestThreadRepository.GetRequestThreads(aid, cid)
+	if err != nil {
+		return nil, err
+	}
+
+	return threads, err
+}

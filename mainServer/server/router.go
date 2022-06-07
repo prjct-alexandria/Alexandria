@@ -36,6 +36,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 
 	router.POST("/articles/:articleID/thread/:threadType/id/:specificID/", contrs.thread.CreateThread)
 	router.GET("/articles/:articleID/history/:commitID/threads", contrs.thread.GetCommitThreads)
+	router.GET("/articles/:articleID/requests/:requestID/threads", contrs.thread.GetRequestThreads)
 
 	//Groups can be used for nested paths, maybe add example later
 	// Path for accessing the API documentation

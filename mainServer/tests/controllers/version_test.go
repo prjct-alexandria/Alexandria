@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-// globalSetup should be called once, before any test starts
+// globalSetup should be called once, before any test in this file starts
 func globalSetup() {
 	// Setup test router, to test controller endpoints through http
 	r = gin.Default()
