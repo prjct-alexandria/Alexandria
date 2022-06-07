@@ -22,7 +22,9 @@ func NewPgRequestRepository(db *sql.DB) PgRequestRepository {
 func (r PgRequestRepository) CreateRequest(req entities.Request) (entities.Request, error) {
 
 	// store request entity
-	stmt, err := r.Db.Prepare("INSERT INTO request (articleID, sourceVersionID, sourceHistoryID, targetVersionID, targetHistoryID) VALUES ($1,$2,$3,$4,$5) RETURNING id,state")
+	stmt, err := r.Db.Prepare(`INSERT INTO request 
+    (articleID, sourceVersionID, sourceHistoryID, targetVersionID, targetHistoryID) 
+	VALUES ($1,$2,$3,$4,$5) RETURNING id,state`)
 	if err != nil {
 		return entities.Request{}, err
 	}
