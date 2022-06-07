@@ -32,15 +32,16 @@ export default function CreateArticle() {
     const url = "http://localhost:8080/articles";
 
     // Make list of strings from input string separated by ","
-    const tagList: string[] = mainVersionTags.split(",");
+    let tagList: string[] = mainVersionTags.split(",");
     let ownerList: string[] = mainVersionOwners.split(",");
 
     // Remove extra spaces
-    tagList.map((tag) => tag.trim());
+    tagList = tagList.map((tag) => tag.trim());
+    ownerList = ownerList.map((owner) => owner.trim());
 
-    if (ownerList.length > 0) {
-      ownerList.map((owner) => owner.trim());
-    }
+    // Remove empty elements
+    tagList = tagList.filter((tag) => tag!= '')
+    ownerList = ownerList.filter((owner) => owner!= '')
 
     let loggedUser = localStorage.getItem("loggedUserEmail");
     ownerList[ownerList.length] =

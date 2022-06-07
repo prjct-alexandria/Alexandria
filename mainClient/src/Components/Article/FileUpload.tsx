@@ -26,7 +26,6 @@ export default function FileUpload() {
       method: "POST",
       mode: "cors",
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
         credentials: 'include',
@@ -38,6 +37,9 @@ export default function FileUpload() {
             ? "File successfully uploaded"
             : "Error: " + response.status + " " + response.statusText;
         console.log(message);
+
+        // refresh page
+        window.location.reload();
       },
       (error) => {
         console.error("Error: ", error);

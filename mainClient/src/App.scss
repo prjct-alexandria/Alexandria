@@ -8,6 +8,10 @@ $removed-color:red;
 $removed-background-color: #fec4c0;
 $error-color: #c70000;
 
+// article contents SASS
+$article-content-background-color:#eee;
+$article-content-border-color: #ccc;
+
 .input-validation {
   color: $error-color;
 }
@@ -92,4 +96,20 @@ a:hover {
   color: $removed-color;
   background-color: $removed-background-color;
   text-shadow: none;
+}
+
+.articleContent {
+  background-color: $article-content-background-color;
+  padding: 15px;
+  border: $article-content-border-color solid;
+  border-radius: 5px;
+}
+
+.alert {
+  position: fixed;
+  bottom: 0;
+  margin:0;
+  width: 75%;
+  left: 50%;
+  transform: translate(-50%)
 }
