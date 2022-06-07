@@ -1,0 +1,32 @@
+{
+  "name": "alexandria",
+  "version": "1.0.0",
+  "description": "We work for clients Andrew Demetriou, PhD. student, and Cynthia Liem, PhD., to develop a collaborative platform and workflow for scientific publishing, for the duration of quarter 4. Our goal is to produce an open-source collaborative scientific publishing software product by translating the git workflow that is usually utilised by a narrow demographic (programmers, computer scientists) into a process that scientists from all domains will be able to use to publish articles and perform peer reviewing.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "alexandria": "^0.1.7",
+    "axios": "^0.27.2",
+    "bootstrap": "^5.1.3",
+    "diff": "^5.1.0",
+    "prismjs": "^1.28.0",
+    "react-bootstrap": "^2.4.0",
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.7.2"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.0.2",
+    "@types/prismjs": "^1.26.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.ewi.tudelft.nl:cse2000-software-project/2021-2022-q4/cluster-07/git_for_science/alexandria.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

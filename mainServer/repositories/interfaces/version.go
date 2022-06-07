@@ -11,4 +11,7 @@ type VersionRepository interface {
 
 	// GetVersion returns version entity from database
 	GetVersion(version int64) (entities.Version, error)
+
+	// GetVersionsByArticle gets the version entities related to a specific article, links the owners
+	GetVersionsByArticle(article int64) ([]entities.Version, error)
 }

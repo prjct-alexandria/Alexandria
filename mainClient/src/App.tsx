@@ -13,6 +13,8 @@ import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import VersionList from "./Components/Article/VersionList";
+import CompareView from "./Components/Article/CompareView"
+import MRList from "./Components/Article/MRList";
 
 function App() {
   return (
@@ -26,7 +28,7 @@ function App() {
               <Route path="/articles" element={<ArticleList />}></Route>
               <Route path="/upload" element={<FileUpload />}></Route>
               <Route
-                path="/articles/:aid/versions"
+                path="/articles/:articleId/versions"
                 element={<VersionList />}
               ></Route>
               <Route
@@ -35,6 +37,8 @@ function App() {
               ></Route>
               <Route path="/signup" element={<Signup />}></Route>
               <Route path="/login" element={<Login />}></Route>
+              <Route path="/articles/:articleId/requests/:requestId" element={<CompareView />}></Route>
+              <Route path="/articles/:articleId/requests/*" element={<MRList />}></Route>
             </Routes>
           </div>
           <Footer />

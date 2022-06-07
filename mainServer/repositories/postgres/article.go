@@ -66,3 +66,16 @@ func (r PgArticleRepository) GetAllArticles() ([]entities.Article, error) {
 
 	return list, err
 }
+
+func (r PgArticleRepository) GetMainVersion(aid int64) (int64, error) {
+	var mvid int64
+
+	row := r.Db.QueryRow("SELECT mainversionid FROM article WHERE id=" + strconv.FormatInt(aid, 10))
+	if err := row.Scan(&mvid); err != nil {
+		if err == sql.ErrNoRows {
+			return mvid, fmt.Errorf("GetMainVersion no such article")
+		}
+		return mvid, fmt.Errorf("GetMainVersion")
+	}
+	return mvid, nil
+}

@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 export default function FileUpload() {
   let [selectedFile, setSelectedFile] = useState<string | Blob>("file");
   let [error, setError] = useState(null);
-  let [httpResponse, setHttpResponse] = useState<Response>();
 
   const onChangeFile = (e: any) => {
     setSelectedFile(e.target.files[0]);
@@ -27,9 +26,9 @@ export default function FileUpload() {
       method: "POST",
       mode: "cors",
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
+        credentials: 'include',
       body: formData,
     }).then(
       (response) => {
@@ -38,7 +37,9 @@ export default function FileUpload() {
             ? "File successfully uploaded"
             : "Error: " + response.status + " " + response.statusText;
         console.log(message);
-        setHttpResponse(response);
+
+        // refresh page
+        window.location.reload();
       },
       (error) => {
         console.error("Error: ", error);
@@ -48,19 +49,46 @@ export default function FileUpload() {
   };
 
   return (
-    <div className="col-6 align-content-center m-auto">
-      {error && <div>{`Error: ${error}`}</div>}
+    <div
+      className="modal fade"
+      id="uploadFile"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      aria-labelledby="uploadLabel"
+      aria-hidden="true"
+    >
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="uploadLabel">
+              Upload file to article
+            </h5>
 
-      <h3>Upload a file</h3>
-      <hr />
-      <input
-        className="file-upload-input"
-        type="file"
-        onChange={onChangeFile}
-      />
-      <button className="btn btn-primary" onClick={uploadFileHandler}>
-        Upload
-      </button>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="modal-body">
+            {error && <div>{`Error: ${error}`}</div>}
+
+            <h5>Upload a file</h5>
+            <hr />
+            <input
+              className="file-upload-input"
+              type="file"
+              onChange={onChangeFile}
+            />
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-primary" onClick={uploadFileHandler}>
+              Upload
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,9 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
+import FileUpload from "./FileUpload";
+import CreateMR from "./CreateMR";
+import FileDownload from "./FileDownload";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -15,11 +18,11 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
-  const url =
-    "http://localhost:8080/articles/" +
-    params.articleId +
-    "/versions/" +
-    params.versionId;
+  const url = "/article_version1.json";
+  // "http://localhost:8080/articles/" +
+  // params.articleId +
+  // "/versions/" +
+  // params.versionId;
 
   useEffect(() => {
     fetch(url, {
@@ -29,6 +32,7 @@ export default function ArticleVersionPage() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then(
@@ -48,14 +52,48 @@ export default function ArticleVersionPage() {
       {!isLoaded && <LoadingSpinner />}
       {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
       {versionData != null && (
-        <div className="article">
-          <ul>
-            {versionData.owners.map((owner, i) => (
-              <li key={i}>{owner}</li>
-            ))}
-          </ul>
-          <h1>{versionData.title}</h1>
-          <div>{versionData.content}</div>
+        <div>
+          <div className={"row"}>
+            <div className="col-8">
+              <h1>{versionData.title}</h1>
+            </div>
+            <div className="col-2">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#uploadFile"
+              >
+                Upload File
+              </button>
+              <FileUpload />
+            </div>
+            <div className="col-2">
+              <FileDownload />
+            </div>
+            <div className="col-2">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#createMR"
+              >
+                Make Request
+              </button>
+              <CreateMR />
+            </div>
+          </div>
+          <div>
+            <h4>Owners:</h4>
+            <ul>
+              {versionData.owners.map((owner, i) => (
+                <li key={i}>{owner}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="articleContent">
+            <div style={{ whiteSpace: "pre-line" }}>{versionData.content}</div>
+          </div>
         </div>
       )}
     </div>
