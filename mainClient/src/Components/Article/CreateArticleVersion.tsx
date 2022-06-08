@@ -114,7 +114,7 @@ export default function CreateArticleVersion() {
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title" id="createNewVersionLabel">
-                            Create new version based off this one
+                            Create new version based on this one
                         </h5>
 
                         <button
