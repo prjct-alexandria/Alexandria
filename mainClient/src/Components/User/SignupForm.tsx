@@ -34,6 +34,7 @@ export default function SignupForm(props: SignupFormProps) {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
+              id="btn-close-signup-form"
             ></button>
           </div>
           <form onSubmit={props.submitHandler}>

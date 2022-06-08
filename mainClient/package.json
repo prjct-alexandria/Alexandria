@@ -52,6 +52,8 @@
   },
   "devDependencies": {
     "@tsconfig/react-native": "^1.0.4",
-    "sass": "^1.52.1"
+    "@types/jquery": "^3.5.14",
+    "sass": "^1.52.1",
+    "jest-watch-typeahead": "^0.6.5"
   }
 }
