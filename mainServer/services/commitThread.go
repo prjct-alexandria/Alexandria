@@ -18,12 +18,3 @@ func (serv CommitThreadService) StartCommitThread(thread models.Thread, tid int6
 
 	return id, err
 }
-
-func (serv CommitThreadService) GetCommitThreads(aid int64, cid int64) (interface{}, error) {
-	threads, err := serv.CommitThreadRepository.GetCommitThreads(aid, cid)
-	if err != nil {
-		//return , err
-	}
-
-	return threads, err
-}
