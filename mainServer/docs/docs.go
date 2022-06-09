@@ -276,6 +276,12 @@ const docTemplate = `{
                         "name": "versionID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "History ID",
+                        "name": "historyID",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -472,6 +478,11 @@ const docTemplate = `{
     "definitions": {
         "entities.Comment": {
             "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "creationDate"
+            ],
             "properties": {
                 "authorId": {
                     "type": "string"
@@ -579,20 +590,12 @@ const docTemplate = `{
         "models.RequestCreationForm": {
             "type": "object",
             "required": [
-                "sourceHistoryID",
                 "sourceVersionID",
-                "targetHistoryID",
                 "targetVersionID"
             ],
             "properties": {
-                "sourceHistoryID": {
-                    "type": "string"
-                },
                 "sourceVersionID": {
                     "type": "integer"
-                },
-                "targetHistoryID": {
-                    "type": "string"
                 },
                 "targetVersionID": {
                     "type": "integer"
@@ -601,8 +604,13 @@ const docTemplate = `{
         },
         "models.ReturnThreadIds": {
             "type": "object",
+            "required": [
+                "CommentId",
+                "id",
+                "threadId"
+            ],
             "properties": {
-                "commentId": {
+                "CommentId": {
                     "type": "integer"
                 },
                 "id": {
@@ -615,6 +623,11 @@ const docTemplate = `{
         },
         "models.Thread": {
             "type": "object",
+            "required": [
+                "articleId",
+                "comment",
+                "specificId"
+            ],
             "properties": {
                 "articleId": {
                     "type": "integer"
