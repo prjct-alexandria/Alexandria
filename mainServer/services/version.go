@@ -179,12 +179,13 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 	if err != nil {
 		return path, err
 	}
+
 	defer zipWriter.Close()
 
 	return path, nil
 }
 
-//ToDo: check if this needs to be moved to repositories/git or repositories/filesystem?
+//@Reviewers does this needs to be moved to repositories/git or repositories/filesystem?
 func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
@@ -195,7 +196,7 @@ func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) 
 		// Wrapped in function to allow for "defer file.close()"
 		err := func() error {
 			if file.IsDir() {
-				//Check if it's not the git folder, that's meant for internal server use
+				//Check if it is not the git folder
 				if file.Name() != ".git" {
 					err := addFilesInDirToZip(zipWriter, filepath.Join(dirPath, file.Name()), file.Name())
 					if err != nil {
@@ -203,17 +204,20 @@ func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) 
 					}
 				}
 			} else {
+				//Create file in zip
 				zipFile, err := zipWriter.Create(filepath.Join(dirInZip, file.Name()))
 				if err != nil {
 					return err
 				}
 
+				//Open file on branch
 				fileReader, err := os.Open(filepath.Join(dirPath, file.Name()))
 				if err != nil {
 					return err
 				}
 				defer fileReader.Close()
 
+				//Copy contents over
 				_, err = io.Copy(zipFile, fileReader)
 				if err != nil {
 					return err
