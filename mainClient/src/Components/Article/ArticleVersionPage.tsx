@@ -56,7 +56,7 @@ export default function ArticleVersionPage() {
             <div className="col-10">
               <div className={"row"}>
                 <div className="col-8">
-                <h1>{versionData.title}</h1>
+                  <h1>{versionData.title}</h1>
                 </div>
                 <div className="row col-4 justify-content-between">
                     <div className="col-1">
@@ -95,8 +95,7 @@ export default function ArticleVersionPage() {
                 </ul>
               </div>
 
-              {/*Don't know why, but without the border and extra div there is some weird effect in the dropdown*/}
-              <div className="row" style={{border: '1px solid transparent'}}>
+              <div className="row">
                 <div className="row mb-2 mt-2">
                   <div className="col-8 articleContent">
                     <div>{versionData.content}</div>

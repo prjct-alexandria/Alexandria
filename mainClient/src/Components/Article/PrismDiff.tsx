@@ -6,7 +6,7 @@ const diff = require('diff');
 const PrismDiff = ({ sourceContent = "", targetContent = ""}) => {
     let groups = diff.diffWords(sourceContent, targetContent);
 
-    const mappedNodes = groups.map((group: { value: any; added: any; removed: any; }) => {
+    const mappedNodes = groups.map((group: { value: any; added: any; removed: any; }, i: number) => {
         const { value, added, removed } = group;
         let nodeStyles;
         if (added) nodeStyles = "added";
@@ -15,7 +15,7 @@ const PrismDiff = ({ sourceContent = "", targetContent = ""}) => {
         // Using dangerouslySetInnerHTML with the Node rendering API
         // Note: is dangerous
         return (
-            <span
+            <span key={i}
                 className={nodeStyles}
                 dangerouslySetInnerHTML={{
                     __html: Prism.highlight(
