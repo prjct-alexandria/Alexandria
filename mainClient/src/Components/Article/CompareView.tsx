@@ -21,13 +21,6 @@ type ArticleVersion = {
     content: string;
 };
 
-type Thread = {
-    "articleId": number,
-    "comment": Comment[]
-    "id": number,
-    "specificId": number
-}
-
 export default function VersionList() {
     let params = useParams();
 
