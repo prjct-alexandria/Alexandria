@@ -3,25 +3,15 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import {useParams} from "react-router-dom";
 import Thread from "./Thread"
+import CreateThread from "./CreateThread";
 
 type ThreadListProps = {
     threadType: string
     specificId: number
 };
 
-type ThreadComment = {
-    "authorId": string,
-    "content": string,
-    "creationDate": string,
-    "id": number,
-    "threadId": number
-}
-
 type Thread = {
-    "articleId": number,
-    "comment": ThreadComment[]
-    "id": number,
-    "specificId": number
+    "id": number
 };
 
 export default function ThreadList(props: ThreadListProps) {
@@ -32,11 +22,17 @@ export default function ThreadList(props: ThreadListProps) {
     const params = useParams();
 
     useEffect(() => {
-        // const urlThreadList = "http://localhost:8080/articles/" + params.articleId + "/thread/" + props.threadType
-        //  + "/id/" + props.specificId;
+        let urlThreadList = "";
+        if (props.threadType === "commit") {
+            urlThreadList = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
+            "/history/" + params.historyId + "/threads";
+        } else if (props.threadType === "request") {
+            urlThreadList = "http://localhost:8080/articles/" + params.articleId + "/request/" + params.requestId +
+                "/threads";
+        }
+        urlThreadList = "/threadList.json"; // Placeholder
 
-        const urlThreadList = "/threadList.json"; // Placeholder
-        // get list of threads of a certain article
+        // get list of threads
         fetch(urlThreadList, {
             method: "GET",
             mode: "cors",
@@ -63,12 +59,13 @@ export default function ThreadList(props: ThreadListProps) {
         <div>
             {!isLoaded && <LoadingSpinner />}
             {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-            <div className="accordion" id="accordionPanelsStayOpenExample">
+            <div className="accordion text-center" id="accordionPanelsStayOpenExample">
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <Thread key={i} thread={thread} threadType={props.threadType}/>
+                        <Thread key={i} thread={thread} specificId={props.specificId} threadType={props.threadType}/>
                     ))}
             </div>
+            <CreateThread thread={undefined} specificId={props.specificId} threadType={props.threadType}/>
         </div>
     );
 }

@@ -2,13 +2,13 @@ import * as React from "react";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import LoadingSpinner from "../LoadingSpinner";
+import CreateComment from "./CreateComment"
 
 type ThreadProps = {
     thread: {
-        "articleId": number,
         "id": number,
-        "specificId": number
     };
+    "specificId": number
     threadType: string
 };
 
@@ -24,14 +24,19 @@ export default function Thread(props: ThreadProps) {
     let [commentData, setData] = useState<ThreadComment[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
-    let [newCommentContent, setNewCommentContent] = useState<string>("");
 
     const params = useParams();
 
     useEffect(() => {
-        // const urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/thread/" +
-        //     props.threadType + "/id/" + props.thread.specificId + "/comments";
-        const urlCommentList = "/commentList1.json"; // Placeholder
+        let urlCommentList = "";
+        if (props.threadType === "commit") {
+            urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
+            "/history/" + params.historyId + "/thread/" + props.thread.id + "/comments"
+        } else if (props.threadType === "request") {
+            urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/requests/" + params.requestId +
+            "/thread/" + props.thread.id + "/comments"
+        }
+        urlCommentList = "/commentList1.json"; // Placeholder
 
         // get comments of specific thread
         fetch(urlCommentList, {
@@ -55,47 +60,6 @@ export default function Thread(props: ThreadProps) {
                 }
             );
     }, []);
-
-
-    const urlReplyComment = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId + "/thread/" +
-    props.thread.id + "/comments";
-    // post new comment in existing thread
-
-    const replyComment = (e: { target: { value: any } }) => {
-        setNewCommentContent(e.target.value);
-    };
-
-    const submitHandler = (e: { preventDefault: () => void }) => {
-        // Prevent unwanted default browser behavior
-        e.preventDefault();
-
-        // Construct request body
-        const body = {
-            content: newCommentContent,
-        };
-
-        // Send request with a JSON of the comment data
-        fetch(urlReplyComment, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-            body: JSON.stringify(body),
-        }).then(
-            (response) => {
-                let message: string =
-                    response.status === 200
-                        ? "Comment successfully placed"
-                        : "Error: " + response.status + " " + response.statusText;
-                console.log(message);
-                // refresh page
-                window.location.reload();
-            },
-            (error) => {
-                console.error("Error: ", error);
-                setError(error);
-            }
-        );
-    };
     
     return (
         <div>
@@ -123,13 +87,7 @@ export default function Thread(props: ThreadProps) {
                                 {comment.content}
                             </div>
                         ))}
-                        <form className="text-end" onSubmit={submitHandler}>
-                            <div className="form-group accordion-body">
-                                <textarea className="form-control" placeholder="write comment here..."
-                                          onChange={replyComment}></textarea>
-                            </div>
-                            <button type="submit" className="btn btn-primary m-1">Submit</button>
-                        </form>
+                        <CreateComment thread={props.thread} specificId={props.specificId} threadType={props.threadType}/>
                     </div>
                 </div>
             }
