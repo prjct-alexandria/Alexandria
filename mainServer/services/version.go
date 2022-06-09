@@ -1,13 +1,17 @@
 package services
 
 import (
+	"archive/zip"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
 	"mime/multipart"
+	"os"
 	"path/filepath"
 )
 
@@ -135,6 +139,86 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	err = serv.Gitrepo.Commit(article)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (serv VersionService) GetVersionFiles(article int64, version int64) error {
+	// Checkout
+	err := serv.Gitrepo.CheckoutBranch(article, version)
+	if err != nil {
+		return err
+	}
+
+	// Get folder to save file to
+	base, err := serv.Gitrepo.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+
+	versionEntity, err := serv.Versionrepo.GetVersion(version)
+	versionName := versionEntity.Title
+
+	//TODO: Replace forbidden characters
+	versionZip, err := os.Create(filepath.Join(base, "../"+versionName+".zip"))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer versionZip.Close()
+
+	zipWriter := zip.NewWriter(versionZip)
+
+	err = addFilesInDirToZip(zipWriter, base, "")
+	if err != nil {
+		return err
+	}
+	defer zipWriter.Close()
+
+	//TODO: check if this needs to be moved to the repository
+	return nil
+}
+
+func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		// Wrapped in function to allow for "defer file.close()"
+		err := func() error {
+			if file.IsDir() {
+				//Check if it's not the git folder, that's meant for internal server use
+				if file.Name() != ".git" {
+					err := addFilesInDirToZip(zipWriter, filepath.Join(dirPath, file.Name()), file.Name())
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				zipFile, err := zipWriter.Create(filepath.Join(dirInZip, file.Name()))
+				if err != nil {
+					return err
+				}
+
+				fileReader, err := os.Open(filepath.Join(dirPath, file.Name()))
+				if err != nil {
+					return err
+				}
+				defer fileReader.Close()
+
+				_, err = io.Copy(zipFile, fileReader)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}()
+
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

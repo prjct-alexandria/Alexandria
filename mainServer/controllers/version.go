@@ -175,3 +175,24 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, version)
 }
+
+func (contr VersionController) GetVersionFiles(c *gin.Context) {
+	aid := c.Param("articleID")
+	vid := c.Param("versionID")
+
+	article, err := strconv.ParseInt(aid, 10, 64)
+	version, err := strconv.ParseInt(vid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("article and version id must be integers"))
+		return
+	}
+
+	err = contr.Serv.GetVersionFiles(article, version)
+	if err != nil {
+		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
+		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
+		return
+	}
+
+	//Return files
+}
