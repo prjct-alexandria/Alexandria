@@ -143,27 +143,33 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	return nil
 }
 
-func (serv VersionService) GetVersionFiles(article int64, version int64) error {
+func (serv VersionService) GetVersionFiles(article int64, version int64) (string, error) {
 	// Checkout
 	err := serv.Gitrepo.CheckoutBranch(article, version)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Get folder to save file to
 	base, err := serv.Gitrepo.GetArticlePath(article)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	versionEntity, err := serv.Versionrepo.GetVersion(version)
 	versionName := versionEntity.Title
 
+	err = os.MkdirAll(filepath.Join(serv.Gitrepo.Path, "cache", "downloads"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
 	//TODO: Replace forbidden characters
-	versionZip, err := os.Create(filepath.Join(base, "../"+versionName+".zip"))
+	path := filepath.Join(serv.Gitrepo.Path, "cache/downloads/"+versionName+".zip")
+	versionZip, err := os.Create(path)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return path, err
 	}
 	defer versionZip.Close()
 
@@ -171,14 +177,14 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) error {
 
 	err = addFilesInDirToZip(zipWriter, base, "")
 	if err != nil {
-		return err
+		return path, err
 	}
 	defer zipWriter.Close()
 
-	//TODO: check if this needs to be moved to the repository
-	return nil
+	return path, nil
 }
 
+//ToDo: check if this needs to be moved to repositories/git or repositories/filesystem?
 func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {

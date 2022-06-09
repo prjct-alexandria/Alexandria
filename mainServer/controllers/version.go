@@ -187,12 +187,14 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 		return
 	}
 
-	err = contr.Serv.GetVersionFiles(article, version)
+	_, err = contr.Serv.GetVersionFiles(article, version)
 	if err != nil {
 		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
 		return
 	}
 
+	//GetVersionFiles creates a temporary zip file, which needs to be removed after this method is finished
+	//TODO clear cache/downloads
 	//Return files
 }
