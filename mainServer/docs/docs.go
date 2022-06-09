@@ -478,6 +478,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/comments/thread/:threadID": {
+            "post": {
+                "description": "Save all types (commit/request/review) of comments to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Save comment",
+                "parameters": [
+                    {
+                        "description": "Comment",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Comment"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "threadID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "failed saving comment"
+                    }
+                }
+            }
+        },
         "/createExampleUser": {
             "post": {
                 "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
@@ -584,6 +622,11 @@ const docTemplate = `{
     "definitions": {
         "entities.Comment": {
             "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "creationDate"
+            ],
             "properties": {
                 "authorId": {
                     "type": "string"
@@ -728,8 +771,13 @@ const docTemplate = `{
         },
         "models.ReturnThreadIds": {
             "type": "object",
+            "required": [
+                "CommentId",
+                "id",
+                "threadId"
+            ],
             "properties": {
-                "commentId": {
+                "CommentId": {
                     "type": "integer"
                 },
                 "id": {
@@ -742,6 +790,11 @@ const docTemplate = `{
         },
         "models.Thread": {
             "type": "object",
+            "required": [
+                "articleId",
+                "comment",
+                "specificId"
+            ],
             "properties": {
                 "articleId": {
                     "type": "integer"

@@ -28,9 +28,6 @@ func (r PgThreadRepository) CreateThread(aid int64) (int64, error) {
 	}
 	row := stmt.QueryRow(aid)
 
-	//row := r.Db.QueryRow("INSERT INTO thread (articleId) " +
-	//	"VALUES ('" + aid + "')" +
-	//	"RETURNING threadId")
 	var tid int64
 	err = row.Scan(&tid)
 	if err != nil {

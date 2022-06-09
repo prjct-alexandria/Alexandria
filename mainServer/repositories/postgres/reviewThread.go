@@ -30,8 +30,8 @@ func (r PgReviewThreadRepository) createReviewThreadTable() error {
 }
 
 func (r PgReviewThreadRepository) CreateReviewThread(thread models.Thread, tid int64) (int64, error) {
-	stmt, err := r.Db.Prepare("INSERT INTO reviewthread (reviewthreadid, reviewid, threadid) " +
-		"VALUES (DEFAULT, $1, $2) RETURNING reviewthreadid")
+	stmt, err := r.Db.Prepare(`INSERT INTO reviewthread (reviewthreadid, reviewid, threadid)
+		VALUES (DEFAULT, $1, $2) RETURNING reviewthreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateReviewThread: %v", err)
 	}
