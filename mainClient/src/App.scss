@@ -17,6 +17,17 @@ body {
   overflow: scroll;
 }
 
+.article {
+  margin-top:15px;
+  border-bottom: 1px solid #bbbbbb;
+}
+.ownersLi {
+  display: inline;
+  padding-right: 10px;
+}
+NotificationAlert {
+  z-index:100;
+}
 .input-validation {
   color: $error-color;
 }

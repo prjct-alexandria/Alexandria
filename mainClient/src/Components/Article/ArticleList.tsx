@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ArticleListElement from "./ArticleListElement";
 import LoadingSpinner from "../LoadingSpinner";
+import NotificationAlert from "../NotificationAlert";
 
 type Article = {
   articleId: string;
@@ -30,7 +31,7 @@ export default function ArticleList() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then(
@@ -49,7 +50,13 @@ export default function ArticleList() {
     <div className="wrapper col-8 m-auto">
       <div className={"accordion"}>
         {!isLoaded && <LoadingSpinner />}
-        {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
+        {error && (
+          <NotificationAlert
+            errorType="danger"
+            title={"Error: "}
+            message={"Something went wrong. " + error}
+          />
+        )}
         {articleListData != null &&
           articleListData.map((article, i) => (
             <ArticleListElement key={i} article={article} />

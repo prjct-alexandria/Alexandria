@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
+import NotificationAlert from "../NotificationAlert";
 
 export default function Login() {
   let [email, setEmail] = useState<string>("");
@@ -60,7 +61,13 @@ export default function Login() {
 
   return (
     <div>
-      {error && <div>{`There is a problem - ${error}`}</div>}
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error}
+        />
+      )}
       {
         <LoginForm
           email={email}

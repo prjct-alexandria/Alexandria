@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import $ from "jquery";
 import SignupForm from "./SignupForm";
+import NotificationAlert from "../NotificationAlert";
 
 export default function Signup() {
   let [username, setUsername] = useState<string>();
@@ -55,8 +56,8 @@ export default function Signup() {
 
         // Use JQuery to "simulate" button presses,
         // which close the signup modal, then open the login
-        $('#btn-close-signup-form').trigger('click');
-        $('#btn-open-login-form').trigger('click');
+        $("#btn-close-signup-form").trigger("click");
+        $("#btn-open-login-form").trigger("click");
       },
       (error) => {
         // Request returns an error
@@ -68,7 +69,13 @@ export default function Signup() {
 
   return (
     <div>
-      {error && <div>{`There is a problem - ${error}`}</div>}
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error}
+        />
+      )}
       {
         <SignupForm
           username={username}

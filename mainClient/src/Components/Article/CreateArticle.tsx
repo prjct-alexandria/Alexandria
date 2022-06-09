@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import NotificationAlert from "../NotificationAlert";
 
 export default function CreateArticle() {
   let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
@@ -40,8 +41,8 @@ export default function CreateArticle() {
     ownerList = ownerList.map((owner) => owner.trim());
 
     // Remove empty elements
-    tagList = tagList.filter((tag) => tag!= '')
-    ownerList = ownerList.filter((owner) => owner!= '')
+    tagList = tagList.filter((tag) => tag != "");
+    ownerList = ownerList.filter((owner) => owner != "");
 
     let loggedUser = localStorage.getItem("loggedUserEmail");
     ownerList[ownerList.length] =
@@ -102,7 +103,13 @@ export default function CreateArticle() {
       aria-labelledby="publishArticleLabel"
       aria-hidden="true"
     >
-      {error != null && <span>{error}</span>}
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error}
+        />
+      )}
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">

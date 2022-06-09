@@ -1,14 +1,17 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import CreateArticle from "../Article/CreateArticle";
-import Login from "../User/Login";
-import Signup from "../User/Signup";
+import CreateArticle from "./Article/CreateArticle";
+import Login from "./User/Login";
+import Signup from "./User/Signup";
 
-export default function Header() {
+export default function NavigationBar() {
   return (
-    <header className="col-xs-12">
+    <div className="col-xs-12">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="/">
+        <a
+          className="navbar-brand"
+          href="/Users/Micutz/Software Project/alexandria/mainClient/public"
+        >
           Project Alexandria
         </a>
         <button
@@ -71,6 +74,6 @@ export default function Header() {
           </ul>
         </div>
       </nav>
-    </header>
+    </div>
   );
 }

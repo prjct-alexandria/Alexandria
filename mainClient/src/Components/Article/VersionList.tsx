@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import VersionListElement from "./VersionListElement";
 import LoadingSpinner from "../LoadingSpinner";
+import NotificationAlert from "../NotificationAlert";
 
 type Version = {
   articleID: string;
@@ -16,8 +17,8 @@ type Version = {
 export default function VersionList() {
   let params = useParams();
   // const urlVersions = "/versionList.json"; // Placeholder
-  const urlVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
-
+  const urlVersions =
+    "http://localhost:8080/articles/" + params.articleId + "/versions";
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
   let [isLoadedVersions, setLoadedVersions] = useState(false);
@@ -31,7 +32,7 @@ export default function VersionList() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then(
@@ -49,7 +50,8 @@ export default function VersionList() {
   }, [urlVersions]);
 
   // const urlMain = "/mainVersion.json"; // Placeholder
-  const urlMain = "http://localhost:8080/articles/" + params.articleId + "/mainVersion";
+  const urlMain =
+    "http://localhost:8080/articles/" + params.articleId + "/mainVersion";
 
   let [dataMain, setDataMain] = useState<string>();
   let [isLoadedMain, setLoadedMain] = useState(false);
@@ -63,28 +65,35 @@ export default function VersionList() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-        .then((res) => res.json())
-        .then(
-            (result) => {
-              setDataMain(result);
-              setErrorMain(null);
-              setLoadedMain(true);
-            },
-            (error) => {
-              setErrorMain(error.message);
-              setDataMain(error);
-              setLoadedMain(true);
-            }
-        );
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          setDataMain(result);
+          setErrorMain(null);
+          setLoadedMain(true);
+        },
+        (error) => {
+          setErrorMain(error.message);
+          setDataMain(error);
+          setLoadedMain(true);
+        }
+      );
   }, [urlVersions]);
 
   return (
     <div className="wrapper col-8 m-auto">
-      {!isLoadedVersions || !isLoadedMain && <LoadingSpinner />}
-      {errorVersions || errorMain && <div>{`There is a problem fetching the data - ${errorVersions} ${errorMain}`}</div>}
-      {(dataVersions != null && dataMain != null) &&
+      {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
+      {(errorVersions || errorMain) && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + errorVersions + errorMain}
+        />
+      )}
+      {dataVersions != null &&
+        dataMain != null &&
         dataVersions.map((version, i) => (
           <VersionListElement key={i} version={version} mv={dataMain} />
         ))}

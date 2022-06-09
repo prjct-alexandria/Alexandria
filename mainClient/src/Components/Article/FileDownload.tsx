@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import * as React from "react";
-import SuccessAlert from "../SuccessAlert";
-import ErrorAlert from "../ErrorAlert";
+import NotificationAlert from "../NotificationAlert";
 
 export default function FileDownload() {
   let [error, setError] = useState(null);
@@ -69,12 +68,13 @@ export default function FileDownload() {
   return (
     <div>
       <form>
-        <button className="btn btn-primary" onClick={downloadFileHandler}>
+        <button className="btn  btn-light" onClick={downloadFileHandler}>
           Download source files
         </button>
       </form>
       {downloadSuccess && (
-        <SuccessAlert
+        <NotificationAlert
+          errorType="success"
           title="Download successful! "
           message={
             "The source file " + filename + " has been successfully downloaded."
@@ -82,7 +82,8 @@ export default function FileDownload() {
         />
       )}
       {error && (
-        <ErrorAlert
+        <NotificationAlert
+          errorType="danger"
           title={"Error: "}
           message={"Something went wrong, please try again."}
         />
