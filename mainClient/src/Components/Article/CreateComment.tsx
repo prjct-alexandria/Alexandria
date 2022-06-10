@@ -9,6 +9,7 @@ type ThreadProps = {
 };
 
 export default function CreateComment(props: ThreadProps) {
+    let baseUrl = "http://localhost:8080";
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
     let [threadId, setThreadId] = useState((props.id) ? undefined : props.id)
@@ -27,7 +28,7 @@ export default function CreateComment(props: ThreadProps) {
         // If the comment is not a reply on an existing thread, create a new thread
         if (!threadId) {
             // the endpoint is depends on what type of thread it is
-            let urlCreateThread = "http://localhost:8080/articles/" + params.articleId + "/thread/" +
+            let urlCreateThread = baseUrl +  "/articles/" + params.articleId + "/thread/" +
                 props.threadType + "/id/" + props.specificId;
 
             const bodyThread = {
@@ -71,7 +72,7 @@ export default function CreateComment(props: ThreadProps) {
             );
         } else {
             // add comment to thread (either the one that is just created or one that already existed)
-            let urlReplyComment = "http://localhost:8080/comments/thread/" + threadId
+            let urlReplyComment = baseUrl + "/comments/thread/" + threadId
 
             // Construct request body
             const bodyComment = {

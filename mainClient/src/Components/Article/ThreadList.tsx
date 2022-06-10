@@ -17,6 +17,7 @@ type ThreadEntity = {
 }
 
 export default function ThreadList(props: ThreadListProps) {
+    let baseUrl = "http://localhost:8080";
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
@@ -26,10 +27,10 @@ export default function ThreadList(props: ThreadListProps) {
     useEffect(() => {
         let urlThreadList = "";
         if (props.threadType === "commit") {
-            urlThreadList = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
+            urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
             "/history/" + params.historyId + "/threads";
         } else if (props.threadType === "request") {
-            urlThreadList = "http://localhost:8080/articles/" + params.articleId + "/request/" + params.requestId +
+            urlThreadList = baseUrl + "/articles/" + params.articleId + "/request/" + params.requestId +
                 "/threads";
         }
         urlThreadList = "/threadList.json"; // Placeholder

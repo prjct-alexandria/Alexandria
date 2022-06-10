@@ -19,6 +19,7 @@ type ThreadComment = {
 }
 
 export default function Thread(props: ThreadProps) {
+    let baseUrl = "http://localhost:8080";
     let [commentData, setData] = useState<ThreadComment[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
@@ -28,10 +29,10 @@ export default function Thread(props: ThreadProps) {
     useEffect(() => {
         let urlCommentList = "";
         if (props.threadType === "commit") {
-            urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
+            urlCommentList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
             "/history/" + params.historyId + "/thread/" + props.id + "/comments"
         } else if (props.threadType === "request") {
-            urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/requests/" + params.requestId +
+            urlCommentList = baseUrl + "/articles/" + params.articleId + "/requests/" + params.requestId +
             "/thread/" + props.id + "/comments"
         }
         urlCommentList = "/commentList1.json"; // Placeholder
