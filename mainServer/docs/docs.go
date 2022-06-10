@@ -328,6 +328,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/{articleID}/versions/{versionID}/files": {
+            "get": {
+                "description": "Get all the files of an article version as a zip, should be accessible without being authenticated.",
+                "produces": [
+                    "application/x-zip-compressed"
+                ],
+                "summary": "Get all the files of a version as a zip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/comments/thread/:threadID": {
             "post": {
                 "description": "Save all types (commit/request/review) of comments to the database",
@@ -472,6 +508,11 @@ const docTemplate = `{
     "definitions": {
         "entities.Comment": {
             "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "creationDate"
+            ],
             "properties": {
                 "authorId": {
                     "type": "string"
@@ -579,20 +620,12 @@ const docTemplate = `{
         "models.RequestCreationForm": {
             "type": "object",
             "required": [
-                "sourceHistoryID",
                 "sourceVersionID",
-                "targetHistoryID",
                 "targetVersionID"
             ],
             "properties": {
-                "sourceHistoryID": {
-                    "type": "string"
-                },
                 "sourceVersionID": {
                     "type": "integer"
-                },
-                "targetHistoryID": {
-                    "type": "string"
                 },
                 "targetVersionID": {
                     "type": "integer"
@@ -601,8 +634,13 @@ const docTemplate = `{
         },
         "models.ReturnThreadIds": {
             "type": "object",
+            "required": [
+                "CommentId",
+                "id",
+                "threadId"
+            ],
             "properties": {
-                "commentId": {
+                "CommentId": {
                     "type": "integer"
                 },
                 "id": {
@@ -615,6 +653,11 @@ const docTemplate = `{
         },
         "models.Thread": {
             "type": "object",
+            "required": [
+                "articleId",
+                "comment",
+                "specificId"
+            ],
             "properties": {
                 "articleId": {
                     "type": "integer"

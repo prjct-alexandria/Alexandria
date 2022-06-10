@@ -11,6 +11,10 @@ definitions:
         type: integer
       threadId:
         type: integer
+    required:
+    - authorId
+    - content
+    - creationDate
     type: object
   entities.User:
     properties:
@@ -71,28 +75,26 @@ definitions:
     type: object
   models.RequestCreationForm:
     properties:
-      sourceHistoryID:
-        type: string
       sourceVersionID:
         type: integer
-      targetHistoryID:
-        type: string
       targetVersionID:
         type: integer
     required:
-    - sourceHistoryID
     - sourceVersionID
-    - targetHistoryID
     - targetVersionID
     type: object
   models.ReturnThreadIds:
     properties:
-      commentId:
+      CommentId:
         type: integer
       id:
         type: integer
       threadId:
         type: integer
+    required:
+    - CommentId
+    - id
+    - threadId
     type: object
   models.Thread:
     properties:
@@ -106,6 +108,10 @@ definitions:
         type: integer
       specificId:
         type: integer
+    required:
+    - articleId
+    - comment
+    - specificId
     type: object
   models.Version:
     properties:
@@ -361,6 +367,31 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
+  /articles/{articleID}/versions/{versionID}/files:
+    get:
+      description: Get all the files of an article version as a zip, should be accessible
+        without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/x-zip-compressed
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all the files of a version as a zip
   /comments/thread/:threadID:
     post:
       consumes:

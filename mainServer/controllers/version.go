@@ -178,6 +178,15 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	c.JSON(http.StatusOK, version)
 }
 
+// GetVersionFiles 	godoc
+// @Summary		Get all the files of a version as a zip
+// @Description	Get all the files of an article version as a zip, should be accessible without being authenticated.
+// @Param		articleID	path	string	true	"Article ID"
+// @Param		versionID	path	string	true	"Version ID"
+// @Produce		application/x-zip-compressed
+// @Success		200
+// @Failure 	400 {object} httperror.HTTPError
+// @Router		/articles/{articleID}/versions/{versionID}/files [get]
 func (contr VersionController) GetVersionFiles(c *gin.Context) {
 	aid := c.Param("articleID")
 	vid := c.Param("versionID")
