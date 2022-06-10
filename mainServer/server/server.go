@@ -1,15 +1,16 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"mainServer/controllers"
 	"mainServer/db"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
+	"mainServer/server/config"
 	"mainServer/services"
 	servinterfaces "mainServer/services/interfaces"
-	"mainServer/utils/clock"
 )
 
 type RepoEnv struct {
@@ -45,38 +46,22 @@ type ControllerEnv struct {
 	thread  controllers.ThreadController
 }
 
-func initRepoEnv(cfg Config) (RepoEnv, error) {
-	// TODO: gitfiles path in config file
-	gitpath := "../../gitfiles"
-
-	gitrepo, err := repositories.NewGitRepository(gitpath)
-	if err != nil {
-		return RepoEnv{}, err
-	}
-
-	database := db.Connect()
-	clock := clock.RealClock{}
-
+func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 	return RepoEnv{
-		git:           gitrepo,
+		git:           repositories.NewGitRepository(&cfg.Git),
 		article:       postgres.NewPgArticleRepository(database),
 		user:          postgres.NewPgUserRepository(database),
 		version:       postgres.NewPgVersionRepository(database),
 		req:           postgres.NewPgRequestRepository(database),
 		thread:        postgres.NewPgThreadRepository(database),
-		comment:       postgres.NewPgCommentRepository(database, clock),
+		comment:       postgres.NewPgCommentRepository(database),
 		commitThread:  postgres.NewPgCommitThreadRepository(database),
 		requestThread: postgres.NewPgRequestThreadRepository(database),
 		reviewThread:  postgres.NewPgReviewThreadRepository(database),
-	}, nil
+	}
 }
 
-func initServiceEnv(cfg Config) (ServiceEnv, error) {
-	repos, err := initRepoEnv(cfg)
-	if err != nil {
-		return ServiceEnv{}, err
-	}
-
+func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
 		article:       services.NewArticleService(repos.article, repos.version, repos.git),
 		user:          services.UserService{UserRepository: repos.user},
@@ -87,18 +72,13 @@ func initServiceEnv(cfg Config) (ServiceEnv, error) {
 		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread},
 		reviewThread:  services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
-	}, nil
+	}
 }
 
-func initControllerEnv(cfg Config) (ControllerEnv, error) {
-	servs, err := initServiceEnv(cfg)
-	if err != nil {
-		return ControllerEnv{}, err
-	}
-
+func initControllerEnv(cfg *config.Config, servs ServiceEnv) ControllerEnv {
 	return ControllerEnv{
 		article: controllers.NewArticleController(servs.article),
-		user:    controllers.UserController{UserService: servs.user},
+		user:    controllers.UserController{UserService: servs.user, Cfg: cfg},
 		req:     controllers.RequestController{Serv: servs.req},
 		version: controllers.VersionController{Serv: servs.version},
 		thread: controllers.ThreadController{ThreadService: servs.thread,
@@ -106,25 +86,24 @@ func initControllerEnv(cfg Config) (ControllerEnv, error) {
 			RequestThreadService: servs.requestThread,
 			CommentService:       servs.comment,
 			ReviewThreadService:  servs.reviewThread},
-	}, nil
+	}
 }
 
 func Init() {
 	// read config file
-	cfg := ReadConfig("../config.json")
+	cfg := config.ReadConfig("../config.json")
 
-	// create controller environment, which recursively also creates services and repositories
-	env, err := initControllerEnv(cfg)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	database := db.Connect(&cfg.Database)
 
-	// set up routing for the endpoint URLs
-	router := SetUpRouter(env)
-	err = router.Run("localhost:8080")
+	// create environments in order
+	repoEnv := initRepoEnv(&cfg, database)
+	serviceEnv := initServiceEnv(repoEnv)
+	controllerEnv := initControllerEnv(&cfg, serviceEnv)
+
+	// set up routing for the endpoint URLsS
+	router := SetUpRouter(&cfg, controllerEnv)
+	err := router.Run(fmt.Sprintf("%s:%d", cfg.Hosting.Backend.Host, cfg.Hosting.Backend.Port))
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 }

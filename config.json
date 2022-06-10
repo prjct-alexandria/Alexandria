@@ -1,14 +1,25 @@
 {
   "hosting":  {
-    "back-end-url": "http://localhost:8080",
-    "front-end-url": "http://localhost:3000"
+    "back-end": {
+      "host" : "localhost",
+      "port": 8080,
+      "use-ssl": false
+    },
+    "front-end": {
+      "host" : "localhost",
+      "port": 3000,
+      "use-ssl": false
+    }
   },
   "database": {
-    "host": "localhost",
-    "port": 5432,
+    "url" : {
+      "host": "localhost",
+      "port": 5432,
+      "use-ssl": false
+    },
     "user": "postgres",
     "pwd": "admin",
-    "name": "AlexandriaPG"
+    "dbname": "AlexandriaPG"
   },
   "auth": {
     "jwt-secret": "thisShouldBeKeptVerySecret",

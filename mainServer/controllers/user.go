@@ -7,6 +7,7 @@ import (
 	"mainServer/entities"
 	"mainServer/middlewares"
 	"mainServer/models"
+	"mainServer/server/config"
 	"mainServer/services"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 type UserController struct {
 	UserService services.UserService
+	Cfg         *config.Config
 }
 
 // Register		godoc
@@ -78,7 +80,7 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	err = middlewares.UpdateJwtCookie(c, cred.Email)
+	err = middlewares.UpdateJwtCookie(c, cred.Email, u.Cfg)
 
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))

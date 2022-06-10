@@ -5,6 +5,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"mainServer/server/config"
 	"mainServer/utils/clock"
 	"os"
 	"path/filepath"
@@ -19,15 +20,15 @@ type GitRepository struct {
 // NewGitRepository creates a new GitRepository class.
 // This is NOT the function used to create a folder/git repository to store an article in.
 // See CreateRepo instead
-func NewGitRepository(path string) (GitRepository, error) {
+func NewGitRepository(cfg *config.GitConfig) GitRepository {
 
 	// make folder for git files
-	err := os.MkdirAll(path, os.ModePerm)
+	err := os.MkdirAll(cfg.Path, os.ModePerm)
 	if err != nil {
-		return GitRepository{}, err
+		panic(err)
 	}
 
-	return GitRepository{Path: path, Clock: clock.RealClock{}}, nil
+	return GitRepository{Path: cfg.Path, Clock: clock.RealClock{}}
 }
 
 // CreateRepo creates a new folder/git repository to store an article in, including main version branch.

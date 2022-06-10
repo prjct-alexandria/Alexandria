@@ -4,27 +4,23 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"mainServer/server/config"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "admin"
-	dbname   = "AlexandriaPG"
-)
-
-func Connect() *sql.DB {
-	// connection string
-	// TODO: use config
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+func Connect(cfg *config.DatabaseConfig) *sql.DB {
+	// fill in connection string
+	var sslMode string
+	if cfg.Url.UseSSL {
+		sslMode = "enable"
+	} else {
+		sslMode = "disable"
+	}
+	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Url.Host, cfg.Url.Port, cfg.User, cfg.Pwd, cfg.DBName, sslMode)
 
 	// open database
-	db, err := sql.Open("postgres", psqlconn)
+	db, err := sql.Open("postgres", conn)
 	CheckError(err)
-
-	// close database
-	//defer db.Close()
 
 	// check db
 	err = db.Ping()
