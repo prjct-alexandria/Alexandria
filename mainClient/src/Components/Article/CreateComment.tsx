@@ -11,7 +11,7 @@ type ThreadProps = {
 export default function CreateComment(props: ThreadProps) {
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
-    let [threadId, setThreadId] = useState((props.id === undefined) ? undefined : props.id)
+    let [threadId, setThreadId] = useState((props.id) ? undefined : props.id)
 
     const params = useParams();
 
@@ -20,14 +20,12 @@ export default function CreateComment(props: ThreadProps) {
         setNewCommentContent(e.target.value);
     };
 
-
-
     const submitHandler = (e: { preventDefault: () => void }) => {
         // Prevent unwanted default browser behavior
         e.preventDefault();
 
         // If the comment is not a reply on an existing thread, create a new thread
-        if (threadId === undefined) {
+        if (!threadId) {
             // the endpoint is depends on what type of thread it is
             let urlCreateThread = "http://localhost:8080/articles/" + params.articleId + "/thread/" +
                 props.threadType + "/id/" + props.specificId;
@@ -109,7 +107,7 @@ export default function CreateComment(props: ThreadProps) {
 
     return (
         <div className="mb-2" style={{border: '#e9ecef 1px solid'}}>
-            {error != null && <span>{error}</span>}
+            {error && <span>{error}</span>}
             <form className="text-end" onSubmit={submitHandler}>
                 <div className="form-group accordion-body">
                     <textarea className="form-control" placeholder="write comment here..."

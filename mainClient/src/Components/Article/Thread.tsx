@@ -14,7 +14,7 @@ type ThreadComment = {
     "authorId": string,
     "content": string,
     "creationDate": string,
-    "id": number,
+    "commentId": number,
     "threadId": number
 }
 
