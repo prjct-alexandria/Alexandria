@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 type ThreadProps = {
     "id": undefined | number,
@@ -9,23 +9,25 @@ type ThreadProps = {
 };
 
 export default function CreateComment(props: ThreadProps) {
-    const params = useParams();
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
-    let [threadId, setThreadId] = useState((props.id == undefined) ? undefined : props.id)
+    let [threadId, setThreadId] = useState((props.id === undefined) ? undefined : props.id)
+
+    const params = useParams();
 
     // post new comment in existing thread
     const addComment = (e: { target: { value: any } }) => {
         setNewCommentContent(e.target.value);
     };
 
+
+
     const submitHandler = (e: { preventDefault: () => void }) => {
         // Prevent unwanted default browser behavior
         e.preventDefault();
 
         // If the comment is not a reply on an existing thread, create a new thread
-        if (threadId == undefined) {
-
+        if (threadId === undefined) {
             // the endpoint is depends on what type of thread it is
             let urlCreateThread = "http://localhost:8080/articles/" + params.articleId + "/thread/" +
                 props.threadType + "/id/" + props.specificId;
@@ -33,9 +35,9 @@ export default function CreateComment(props: ThreadProps) {
             const bodyThread = {
                 articleId: parseInt(params.articleId as string),
                 comment: [{
-                    "authorId": "a@b.nl",
+                    "authorId": localStorage.getItem('loggedUserEmail'),
                     "content": newCommentContent,
-                    "creationDate": "date"
+                    "creationDate": new Date()
                 }],
                 specificId: props.specificId
             }
@@ -47,7 +49,6 @@ export default function CreateComment(props: ThreadProps) {
                 body: JSON.stringify(bodyThread),
                 credentials: 'include',
             }).then(
-
                 // Success
                 async (response) => {
                     console.log(bodyThread)
@@ -60,6 +61,8 @@ export default function CreateComment(props: ThreadProps) {
 
                         setThreadId(parseInt(responseJSON.threadId as string));
                     }
+                    // refresh page
+                    window.location.reload();
                 },
                 (error) => {
                     // Request returns an error
@@ -68,20 +71,14 @@ export default function CreateComment(props: ThreadProps) {
                 }
             );
         } else {
-
-
-
             // add comment to thread (either the one that is just created or one that already existed)
-            let urlReplyComment = "";
-            if (threadId != undefined) {
-                urlReplyComment = "http://localhost:8080/comments/thread/" + threadId
-            }
+            let urlReplyComment = "http://localhost:8080/comments/thread/" + threadId
 
             // Construct request body
             const bodyComment = {
-                authorId: "aid",
-                content: newCommentContent,
-                creationDate: "date",
+                "authorId": localStorage.getItem('loggedUserEmail'),
+                "content": newCommentContent,
+                "creationDate": new Date()
             };
 
             // Send request with a JSON of the comment data
@@ -99,14 +96,13 @@ export default function CreateComment(props: ThreadProps) {
                             : "Error: " + response.status + " " + response.statusText;
                     console.log(message);
                     // refresh page
-                    // window.location.reload();
+                    window.location.reload();
                 },
                 (error) => {
                     console.error("Error: ", error);
                     setError(error);
                 }
             );
-
         }
 
     };
@@ -119,7 +115,7 @@ export default function CreateComment(props: ThreadProps) {
                     <textarea className="form-control" placeholder="write comment here..."
                               onChange={addComment}></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary m-1" disabled={newCommentContent == ""}>Submit</button>
+                <button type="submit" className="btn btn-primary m-1" disabled={newCommentContent === ""}>Submit</button>
             </form>
         </div>
 
