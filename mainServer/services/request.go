@@ -40,7 +40,7 @@ func (s RequestService) RejectRequest(request int64, email string) error {
 		return err
 	}
 
-	// check who the owner is
+	// check if logged-in user owns this version
 	target := req.TargetVersionID
 	ok, err := s.Versionrepo.CheckIfOwner(target, email)
 	if err != nil {
@@ -78,7 +78,7 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 		return err
 	}
 
-	// check who the owner is
+	// check if logged-in user owns this version
 	target := req.TargetVersionID
 	ok, err := s.Versionrepo.CheckIfOwner(target, email)
 	if err != nil {

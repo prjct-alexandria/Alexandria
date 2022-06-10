@@ -228,11 +228,14 @@ func (r GitRepository) GetLatestCommit(article int64, version int64) (string, er
 		return "", err
 	}
 	versionStr := strconv.FormatInt(version, 10)
-	commitHash, err := git2.RevParse(revparse.Args(versionStr), runGitIn(path))
+
+	// call the git command rev-parse, which returns a commit hash when given a branch name
+	output, err := git2.RevParse(revparse.Args(versionStr), runGitIn(path))
 	if err != nil {
-		return "", err
+		return "", errors.New(output)
 	}
-	return commitHash, nil
+
+	return output, nil
 }
 
 // Merge merges the source branch (version) into the target branch (version) of the specified repository (article)
