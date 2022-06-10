@@ -16,6 +16,7 @@ const (
 
 func Connect() *sql.DB {
 	// connection string
+	// TODO: use config
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	// open database

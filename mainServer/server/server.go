@@ -45,7 +45,7 @@ type ControllerEnv struct {
 	thread  controllers.ThreadController
 }
 
-func initRepoEnv() (RepoEnv, error) {
+func initRepoEnv(cfg Config) (RepoEnv, error) {
 	// TODO: gitfiles path in config file
 	gitpath := "../../gitfiles"
 
@@ -71,8 +71,8 @@ func initRepoEnv() (RepoEnv, error) {
 	}, nil
 }
 
-func initServiceEnv() (ServiceEnv, error) {
-	repos, err := initRepoEnv()
+func initServiceEnv(cfg Config) (ServiceEnv, error) {
+	repos, err := initRepoEnv(cfg)
 	if err != nil {
 		return ServiceEnv{}, err
 	}
@@ -90,8 +90,8 @@ func initServiceEnv() (ServiceEnv, error) {
 	}, nil
 }
 
-func initControllerEnv() (ControllerEnv, error) {
-	servs, err := initServiceEnv()
+func initControllerEnv(cfg Config) (ControllerEnv, error) {
+	servs, err := initServiceEnv(cfg)
 	if err != nil {
 		return ControllerEnv{}, err
 	}
@@ -110,12 +110,17 @@ func initControllerEnv() (ControllerEnv, error) {
 }
 
 func Init() {
-	env, err := initControllerEnv()
+	// read config file
+	cfg := ReadConfig("../config.json")
+
+	// create controller environment, which recursively also creates services and repositories
+	env, err := initControllerEnv(cfg)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	// set up routing for the endpoint URLs
 	router := SetUpRouter(env)
 	err = router.Run("localhost:8080")
 	if err != nil {
