@@ -34,6 +34,8 @@ export default function CreateComment(props: ThreadProps) {
                 articleId: parseInt(params.articleId as string),
                 comment: [{
                     "authorId": localStorage.getItem('loggedUserEmail'),
+                    // immediately add comment when creating a new thread to make
+                    // sure a thread cannot be without comments
                     "content": newCommentContent,
                     "creationDate": new Date()
                 }],
@@ -49,7 +51,6 @@ export default function CreateComment(props: ThreadProps) {
             }).then(
                 // Success
                 async (response) => {
-                    console.log(bodyThread)
                     console.log("Success:", response);
 
                     if (response.ok) {
@@ -59,7 +60,7 @@ export default function CreateComment(props: ThreadProps) {
 
                         setThreadId(parseInt(responseJSON.threadId as string));
                     }
-                    // refresh page
+                    // refresh page, remove this for debugging
                     window.location.reload();
                 },
                 (error) => {
@@ -93,7 +94,7 @@ export default function CreateComment(props: ThreadProps) {
                             ? "Comment successfully placed"
                             : "Error: " + response.status + " " + response.statusText;
                     console.log(message);
-                    // refresh page
+                    // refresh page, remove this for debugging
                     window.location.reload();
                 },
                 (error) => {

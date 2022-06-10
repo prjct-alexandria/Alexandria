@@ -21,13 +21,11 @@ export default function CreateThread(props: ThreadProps) {
         ));
     }
 
-    const textFromStorage = localStorage.getItem('loggedUserEmail');
-
     return (
         <div className="text-center">
             {/*Leave out the first one. This one is used to initialize the array with the right type*/}
             {newThreadList.slice(1)}
-            <button className="btn btn-primary m-2" type="submit" onClick={addThread}>+ {textFromStorage}</button>
+            <button className="btn btn-primary m-2" type="submit" onClick={addThread}>+</button>
         </div>
 
     );
