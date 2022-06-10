@@ -5,9 +5,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment"
 
 type ThreadProps = {
-    thread: {
-        "id": number,
-    };
+    "id": number,
     "specificId": number
     threadType: string
 };
@@ -31,10 +29,10 @@ export default function Thread(props: ThreadProps) {
         let urlCommentList = "";
         if (props.threadType === "commit") {
             urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
-            "/history/" + params.historyId + "/thread/" + props.thread.id + "/comments"
+            "/history/" + params.historyId + "/thread/" + props.id + "/comments"
         } else if (props.threadType === "request") {
             urlCommentList = "http://localhost:8080/articles/" + params.articleId + "/requests/" + params.requestId +
-            "/thread/" + props.thread.id + "/comments"
+            "/thread/" + props.id + "/comments"
         }
         urlCommentList = "/commentList1.json"; // Placeholder
 
@@ -71,15 +69,15 @@ export default function Thread(props: ThreadProps) {
                     <button className="accordion-button collapsed"
                             type="button"
                             data-bs-toggle="collapse"
-                            data-bs-target={"#panelsStayOpen-collapse" + props.thread.id}
+                            data-bs-target={"#panelsStayOpen-collapse" + props.id}
                             aria-expanded="false"
-                            aria-controls={"panelsStayOpen-collapse" + props.thread.id}>
+                            aria-controls={"panelsStayOpen-collapse" + props.id}>
                         {commentData[0].content}
                     </button>
                     <div
-                        id={"panelsStayOpen-collapse" + props.thread.id}
+                        id={"panelsStayOpen-collapse" + props.id}
                         className="accordion-collapse collapse"
-                        aria-labelledby={"panelsStayOpen-heading" + props.thread.id}
+                        aria-labelledby={"panelsStayOpen-heading" + props.id}
                     >
                         {commentData.map((comment, i) => (
                             i !== 0 && // don't show first element in the list
@@ -87,7 +85,7 @@ export default function Thread(props: ThreadProps) {
                                 {comment.content}
                             </div>
                         ))}
-                        <CreateComment thread={props.thread} specificId={props.specificId} threadType={props.threadType}/>
+                        <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType}/>
                     </div>
                 </div>
             }

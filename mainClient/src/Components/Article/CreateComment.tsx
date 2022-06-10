@@ -3,9 +3,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 
 type ThreadProps = {
-    thread: undefined | {
-        "id": number,
-    };
+    "id": undefined | number,
     "specificId": number
     "threadType": string
 };
@@ -14,7 +12,7 @@ export default function CreateComment(props: ThreadProps) {
     const params = useParams();
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
-    let [threadId, setThreadId] = useState((props.thread == undefined) ? undefined : props.thread.id)
+    let [threadId, setThreadId] = useState((props.id == undefined) ? undefined : props.id)
 
     // post new comment in existing thread
     const addComment = (e: { target: { value: any } }) => {
@@ -33,19 +31,26 @@ export default function CreateComment(props: ThreadProps) {
                 props.threadType + "/id/" + props.specificId;
 
             const bodyThread = {
-                articleId: params.articleId,
-                comment: null,
+                articleId: parseInt(params.articleId as string),
+                comment: [{
+                    "authorId": "a@b.nl",
+                    "content": newCommentContent,
+                    "creationDate": "date"
+                }],
                 specificId: props.specificId
             }
 
             fetch(urlCreateThread, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                mode: "cors",
-                body: JSON.stringify(bodyThread)
+                mode: "no-cors",
+                body: JSON.stringify(bodyThread),
+                credentials: 'include',
             }).then(
+
                 // Success
                 async (response) => {
+                    console.log(bodyThread)
                     console.log("Success:", response);
 
                     if (response.ok) {
@@ -62,44 +67,48 @@ export default function CreateComment(props: ThreadProps) {
                     setError(error);
                 }
             );
-        }
+        } else {
 
-        // add comment to thread (either the one that is just created or one that already existed)
-        let urlReplyComment = "";
-        if (props.threadType == "commit" && props.specificId != -1 && threadId != undefined) {
-            urlReplyComment = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId +
-                "/history/" + props.specificId + "/threads/" + threadId + "/comments";
-        } else if (props.threadType == "request" && threadId != undefined) {
-            urlReplyComment = "http://localhost:8080/articles/" + params.articleId + "/request/" +
-                props.specificId + "/threads/" + threadId + "/comments";
-        }
 
-        // Construct request body
-        const bodyComment = {
-            content: newCommentContent,
-        };
 
-        // Send request with a JSON of the comment data
-        fetch(urlReplyComment, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-            body: JSON.stringify(bodyComment),
-        }).then(
-            (response) => {
-                let message: string =
-                    response.status === 200
-                        ? "Comment successfully placed"
-                        : "Error: " + response.status + " " + response.statusText;
-                console.log(message);
-                // refresh page
-                window.location.reload();
-            },
-            (error) => {
-                console.error("Error: ", error);
-                setError(error);
+            // add comment to thread (either the one that is just created or one that already existed)
+            let urlReplyComment = "";
+            if (threadId != undefined) {
+                urlReplyComment = "http://localhost:8080/comments/thread/" + threadId
             }
-        );
+
+            // Construct request body
+            const bodyComment = {
+                authorId: "aid",
+                content: newCommentContent,
+                creationDate: "date",
+            };
+
+            // Send request with a JSON of the comment data
+            fetch(urlReplyComment, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                mode: "cors",
+                body: JSON.stringify(bodyComment),
+                credentials: 'include',
+            }).then(
+                (response) => {
+                    let message: string =
+                        response.status === 200
+                            ? "Comment successfully placed"
+                            : "Error: " + response.status + " " + response.statusText;
+                    console.log(message);
+                    // refresh page
+                    // window.location.reload();
+                },
+                (error) => {
+                    console.error("Error: ", error);
+                    setError(error);
+                }
+            );
+
+        }
+
     };
 
     return (

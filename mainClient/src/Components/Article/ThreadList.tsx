@@ -10,12 +10,14 @@ type ThreadListProps = {
     specificId: number
 };
 
-type Thread = {
-    "id": number
-};
+type ThreadEntity = {
+    articleId:	number
+    id: number
+    specificId: number
+}
 
 export default function ThreadList(props: ThreadListProps) {
-    let [threadListData, setData] = useState<Thread[]>();
+    let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
 
@@ -59,13 +61,13 @@ export default function ThreadList(props: ThreadListProps) {
         <div>
             {!isLoaded && <LoadingSpinner />}
             {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-            <div className="accordion text-center" id="accordionPanelsStayOpenExample">
+            <div id="accordionPanelsStayOpenExample">
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <Thread key={i} thread={thread} specificId={props.specificId} threadType={props.threadType}/>
+                        <Thread key={i} id={thread.id} specificId={props.specificId} threadType={props.threadType}/>
                     ))}
             </div>
-            <CreateThread thread={undefined} specificId={props.specificId} threadType={props.threadType}/>
+            <CreateThread id={undefined} specificId={props.specificId} threadType={props.threadType}/>
         </div>
     );
 }
