@@ -16,7 +16,7 @@ type VersionService struct {
 	Versionrepo interfaces.VersionRepository
 }
 
-func (serv VersionService) GetOldVersion(article int64, version int64, commit [20]byte) (models.Version, error) {
+func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
 
 	// Get file contents from Git
 	err := serv.Gitrepo.CheckoutCommit(article, commit)

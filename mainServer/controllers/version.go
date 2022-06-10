@@ -68,7 +68,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	// Get either a specific version or just the latest
 	var res models.Version
 	if usingCommit {
-		res, err = contr.Serv.GetOldVersion(article, version, *commitHashArr)
+		res, err = contr.Serv.GetVersionByCommitID(article, version, *commitHashArr)
 	} else {
 		res, err = contr.Serv.GetVersion(article, version)
 	}

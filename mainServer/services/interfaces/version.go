@@ -14,9 +14,8 @@ type VersionService interface {
 	// GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
 	GetVersion(article int64, version int64) (models.Version, error)
 
-	// GetOldVersion does the same as GetVersion, but with a specific history/commit ID
-	// Doesn't necessarily have to be an old version, most recent commit ID can also be specified
-	GetOldVersion(article int64, version int64, commit [20]byte) (models.Version, error)
+	// GetVersionByCommitID does the same as GetVersion, but with a specific history/commit ID
+	GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error)
 
 	// CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
 	CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error)
