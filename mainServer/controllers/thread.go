@@ -6,18 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
 
 type ThreadController struct {
-	ThreadService        services.ThreadService
-	CommitThreadService  services.CommitThreadService
-	RequestThreadService services.RequestThreadService
-	ReviewThreadService  services.ReviewThreadService
-	CommentService       services.CommentService
+	ThreadService        interfaces.ThreadService
+	CommitThreadService  interfaces.CommitThreadService
+	RequestThreadService interfaces.RequestThreadService
+	ReviewThreadService  interfaces.ReviewThreadService
+	CommentService       interfaces.CommentService
 }
 
 // CreateThread godoc
