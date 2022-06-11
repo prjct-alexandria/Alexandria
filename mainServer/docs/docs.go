@@ -59,13 +59,33 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/:articleID/history/:commitID/threads": {
+        "/articles/:articleID/mainVersion": {
             "get": {
-                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get all threads for a commit",
+                "summary": "Get main version id of article",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/requests/:requestID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific request of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a request",
                 "parameters": [
                     {
                         "type": "integer",
@@ -76,7 +96,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Commit ID",
+                        "description": "Request ID",
                         "name": "ID",
                         "in": "path",
                         "required": true
@@ -88,32 +108,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Thread"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/:articleID/mainVersion": {
-            "get": {
-                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get main version id of article",
-                "responses": {
-                    "200": {
-                        "description": "Success"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -160,6 +154,45 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/httperror.HTTPError"
                         }
@@ -373,6 +406,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/comments/thread/:threadID": {
+            "post": {
+                "description": "Save all types (commit/request/review) of comments to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Save comment",
+                "parameters": [
+                    {
+                        "description": "Comment",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Comment"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "threadID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "failed saving comment"
+                    }
+                }
+            }
+        },
         "/createExampleUser": {
             "post": {
                 "description": "Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database",
@@ -479,6 +550,11 @@ const docTemplate = `{
     "definitions": {
         "entities.Comment": {
             "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "creationDate"
+            ],
             "properties": {
                 "authorId": {
                     "type": "string"
@@ -600,8 +676,13 @@ const docTemplate = `{
         },
         "models.ReturnThreadIds": {
             "type": "object",
+            "required": [
+                "CommentId",
+                "id",
+                "threadId"
+            ],
             "properties": {
-                "commentId": {
+                "CommentId": {
                     "type": "integer"
                 },
                 "id": {
@@ -614,6 +695,11 @@ const docTemplate = `{
         },
         "models.Thread": {
             "type": "object",
+            "required": [
+                "articleId",
+                "comment",
+                "specificId"
+            ],
             "properties": {
                 "articleId": {
                     "type": "integer"

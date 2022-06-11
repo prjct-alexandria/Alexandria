@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/services"
 	"mainServer/utils/httperror"
@@ -101,41 +102,42 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, ids)
 }
 
-// GetCommitThreads godoc
-// @Summary      Get all threads for a commit
-// @Description  Gets a list with all threads belonging to a specific commit of an article
-// @Param		 article ID 		path	int64		true 	"Article ID"
-// @Param		 commit ID 			path	int64		true 	"Commit ID"
-// @Produce      json
-// @Success      200  {object} models.Thread
-// @Failure      400  {object} httperror.HTTPError
-// @Router       /articles/:articleID/history/:commitID/threads [get]
-func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
-	aid := c.Param("articleID")
-	cid := c.Param("commitID")
-
-	intAid, err := strconv.ParseInt(aid, 10, 64)
-	if err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
-		return
-	}
-	intCid, err := strconv.ParseInt(cid, 10, 64)
+// SaveComment godoc
+// @Summary     Save comment
+// @Description Save all types (commit/request/review) of comments to the database
+// @Accept      json
+// @Param 		comment 		body	entities.Comment		true 	"Comment"
+// @Param		threadID		path	string					true	"Thread ID"
+// @Success     200 "Success"
+// @Failure     400 "Bad request"
+// @Failure     500 "failed saving comment"
+// @Router      /comments/thread/:threadID [post]
+func (contr *ThreadController) SaveComment(c *gin.Context) {
+	var comment entities.Comment
+	err := c.BindJSON(&comment)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
-	if err != nil || threads == nil {
+	tid := c.Param("threadID")
+	intTid, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	id, err := contr.CommentService.SaveComment(comment, intTid)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed saving comment"))
 		return
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, threads)
+	c.IndentedJSON(http.StatusOK, id)
 }
 
 // GetRequestThreads godoc
@@ -157,6 +159,7 @@ func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
+
 	intRid, err := strconv.ParseInt(rid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
@@ -168,6 +171,44 @@ func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
 	if err != nil || threads == nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find requestthreads for this request"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
+}
+
+// GetCommitThreads godoc
+// @Summary      Get all threads for a commit
+// @Description  Gets a list with all threads belonging to a specific commit of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 commit ID 			path	int64		true 	"Commit ID"
+// @Produce      json
+// @Success      200  {object} models.Thread
+// @Failure      400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/versions/:versionID/history/:commitID/threads [get]
+func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	cid := c.Param("commitID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	intCid, err := strconv.ParseInt(cid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
+	if err != nil || threads == nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
 		return
 	}
 

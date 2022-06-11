@@ -104,8 +104,8 @@ func (r PgRequestThreadRepository) createRequestThreadTable() error {
 }
 
 func (r PgRequestThreadRepository) CreateRequestThread(thread models.Thread, tid int64) (int64, error) {
-	stmt, err := r.Db.Prepare("INSERT INTO requestthread (requestthreadid, requestid, threadid) " +
-		"VALUES (DEFAULT, $1, $2) RETURNING requestthreadid")
+	stmt, err := r.Db.Prepare(`INSERT INTO requestthread (requestthreadid, requestid, threadid)
+	VALUES (DEFAULT, $1, $2) RETURNING requestthreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateThread: %v", err)
 	}

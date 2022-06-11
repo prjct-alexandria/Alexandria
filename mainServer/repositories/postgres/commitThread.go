@@ -104,7 +104,8 @@ func (r PgCommitThreadRepository) createCommitThreadTable() error {
 }
 
 func (r PgCommitThreadRepository) CreateCommitThread(thread models.Thread, tid int64) (int64, error) {
-	stmt, err := r.Db.Prepare("INSERT INTO committhread (committhreadid, commitid, threadid) VALUES (DEFAULT, $1, $2) RETURNING committhreadid")
+	stmt, err := r.Db.Prepare(`INSERT INTO committhread (committhreadid, commitid, threadid) 
+	VALUES (DEFAULT, $1, $2) RETURNING committhreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateThread: %v", err)
 	}
