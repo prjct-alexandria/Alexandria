@@ -3,10 +3,11 @@ package thread
 import (
 	"github.com/gin-gonic/gin"
 	"mainServer/controllers"
+	"mainServer/tests/mocks/services"
 	"testing"
 )
 
-//var servMock services.ThreadServiceMock
+var threadServMock services.ThreadServiceMock
 var contr controllers.ThreadController
 var r *gin.Engine
 
@@ -23,15 +24,15 @@ func globalSetup() {
 	r = gin.Default()
 	contr = controllers.ThreadController{}
 
-	//// route
-	//r.POST("/articles/:articleID/versions/:versionID", func(c *gin.Context) {
-	//	contr.UpdateVersion(c)
-	//})
+	// route
+	r.POST("/articles/:articleID/thread/:threadType/id/:specificID/", func(c *gin.Context) {
+		contr.CreateThread(c)
+	})
 }
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// (Re)set controller mocks
-	//servMock = services.NewVersionServiceMock()
-	//contr.Serv = servMock
+	//(Re)set controller mocks
+	threadServMock = services.NewThreadServiceMock()
+	contr.ThreadService = threadServMock
 }
