@@ -1,13 +1,22 @@
 package thread
 
 import (
+	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"mainServer/controllers"
+	"mainServer/entities"
+	"mainServer/models"
 	"mainServer/tests/mocks/services"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
 var threadServMock services.ThreadServiceMock
+var commitThreadServMock services.CommitThreadServiceMock
+var requestThreadServMock services.RequestThreadServiceMock
 var contr controllers.ThreadController
 var r *gin.Engine
 
@@ -24,9 +33,21 @@ func globalSetup() {
 	r = gin.Default()
 	contr = controllers.ThreadController{}
 
-	// route
+	// routes
 	r.POST("/articles/:articleID/thread/:threadType/id/:specificID/", func(c *gin.Context) {
 		contr.CreateThread(c)
+	})
+
+	r.GET("/articles/:articleID/versions/:versionID/history/:commitID/threads", func(c *gin.Context) {
+		contr.GetCommitThreads(c)
+	})
+
+	r.GET("/articles/:articleID/requests/:requestID/threads", func(c *gin.Context) {
+		contr.GetRequestThreads(c)
+	})
+
+	r.POST("/comments/thread/:threadID", func(c *gin.Context) {
+		contr.SaveComment(c)
 	})
 }
 
@@ -34,5 +55,217 @@ func globalSetup() {
 func localSetup() {
 	//(Re)set controller mocks
 	threadServMock = services.NewThreadServiceMock()
+	requestThreadServMock = services.NewRequestThreadServiceMock()
+	commitThreadServMock = services.NewCommitThreadServiceMock()
+
 	contr.ThreadService = threadServMock
+	contr.RequestThreadService = requestThreadServMock
+	contr.CommitThreadService = commitThreadServMock
+}
+
+func TestGetCommitThreadFail(t *testing.T) {
+	localSetup()
+
+	//define service mock behaviour
+	services.GetCommitThreadsMock = func(aid int64, cid int64) ([]models.Thread, error) {
+		return []models.Thread{}, errors.New("cannot get commit threads")
+	}
+
+	// set request url
+	const aid int64 = 2
+	const vid int64 = 1
+	const cid int64 = 3
+	url := fmt.Sprintf("/articles/%d/versions/%d/history/%d/threads", aid, vid, cid)
+
+	// create request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+		return
+	}
+
+	// perform the request, with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 400 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if !(*commitThreadServMock.Called)["GetCommitThreads"] {
+		t.Errorf("Expected GetRequestThreads to be called")
+	}
+	a := (*commitThreadServMock.Params)["GetCommitThreads"]["aid"]
+	c := (*commitThreadServMock.Params)["GetCommitThreads"]["cid"]
+	if a != aid || c != cid {
+		t.Errorf("Expected different function params, got article=%v and commit=%v", a, c)
+	}
+}
+
+func TestGetCommitThreadsSuccess(t *testing.T) {
+	localSetup()
+
+	//define service mock behaviour
+	services.GetCommitThreadsMock = func(aid int64, cid int64) ([]models.Thread, error) {
+		return exampleThreads, nil
+	}
+
+	// set request url
+	const aid int64 = 2
+	const vid int64 = 1
+	const cid int64 = 3
+	url := fmt.Sprintf("/articles/%d/versions/%d/history/%d/threads", aid, vid, cid)
+
+	// create request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+		return
+	}
+
+	// perform the request with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 200 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if !(*commitThreadServMock.Called)["GetCommitThreads"] {
+		t.Errorf("Expected GetRequestThreads to be called")
+	}
+	a := (*commitThreadServMock.Params)["GetCommitThreads"]["aid"]
+	c := (*commitThreadServMock.Params)["GetCommitThreads"]["cid"]
+	if a != aid || c != cid {
+		t.Errorf("Expected different function params, got article=%v and commit=%v", a, c)
+	}
+}
+
+func TestGetRequestThreadFail(t *testing.T) {
+	localSetup()
+
+	//define service mock behaviour
+	services.GetRequestThreadsMock = func(aid int64, rid int64) ([]models.Thread, error) {
+		return []models.Thread{}, errors.New("cannot get request threads")
+	}
+
+	// set request url
+	const aid int64 = 2
+	const rid int64 = 3
+	url := fmt.Sprintf("/articles/%d/requests/%d/threads", aid, rid)
+
+	// create request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+		return
+	}
+
+	// perform the request, with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 400 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if !(*requestThreadServMock.Called)["GetRequestThreads"] {
+		t.Errorf("Expected GetRequestThreads to be called")
+	}
+	a := (*requestThreadServMock.Params)["GetRequestThreads"]["aid"]
+	r := (*requestThreadServMock.Params)["GetRequestThreads"]["rid"]
+	if a != aid || r != rid {
+		t.Errorf("Expected different function params, got article=%v and request=%v", a, r)
+	}
+}
+
+func TestGetRequestThreadsSuccess(t *testing.T) {
+	localSetup()
+
+	//define service mock behaviour
+	services.GetRequestThreadsMock = func(aid int64, rid int64) ([]models.Thread, error) {
+		return exampleThreads, nil
+	}
+
+	// set request url
+	const aid int64 = 2
+	const rid int64 = 3
+	url := fmt.Sprintf("/articles/%d/requests/%d/threads", aid, rid)
+
+	// create request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+		return
+	}
+
+	// perform the request with a response recorder
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// check the response
+	if w.Code != 200 {
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Error(w.Code, string(b))
+	}
+
+	// check the service mock
+	if !(*requestThreadServMock.Called)["GetRequestThreads"] {
+		t.Errorf("Expected GetRequestThreads to be called")
+	}
+	a := (*requestThreadServMock.Params)["GetRequestThreads"]["aid"]
+	r := (*requestThreadServMock.Params)["GetRequestThreads"]["rid"]
+	if a != aid || r != rid {
+		t.Errorf("Expected different function params, got article=%v and request=%v", a, r)
+	}
+}
+
+var exampleThreads = []models.Thread{
+	{
+		Id:         1,
+		ArticleId:  2,
+		SpecificId: 3,
+		Comment: []entities.Comment{
+			{
+				Id:           1,
+				AuthorId:     "pietje@gmail.com",
+				ThreadId:     1,
+				Content:      "Hey",
+				CreationDate: "12345678",
+			}, {
+				Id:           2,
+				AuthorId:     "puk@gmail.com",
+				ThreadId:     1,
+				Content:      "Hello!",
+				CreationDate: "12345678",
+			}},
+	},
+	{
+		Id:         2,
+		ArticleId:  2,
+		SpecificId: 3,
+		Comment: []entities.Comment{
+			{
+				Id:           1,
+				AuthorId:     "pietje@gmail.com",
+				ThreadId:     2,
+				Content:      "Hey again",
+				CreationDate: "12345678",
+			}, {
+				Id:           2,
+				AuthorId:     "puk@gmail.com",
+				ThreadId:     2,
+				Content:      "Hello again!",
+				CreationDate: "12345678",
+			}},
+	},
 }
