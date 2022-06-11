@@ -12,7 +12,7 @@ export default function CreateComment(props: ThreadProps) {
     let baseUrl = "http://localhost:8080";
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
-    let [threadId, setThreadId] = useState((props.id) ? undefined : props.id)
+    let [threadId, setThreadId] = useState((props.id) ? props.id : undefined)
 
     const params = useParams();
 
