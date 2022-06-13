@@ -206,7 +206,7 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	}
 
 	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, intCid)
-	if err != nil || threads == nil {
+	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
 		return
