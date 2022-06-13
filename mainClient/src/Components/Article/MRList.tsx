@@ -75,7 +75,7 @@ export default function MRList() {
     }
 
     return (
-        <div>
+        <div className="wrapper col-8 m-auto">
             {!isLoaded && <LoadingSpinner />}
             {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
             {

@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import PrismDiff from "./PrismDiff";
 import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
+import ThreadList from "./ThreadList"
 
 type Request = {
     sourceVersionID: number;
@@ -197,54 +198,54 @@ export default function VersionList() {
 
     const view = () => {
         return (
-            <div>
-                {/*Delete button*/}
-                <div className='mt-3' style={{position:'absolute', right:'5%'}}>
-                    {deleteButton()}
-                </div>
-
-                <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Changes</h1>
-
-                <div className='row justify-content-center'>
-                    {/*Version names*/}
-                    <div className='row' style={{margin:"15px"}}>
-                        <div className='col-6' style={{textAlign:'center'}}>
-                            <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
+            <div className='row'>
+                <div>
+                    <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Versions</h1>
+                    <div className='row justify-content-center'>
+                        {/*Version names*/}
+                        <div className='row col-8 mb-2'>
+                            <div className='col-6'>
+                                <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
+                            </div>
+                            <div className='col-6'>
+                                <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
+                            </div>
                         </div>
-                        <div className='col-4' style={{textAlign:'center'}}>
-                            <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
-                        </div>
-                        {/*Accept and reject button*/}
+
+                        {/*Accept, reject and delete button*/}
                         <div className='col-1' id='AcceptButton'>
                             {acceptButton()}
                         </div>
                         <div className='col-1'>
                             {rejectButton()}
                         </div>
-                    </div>
-
-                    {/*Content of versions*/}
-                    <div>
-                        <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
-                            {/*Source version, including changes that are made*/}
-                            <div className='col-6'>
-                                {(dataSource !== undefined && dataTarget !== undefined) &&
-                                    <PrismDiff
-                                        sourceContent={dataSource.content}
-                                        targetContent={dataTarget.content}
-                                    />
-                                }
-                            </div>
-                            {/*Target version*/}
-                            <div className='col-6'>
-                                {dataTarget !== undefined && dataTarget.content}
-                            </div>
-
+                        <div className='col-1'>
+                            {deleteButton()}
                         </div>
                     </div>
-                    {/*Space for threads regarding this request*/}
-                    <div style={{border: 'black solid 1px', height: '100px'}}>
-                        Threads
+
+                    <div className='row justify-content-center'>
+                        {/*Content of versions*/}
+                        <div className="wrapper col-8">
+                            <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
+                                {/*Source version, including changes that are made*/}
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
+                                    {(dataSource !== undefined && dataTarget !== undefined) &&
+                                        <PrismDiff
+                                            sourceContent={dataSource.content}
+                                            targetContent={dataTarget.content}
+                                        />
+                                    }
+                                </div>
+                                {/*Target version*/}
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
+                                    {dataTarget !== undefined && dataTarget.content}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="wrapper col-3">
+                            <ThreadList threadType={"request"} specificId={parseInt(params.requestId as string)}/>
+                        </div>
                     </div>
                 </div>
             </div>

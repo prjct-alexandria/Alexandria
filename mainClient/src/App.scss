@@ -12,6 +12,11 @@ $error-color: #c70000;
 $article-content-background-color:#eee;
 $article-content-border-color: #ccc;
 
+body {
+  // to prevent the browser from shaking when threads are opened
+  overflow: scroll;
+}
+
 .input-validation {
   color: $error-color;
 }
