@@ -19,6 +19,8 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
+  
+  // const url = "/article_version1.json";
   const url = "http://localhost:8080/articles/" +
   params.articleId +
   "/versions/" +
