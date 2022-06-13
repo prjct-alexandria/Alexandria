@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import configData from "../../config.json"
 
 export default function CreateArticle() {
   let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
@@ -29,7 +30,7 @@ export default function CreateArticle() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = "http://localhost:8080/articles";
+    const url= configData.back_end_url +"/articles";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = mainVersionTags.split(",");

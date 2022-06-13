@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
+import configData from "../../config.json";
 
 type Article = {
   authors: Array<string>;
@@ -16,7 +17,7 @@ export default function ArticlePage() {
 
   let params = useParams();
   const url =
-    "http://localhost:8080/articles/" + params.aid + "versions/" + params.vId;
+    configData.back_end_url +"/articles/" + params.aid + "versions/" + params.vId;
 
   useEffect(() => {
     fetch(url, {

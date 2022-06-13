@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
+import configData from "../../config.json";
 
 export default function Login() {
   let [email, setEmail] = useState<string>("");
@@ -19,7 +20,7 @@ export default function Login() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = "http://localhost:8080/login";
+    const url= configData.back_end_url +"/login";
 
     // Construct request body
     const body = {

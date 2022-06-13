@@ -2,7 +2,8 @@ import * as React from "react";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import CreateComment from "./CreateComment"
+import CreateComment from "./CreateComment";
+import configData from "../../config.json";
 
 type ThreadProps = {
     "id": number,
@@ -19,7 +20,7 @@ type ThreadComment = {
 }
 
 export default function Thread(props: ThreadProps) {
-    let baseUrl = "http://localhost:8080";
+    let baseUrl= configData.back_end_url +"";
     let [commentData, setData] = useState<ThreadComment[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);

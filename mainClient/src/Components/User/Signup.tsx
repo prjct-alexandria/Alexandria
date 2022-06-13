@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import $ from "jquery";
 import SignupForm from "./SignupForm";
+import configData from "../../config.json";
 
 export default function Signup() {
   let [username, setUsername] = useState<string>();
@@ -32,7 +33,7 @@ export default function Signup() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = "http://localhost:8080/users";
+    const url= configData.back_end_url +"/users";
 
     // Construct request body
     const body = {

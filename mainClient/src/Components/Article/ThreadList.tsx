@@ -4,6 +4,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import {useParams} from "react-router-dom";
 import Thread from "./Thread"
 import CreateThread from "./CreateThread";
+import configData from "../../config.json";
 
 type ThreadListProps = {
     threadType: string
@@ -17,7 +18,7 @@ type ThreadEntity = {
 }
 
 export default function ThreadList(props: ThreadListProps) {
-    let baseUrl = "http://localhost:8080";
+    let baseUrl= configData.back_end_url +"";
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);

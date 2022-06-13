@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import * as React from "react";
 import SuccessAlert from "../SuccessAlert";
 import ErrorAlert from "../ErrorAlert";
+import configData from "../../config.json";
 
 export default function FileDownload() {
   let [error, setError] = useState(null);
@@ -13,7 +14,7 @@ export default function FileDownload() {
   let params = useParams();
 
   const endpointUrl =
-    "http://localhost:8080/articles/" +
+    configData.back_end_url +"/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId +
