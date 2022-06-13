@@ -106,6 +106,21 @@ func (r GitRepository) Commit(article int64) error {
 	return nil
 }
 
+// CheckoutCommit checks out the specified commit in the specified article repo
+func (r GitRepository) CheckoutCommit(article int64, commit [20]byte) error {
+	w, err := r.getWorktree(article)
+	if err != nil {
+		return err
+	}
+
+	// checkout
+	err = w.Checkout(&git.CheckoutOptions{
+		Hash: commit,
+	})
+
+	return err
+}
+
 // CheckoutBranch checks out the specified version in the specified article repo
 func (r GitRepository) CheckoutBranch(article int64, version int64) error {
 	w, err := r.getWorktree(article)
