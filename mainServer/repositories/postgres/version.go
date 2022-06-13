@@ -223,3 +223,21 @@ func (r PgVersionRepository) getOwners(version int64) ([]string, error) {
 
 	return owners, nil
 }
+
+// CheckIfOwner returns directly with a query whether the specified user owns an article version
+func (r PgVersionRepository) CheckIfOwner(version int64, email string) (bool, error) {
+	// Prepare and execute query
+	stmt, err := r.Db.Prepare("SELECT 1 FROM versionOwners WHERE versionid=$1 AND email=$2")
+	if err != nil {
+		return false, err
+	}
+
+	rows, err := stmt.Query(version, email)
+	if rows.Next() {
+		// there is (at least) one row, so the specified email is an owner of the version
+		return true, nil
+	} else {
+		// no rows match, so the specified email is not an owner of the version
+		return false, nil
+	}
+}
