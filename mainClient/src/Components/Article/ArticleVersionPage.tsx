@@ -5,6 +5,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
 import CreateMR from "./CreateMR"
 import ThreadList from "./ThreadList";
+import CreateArticleVersion from "./CreateArticleVersion";
 import FileDownload from "./FileDownload";
 
 type ArticleVersion = {
@@ -19,6 +20,7 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
+
   // const url = "/article_version1.json";
   const url = "http://localhost:8080/articles/" +
   params.articleId +
@@ -84,6 +86,20 @@ export default function ArticleVersionPage() {
                       </button>
                       <CreateMR />
                     </div>
+                    <div className="col-1">
+                      <button
+                          type="button"
+                          className="btn btn-primary btn-lg"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createNewVersion"
+                      >
+                        Clone this version
+                      </button>
+                      <CreateArticleVersion />
+                    </div>
+
+
+
                   </div>
               </div>
               <div>
