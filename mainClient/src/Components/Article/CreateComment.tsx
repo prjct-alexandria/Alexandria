@@ -46,7 +46,7 @@ export default function CreateComment(props: ThreadProps) {
             fetch(urlCreateThread, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                mode: "no-cors",
+                mode: "cors",
                 body: JSON.stringify(bodyThread),
                 credentials: 'include',
             }).then(
