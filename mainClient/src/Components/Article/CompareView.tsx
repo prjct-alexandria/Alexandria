@@ -229,7 +229,7 @@ export default function VersionList() {
                         <div className="wrapper col-8">
                             <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
                                 {/*Source version, including changes that are made*/}
-                                <div className='col-6'>
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
                                     {(dataSource !== undefined && dataTarget !== undefined) &&
                                         <PrismDiff
                                             sourceContent={dataSource.content}
@@ -238,7 +238,7 @@ export default function VersionList() {
                                     }
                                 </div>
                                 {/*Target version*/}
-                                <div className='col-6'>
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
                                     {dataTarget !== undefined && dataTarget.content}
                                 </div>
                             </div>

@@ -114,7 +114,7 @@ export default function ArticleVersionPage() {
               <div className="row">
                 <div className="row mb-2 mt-2">
                   <div className="col-8 articleContent">
-                    <div>{versionData.content}</div>
+                    <div style={{whiteSpace: "pre-line"}}>{versionData.content}</div>
                   </div>
                   <div className="col-3">
                     <ThreadList threadType={"commit"} specificId={parseInt(params.versionId as string)} />
