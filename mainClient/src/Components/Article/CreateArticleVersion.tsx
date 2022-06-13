@@ -85,10 +85,8 @@ export default function CreateArticleVersion() {
 
                     if (typeof window !== "undefined") {
                         window.location.href =
-                            "http://localhost:3000/articles/" +
-                            articleId +
-                            "/versions/" +
-                            versionId;
+                            "/articles/" + articleId +
+                            "/versions/" + versionId;
                     }
                 }
             },

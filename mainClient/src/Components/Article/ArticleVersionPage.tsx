@@ -19,11 +19,10 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState(null);
 
   let params = useParams();
-  const url = "/article_version1.json";
-  // "http://localhost:8080/articles/" +
-  // params.articleId +
-  // "/versions/" +
-  // params.versionId;
+  const url = "http://localhost:8080/articles/" +
+  params.articleId +
+  "/versions/" +
+  params.versionId;
 
   useEffect(() => {
     fetch(url, {
