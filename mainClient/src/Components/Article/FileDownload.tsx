@@ -27,19 +27,28 @@ export default function FileDownload() {
       method: "GET",
       mode: "cors",
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        "Content-Type": "application/x-zip-compressed",
+        Accept: "application/x-zip-compressed",
       },
       credentials: "include",
     })
-      .then((res) => res.blob())
+      .then((res) =>
+          res.blob().then((blob) => {
+              const filename = res.headers.get("content-disposition")!.split('"')[1]
+              let tuple: [Blob, string] = [blob, filename];
+              return tuple
+          })
+      )
       .then(
         // Process the response as a BLOB (Binary large object)
         (result) => {
+            let filename = result[1]
+            setFilename(filename)
+
           // Put the file in the DOM
-          const windowUrl = window.URL.createObjectURL(result);
+          const windowUrl = window.URL.createObjectURL(result[0]);
           // Set filename
-          setFilename("source-file.zip");
+          // setFilename("source-file.zip");
 
           // Add a hidden <a> element to DOM, that downloads the file when clicking on it
           const a = document.createElement("a");

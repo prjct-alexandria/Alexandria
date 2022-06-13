@@ -215,5 +215,6 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 	}(path)
 
 	//Return files
+	c.Header("Access-Control-Expose-Headers", "content-disposition")
 	c.FileAttachment(path, filepath.Base(path))
 }
