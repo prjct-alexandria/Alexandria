@@ -16,9 +16,9 @@ type Article = {
 };
 
 export default function ArticleList() {
-  let [articleListData, setData] = useState<Article[]>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [articleList, setArticleList] = useState<Article[]>();
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
 
   useEffect(() => {
     const url = "http://localhost:8080/articles";
@@ -32,18 +32,27 @@ export default function ArticleList() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setLoaded(true);
-          setData(result);
-        },
-        (error) => {
-          setLoaded(true);
-          setError(error);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let ArticleList: Article[] = await response.json();
+          setArticleList(ArticleList);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+        setLoaded(true);
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, []);
 
   return (
@@ -57,8 +66,8 @@ export default function ArticleList() {
             message={"Something went wrong. " + error}
           />
         )}
-        {articleListData != null &&
-          articleListData.map((article, i) => (
+        {articleList != null &&
+          articleList.map((article, i) => (
             <ArticleListElement key={i} article={article} />
           ))}
       </div>

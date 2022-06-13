@@ -2,24 +2,21 @@ import * as React from "react";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
 import NotificationAlert from "../NotificationAlert";
+import $ from "jquery";
+import setUserInLocalStorage from "./AuthHelpers/setUserInLocalStorage";
 
 export default function Login() {
   let [email, setEmail] = useState<string>("");
-  let [password, setPassword] = useState<string>();
-  let [error, setError] = useState(null);
-
-  const onChangeEmail = (e: { target: { value: any } }) => {
-    setEmail(e.target.value);
-  };
-
-  const onChangePassword = (e: { target: { value: any } }) => {
-    setPassword(e.target.value);
-  };
+  let [password, setPassword] = useState<string>("");
+  let [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
+  let [username, setUsername] = useState<string>("");
 
   const submitHandler = (e: { preventDefault: () => void }) => {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
+    // Login endpoint url
     const url = "http://localhost:8080/login";
 
     // Construct request body
@@ -36,24 +33,34 @@ export default function Login() {
       credentials: "include",
       body: JSON.stringify(body),
     }).then(
-      // Success; set response in state
-      (response) => {
-        console.log("Success:", response);
-
+      async (response) => {
         if (response.ok) {
-          localStorage.setItem("loggedUserEmail", email);
+          let responseJSON: {
+            name: string;
+            email: string;
+          } = await response.json();
 
-          // Redirect to homepage; Comment this to debug the form submission
-          if (typeof window !== "undefined") {
-            window.location.href = "http://localhost:3000/";
-          } else {
-            console.log("Error: Undefined window");
-          }
+          // Set session details in localStorage
+          setUserInLocalStorage(email, responseJSON.name);
+
+          // Close login form
+          $("#btn-close-login-form").trigger("click");
+
+          // Show success alert for 3 seconds
+          setUsername(responseJSON.name);
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 3000);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
       },
       (error) => {
-        // Request returns an error; set it in component's state
-        console.error("Error:", error);
         setError(error);
       }
     );
@@ -68,12 +75,23 @@ export default function Login() {
           message={"Something went wrong. " + error}
         />
       )}
+      {showSuccessMessage && (
+        <NotificationAlert
+          errorType="success"
+          title={"Welcome, " + username + "!"}
+          message={"You are now logged in."}
+        />
+      )}
       {
         <LoginForm
           email={email}
           password={password}
-          onChangeEmail={onChangeEmail}
-          onChangePassword={onChangePassword}
+          onChangeEmail={(e) => {
+            setEmail(e.target.value);
+          }}
+          onChangePassword={(e) => {
+            setPassword(e.target.value);
+          }}
           submitHandler={submitHandler}
         />
       }

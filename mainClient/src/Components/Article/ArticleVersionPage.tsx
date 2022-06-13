@@ -8,6 +8,7 @@ import ThreadList from "./ThreadList";
 import CreateArticleVersion from "./CreateArticleVersion";
 import FileDownload from "./FileDownload";
 import NotificationAlert from "../NotificationAlert";
+import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -17,12 +18,19 @@ type ArticleVersion = {
 
 export default function ArticleVersionPage() {
   let [versionData, setData] = useState<ArticleVersion>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
+  let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+
+  // Listen for userAccountEvent that fires when user in localstorage changes
+  window.addEventListener("userAccountEvent", () => {
+    setLoggedIn(isUserLoggedIn());
+  });
 
   let params = useParams();
 
-  let url = //"/article_version1.json";
+  let url =
+    // "/article_version1.json"; // Placeholder
     "http://localhost:8080/articles/" +
     params.articleId +
     "/versions/" +
@@ -45,18 +53,28 @@ export default function ArticleVersionPage() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let VersionData: ArticleVersion = await response.json();
+          setData(VersionData);
           setLoaded(true);
-          setData(result);
-        },
-        (error) => {
+        } else {
           setLoaded(true);
-          setError(error);
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, [url]);
 
   return (
@@ -69,100 +87,99 @@ export default function ArticleVersionPage() {
           message={"Something went wrong. " + error}
         />
       )}
-      {versionData != null && (
-        <div className={"col-10"}>
-          <h3>{versionData.title}</h3>
-          <div>
-            <ul>
-              <li className="ownersLi">Owners: </li>
-              {versionData.owners.map((owner, i) => (
+      <div className={"col-10"}>
+        <h3>{versionData && versionData.title}</h3>
+        <div>
+          <ul>
+            <li className="ownersLi">Owners: </li>
+            {versionData &&
+              versionData.owners.map((owner, i) => (
                 <li className="ownersLi" key={i}>
                   {owner + ";"}
                 </li>
               ))}
-            </ul>
-          </div>
-          <hr />
-
-          <ul className="nav justify-content-end d-grid gap-2 d-md-flex justify-content-md-end">
-            {!viewingOldVersion && (
-              <li className="nav-item">
-                <a className="nav-link">
-                  <button
-                    type="button"
-                    className="btn  btn-light"
-                    data-bs-toggle="modal"
-                    data-bs-target="#uploadFile"
-                  >
-                    Upload File
-                  </button>
-                  <FileUpload />
-                </a>
-              </li>
-            )}
+          </ul>
+        </div>
+        <hr />
+        <ul className="nav justify-content-end d-grid gap-2 d-md-flex justify-content-md-end">
+          {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
-                <FileDownload />
+                <button
+                  type="button"
+                  className="btn  btn-light"
+                  data-bs-toggle="modal"
+                  data-bs-target="#uploadFile"
+                >
+                  Upload File
+                </button>
+                <FileUpload />
               </a>
             </li>
-            {!viewingOldVersion && (
-              <li className="nav-item">
-                <a className="nav-link">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-lg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createNewVersion"
-                  >
-                    Clone this version
-                  </button>
-                  <CreateArticleVersion />
-                </a>
-              </li>
-            )}
-            {!viewingOldVersion && (
-              <li className="nav-item">
-                <a className="nav-link">
-                  <button
-                    type="button"
-                    className="btn  btn-light"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createMR"
-                  >
-                    Make Request
-                  </button>
-                  <CreateMR />
-                </a>
-              </li>
-            )}
-          </ul>
-
-          {viewingOldVersion && (
-            <p>
-              <em>
-                {
-                  "You are currently viewing a read-only version from the history, which might be outdated. Modifications are disabled."
-                }
-              </em>
-            </p>
           )}
-          <div className="row">
-            <div className="row mb-2 mt-2">
-              <div className="col-8 articleContent">
-                <div style={{ whiteSpace: "pre-line" }}>
-                  {versionData.content}
-                </div>
+          <li className="nav-item">
+            <a className="nav-link">
+              <FileDownload />
+            </a>
+          </li>
+          {!viewingOldVersion && (
+            <li className="nav-item">
+              <a className="nav-link">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-lg"
+                  data-bs-toggle="modal"
+                  data-bs-target="#createNewVersion"
+                >
+                  Clone this version
+                </button>
+                <CreateArticleVersion />
+              </a>
+            </li>
+          )}
+          {!viewingOldVersion && isLoggedIn && (
+            <li className="nav-item">
+              <a className="nav-link">
+                <button
+                  type="button"
+                  className="btn  btn-light"
+                  data-bs-toggle="modal"
+                  data-bs-target="#createMR"
+                >
+                  Make Request
+                </button>
+                <CreateMR />
+              </a>
+            </li>
+          )}
+        </ul>
+
+        {viewingOldVersion && (
+          <p>
+            <em>
+              {
+                "You are currently viewing a read-only version from the history, which might be outdated. Modifications are disabled."
+              }
+            </em>
+          </p>
+        )}
+
+        <div className="row">
+          <div className="row mb-2 mt-2">
+            <div className="col-8 articleContent">
+              <div style={{ whiteSpace: "pre-line" }}>
+                {versionData && versionData.content}
               </div>
-              <div className="col-3">
-                <ThreadList
-                  threadType={"commit"}
-                  specificId={parseInt(params.versionId as string)}
-                />
-              </div>
+            </div>
+            <div className="col-3">
+              <ThreadList
+                threadType={"commit"}
+                specificId={parseInt(params.versionId as string)}
+              />
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

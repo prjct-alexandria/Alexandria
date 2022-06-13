@@ -87,6 +87,27 @@ func (u *UserController) Login(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, models.User{Name: dbUser.Name, Email: dbUser.Email})
 }
 
+// Logout		godoc
+// @Summary		Endpoint for user logging out
+// @Description	Sets an expired cookie with an empty email and returns a JWT token
+// @Accept		json
+// @Param		credentials	body	models.LoginForm true "User credentials"
+// @Success		200 "Success"
+// @Failure		400 "Could not read request body"
+// @Failure		400 "Invalid JSON provided"
+// @Failure		500 "Could not update token"
+// @Router		/logout	[post]
+func (u *UserController) Logout(c *gin.Context) {
+	err := middlewares.ExpireJwtCookie(c)
+
+	if err != nil {
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not delete token to logout user"))
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, models.User{Name: "", Email: ""})
+}
+
 // CreateExampleUser godoc
 // @Summary      Temporary user creation endpoint
 // @Description  Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database

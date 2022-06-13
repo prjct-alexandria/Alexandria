@@ -16,7 +16,23 @@ body {
   // to prevent the browser from shaking when threads are opened
   overflow: scroll;
 }
-
+.App {
+  margin-top:50px;
+}
+.textarea {
+  background-color: transparent;
+  border: 0;
+  padding: 8px;
+  resize: none;
+  width: 100%;
+  resize: none;
+  overflow: auto;
+  min-height: 300px;
+}
+.textarea:hover {
+  background-color: #d3d3d3;
+  cursor: pointer;
+}
 .article {
   margin-top:15px;
   border-bottom: 1px solid #bbbbbb;

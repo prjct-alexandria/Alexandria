@@ -5,6 +5,7 @@ import PrismDiff from "./PrismDiff";
 import LoadingSpinner from "../LoadingSpinner";
 import ThreadList from "./ThreadList";
 import NotificationAlert from "../NotificationAlert";
+import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type Request = {
   sourceVersionID: number;
@@ -27,39 +28,65 @@ function getRequest(
   setLoaded: (b: boolean) => void,
   setError: (e: Error) => void
 ) {
-  fetch(url)
-    .then((res) => res.json())
-    .then(
-      (response) => {
-        setData(response);
+  fetch(url).then(
+    async (response) => {
+      if (response.ok) {
+        let requestData: Request = await response.json();
+        setData(requestData);
         setLoaded(true);
-      },
-      (error) => {
-        setError(error.message);
-        setLoaded(true);
+      } else {
+        // Set error with message returned from the server
+        let responseJSON: {
+          message: string;
+        } = await response.json();
+
+        let serverMessage: string = responseJSON.message;
+        setError(new Error(serverMessage));
       }
-    );
+    },
+    (error) => {
+      setError(error.message);
+      setLoaded(true);
+    }
+  );
 }
+
 function getVersion(
   url: string,
   setData: (v: ArticleVersion) => void,
   setLoaded: (b: boolean) => void,
   setError: (e: Error) => void
 ) {
-  fetch(url)
-    .then((res) => res.json())
-    .then(
-      (response) => {
-        setData(response);
-        setLoaded(true);
-      },
-      (error) => {
-        setError(error.message);
-        setLoaded(true);
+  fetch(url).then(
+    async (response) => {
+      if (response.ok) {
+        let articleSourceData: ArticleVersion = await response.json();
+        setData(articleSourceData);
+      } else {
+        // Set error with message returned from the server
+        let responseJSON: {
+          message: string;
+        } = await response.json();
+
+        let serverMessage: string = responseJSON.message;
+        setError(new Error(serverMessage));
       }
-    );
+      setLoaded(true);
+    },
+    (error) => {
+      setError(error.message);
+      setLoaded(true);
+    }
+  );
 }
 export default function VersionList() {
+  let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+
+  // Listen for userAccountEvent that fires when user in localstorage changes
+  window.addEventListener("userAccountEvent", () => {
+    setLoggedIn(isUserLoggedIn());
+  });
+
   let params = useParams();
 
   const urlRequest = "/request.json";
@@ -73,6 +100,7 @@ export default function VersionList() {
   useEffect(() => {
     getRequest(urlRequest, setDataRequest, setLoadedRequest, setErrorRequest);
   }, []);
+
   let urlArticleSource = "";
   let urlArticleTarget = "";
 

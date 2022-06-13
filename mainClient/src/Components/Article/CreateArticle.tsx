@@ -6,7 +6,7 @@ export default function CreateArticle() {
   let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
   let [mainVersionOwners, setMainVersionOwners] = useState<string>("");
   let [mainVersionTags, setMainVersionTags] = useState<string>("");
-  let [error, setError] = useState(null);
+  let [error, setError] = useState<Error>();
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
 
   // Variable and references to it to be removed when adding tags
@@ -64,10 +64,7 @@ export default function CreateArticle() {
       body: JSON.stringify(body),
       credentials: "include"
     }).then(
-      // Success
       async (response) => {
-        console.log("Success:", response);
-
         if (response.ok) {
           let responseJSON: {
             articleID: string;
@@ -84,11 +81,18 @@ export default function CreateArticle() {
               "/versions/" +
               versionId;
           }
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
       },
       (error) => {
         // Request returns an error
-        console.error("Error:", error);
         setError(error);
       }
     );

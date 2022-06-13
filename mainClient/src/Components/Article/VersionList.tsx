@@ -15,6 +15,7 @@ type Version = {
 };
 
 export default function VersionList() {
+  let [error, setError] = useState<Error>();
   let params = useParams();
   // const urlVersions = "/versionList.json"; // Placeholder
   const urlVersions =
@@ -36,10 +37,15 @@ export default function VersionList() {
     })
       .then((res) => res.json())
       .then(
-        (result) => {
-          setDataVersions(result);
-          setErrorVersions(null);
-          setLoadedVersions(true);
+        (response) => {
+          if (response.ok) {
+            setDataVersions(response);
+            setErrorVersions(null);
+            setLoadedVersions(true);
+          } else {
+            let serverMessage: string = response.message;
+            setError(new Error(serverMessage));
+          }
         },
         (error) => {
           setErrorVersions(error.message);
@@ -69,10 +75,15 @@ export default function VersionList() {
     })
       .then((res) => res.json())
       .then(
-        (result) => {
-          setDataMain(result);
-          setErrorMain(null);
-          setLoadedMain(true);
+        (response) => {
+          if (response.ok) {
+            setDataMain(response);
+            setErrorMain(null);
+            setLoadedMain(true);
+          } else {
+            let serverMessage: string = response.message;
+            setError(new Error(serverMessage));
+          }
         },
         (error) => {
           setErrorMain(error.message);
@@ -84,19 +95,28 @@ export default function VersionList() {
 
   return (
     <div className="wrapper col-8 m-auto">
-      {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
-      {(errorVersions || errorMain) && (
+      {error && (
         <NotificationAlert
           errorType="danger"
           title={"Error: "}
-          message={"Something went wrong. " + errorVersions + errorMain}
+          message={"Something went wrong. " + error.message}
         />
       )}
-      {dataVersions != null &&
-        dataMain != null &&
-        dataVersions.map((version, i) => (
-          <VersionListElement key={i} version={version} mv={dataMain} />
-        ))}
+      <div>
+        {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
+        {(errorVersions || errorMain) && (
+          <NotificationAlert
+            errorType="danger"
+            title={"Error: "}
+            message={"Something went wrong. " + errorVersions + errorMain}
+          />
+        )}
+        {dataVersions != null &&
+          dataMain != null &&
+          dataVersions.map((version, i) => (
+            <VersionListElement key={i} version={version} mv={dataMain} />
+          ))}
+      </div>
     </div>
   );
 }
