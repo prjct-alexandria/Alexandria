@@ -15,7 +15,6 @@ type ArticleListProps = {
 };
 
 export default function ArticleListElement(props: ArticleListProps) {
-  console.log(props)
   return (
     <div className="accordion-item">
       <div className="article-elem-header accordion-header">

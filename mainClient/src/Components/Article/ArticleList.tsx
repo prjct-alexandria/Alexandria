@@ -46,13 +46,15 @@ export default function ArticleList() {
   }, []);
 
   return (
-    <div className={"accordion"}>
-      {!isLoaded && <LoadingSpinner />}
-      {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-      {articleListData != null &&
-        articleListData.map((article, i) => (
-          <ArticleListElement key={i} article={article} />
-        ))}
+    <div className="wrapper col-8 m-auto">
+      <div className={"accordion"}>
+        {!isLoaded && <LoadingSpinner />}
+        {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
+        {articleListData != null &&
+          articleListData.map((article, i) => (
+            <ArticleListElement key={i} article={article} />
+          ))}
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	//Example of how to make an endpoint use the authentication
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
-	router.POST("/articles/:articleID/thread/:threadType/id/:specificID/", contrs.thread.CreateThread)
+	router.POST("/articles/:articleID/thread/:threadType/id/:specificID", contrs.thread.CreateThread)
 	router.POST("/comments/thread/:threadID", contrs.thread.SaveComment)
 
 	//Groups can be used for nested paths, maybe add example later

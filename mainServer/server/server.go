@@ -101,7 +101,11 @@ func initControllerEnv() (ControllerEnv, error) {
 		user:    controllers.UserController{UserService: servs.user},
 		req:     controllers.RequestController{Serv: servs.req},
 		version: controllers.VersionController{Serv: servs.version},
-		thread:  controllers.ThreadController{ThreadService: servs.thread},
+		thread: controllers.ThreadController{ThreadService: servs.thread,
+			CommitThreadService:  servs.commitThread,
+			RequestThreadService: servs.requestThread,
+			ReviewThreadService:  servs.reviewThread,
+			CommentService:       servs.comment},
 	}, nil
 }
 
