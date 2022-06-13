@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
-import configData from "../../config.json";
+import configData from "../../config.json"
 
 type Article = {
   authors: Array<string>;

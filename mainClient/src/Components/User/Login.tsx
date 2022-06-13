@@ -45,7 +45,7 @@ export default function Login() {
 
           // Redirect to homepage; Comment this to debug the form submission
           if (typeof window !== "undefined") {
-            window.location.href = "http://localhost:3000/";
+            window.location.href = configData.front_end_url;
           } else {
             console.log("Error: Undefined window");
           }

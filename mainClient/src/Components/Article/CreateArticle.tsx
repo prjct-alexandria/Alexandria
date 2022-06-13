@@ -79,7 +79,7 @@ export default function CreateArticle() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              "http://localhost:3000/articles/" +
+              configData.front_end_url +"/articles/" +
               articleId +
               "/versions/" +
               versionId;

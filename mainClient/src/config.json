@@ -1,3 +1,4 @@
 {
-  "back_end_url": "http://localhost:8080"
+  "back_end_url": "http://localhost:8080",
+  "front_end_url": "http://localhost:3000"
 }
