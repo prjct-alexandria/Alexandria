@@ -47,7 +47,7 @@ func (s RequestService) RejectRequest(request int64, email string) error {
 		return err
 	}
 
-	// check who the owner is
+	// check if logged-in user owns this version
 	target := req.TargetVersionID
 	ok, err := s.Versionrepo.CheckIfOwner(target, email)
 	if err != nil {
@@ -88,7 +88,7 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 		return fmt.Errorf("request %d cannot be accepted, because there would be merge conflicts", request)
 	}
 
-	// check who the owner is
+	// check if logged-in user owns this version
 	target := req.TargetVersionID
 	ok, err := s.Versionrepo.CheckIfOwner(target, email)
 	if err != nil {
