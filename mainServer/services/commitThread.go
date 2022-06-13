@@ -19,6 +19,7 @@ func (serv CommitThreadService) StartCommitThread(thread models.Thread, tid int6
 	return id, err
 }
 
+// GetCommitThreads  gets the commit comment threads from the database, using the article id (aid) and commit id (cid)
 func (serv CommitThreadService) GetCommitThreads(aid int64, cid int64) ([]models.Thread, error) {
 	threads, err := serv.CommitThreadRepository.GetCommitThreads(aid, cid)
 	if err != nil {

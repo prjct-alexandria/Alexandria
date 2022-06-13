@@ -19,8 +19,9 @@ func (serv RequestThreadService) StartRequestThread(thread models.Thread, tid in
 	return id, err
 }
 
-func (serv RequestThreadService) GetRequestThreads(aid int64, cid int64) ([]models.Thread, error) {
-	threads, err := serv.RequestThreadRepository.GetRequestThreads(aid, cid)
+//GetRequestThreads gets the request comment threads from the database, using the article id (aid) and request id (rid)
+func (serv RequestThreadService) GetRequestThreads(aid int64, rid int64) ([]models.Thread, error) {
+	threads, err := serv.RequestThreadRepository.GetRequestThreads(aid, rid)
 	if err != nil {
 		return nil, err
 	}
