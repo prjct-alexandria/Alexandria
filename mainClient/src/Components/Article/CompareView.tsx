@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import PrismDiff from "./PrismDiff";
 import axios from 'axios';
 import LoadingSpinner from "../LoadingSpinner";
-import Thread from "./Thread"
+import ThreadList from "./ThreadList"
 
 type Request = {
     sourceVersionID: number;
@@ -136,79 +136,115 @@ export default function VersionList() {
 
     // Send HTTP request and reload, so that the style (see "acceptButton") is updated.
     const handleAcceptClick = async () => {
-        const acceptRequest = await axios.get('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
-            + params.requestId + '/merge')
+        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId + '/accept'
+        fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            mode: "cors",
+            credentials: "include"
+        }).then(
+            // Success
+            (response) => {
+                console.log(response)
+            },
+            (error) => {
+                // Request returns an error
+                console.error("Error:", error);
+            }
+        );
         window.location.reload()
     }
 
     // Send HTTP request and reload, so that the style (see "rejectButton") is updated.
     const handleRejectClick = async () => {
-        const rejectRequest = await axios.get('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
-            + params.requestId + '/reject')
+        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId + '/reject'
+        fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            mode: "cors",
+            credentials: "include"
+        }).then(
+            // Success
+            (response) => {
+                console.log(response)
+            },
+            (error) => {
+                // Request returns an error
+                console.error("Error:", error);
+            }
+        );
         window.location.reload()
     }
 
     // Send HTTP request and reload, so that the style (see "deleteButton") is updated.
     const handleDeleteClick = async () => {
-        const deleteRequest = await axios.delete('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
-            + params.requestId + '/delete')
-        window.location.reload()
+        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId
+        fetch(url, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            mode: "cors",
+            credentials: "include"
+        }).then(
+            // Success
+            (response) => {
+                console.log(response)
+            },
+            (error) => {
+                // Request returns an error
+                console.error("Error:", error);
+            }
+        );
     }
 
     const view = () => {
         return (
             <div className='row'>
-                {/*to do: do this in a better way*/}
-                <div className="col-1"></div>
                 <div>
-                    <div>
-                        <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Changes</h1>
+                    <h1 style={{textAlign:"center", marginBottom:"30px"}}>Compare Versions</h1>
+                    <div className='row justify-content-center'>
                         {/*Version names*/}
-                        <div className='row justify-content-center'>
-                            {/*Version names*/}
-                            <div className='row col-8 mb-2'>
-                                <div className='col-6'>
-                                    <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
-                                </div>
-                                <div className='col-6'>
-                                    <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
-                                </div>
+                        <div className='row col-8 mb-2'>
+                            <div className='col-6'>
+                                <h5>Changes of '{dataTarget !== undefined && dataTarget.title}'</h5>
                             </div>
-
-                            {/*Accept, reject and delete button*/}
-                            <div className='col-1' id='AcceptButton'>
-                                {acceptButton()}
-                            </div>
-                            <div className='col-1'>
-                                {rejectButton()}
-                            </div>
-                            <div className='col-1'>
-                                {deleteButton()}
+                            <div className='col-6'>
+                                <h5>Result: {dataSource !== undefined && dataSource.title}</h5>
                             </div>
                         </div>
 
-                        <div className='row justify-content-center'>
-                            {/*Content of versions*/}
-                            <div className="wrapper col-8">
-                                <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
-                                    {/*Source version, including changes that are made*/}
-                                    <div className='col-6'>
-                                        {(dataSource !== undefined && dataTarget !== undefined) &&
-                                            <PrismDiff
-                                                sourceContent={dataSource.content}
-                                                targetContent={dataTarget.content}
-                                            />
-                                        }
-                                    </div>
-                                    {/*Target version*/}
-                                    <div className='col-6'>
-                                        {dataTarget !== undefined && dataTarget.content}
-                                    </div>
+                        {/*Accept, reject and delete button*/}
+                        <div className='col-1' id='AcceptButton'>
+                            {acceptButton()}
+                        </div>
+                        <div className='col-1'>
+                            {rejectButton()}
+                        </div>
+                        <div className='col-1'>
+                            {deleteButton()}
+                        </div>
+                    </div>
+
+                    <div className='row justify-content-center'>
+                        {/*Content of versions*/}
+                        <div className="wrapper col-8">
+                            <div className='row overflow-scroll' style={{height:'500px',whiteSpace: 'pre-line', border: 'grey solid 3px'}}>
+                                {/*Source version, including changes that are made*/}
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
+                                    {(dataSource !== undefined && dataTarget !== undefined) &&
+                                        <PrismDiff
+                                            sourceContent={dataSource.content}
+                                            targetContent={dataTarget.content}
+                                        />
+                                    }
+                                </div>
+                                {/*Target version*/}
+                                <div className='col-6' style={{whiteSpace: "pre-line"}}>
+                                    {dataTarget !== undefined && dataTarget.content}
                                 </div>
                             </div>
-                            <div className="wrapper col-3" style={{border: 'black 1px solid'}}>
-                                Threads
-                            </div>
+                        </div>
+                        <div className="wrapper col-3">
+                            <ThreadList threadType={"request"} specificId={parseInt(params.requestId as string)}/>
                         </div>
                     </div>
                 </div>
