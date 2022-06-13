@@ -80,7 +80,7 @@ func initServiceEnv() (ServiceEnv, error) {
 	return ServiceEnv{
 		article:       services.NewArticleService(repos.article, repos.version, repos.git),
 		user:          services.UserService{UserRepository: repos.user},
-		req:           services.RequestService{Repo: repos.req},
+		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
 		version:       services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
 		thread:        services.ThreadService{ThreadRepository: repos.thread},
 		comment:       services.CommentService{CommentRepository: repos.comment},
@@ -101,11 +101,7 @@ func initControllerEnv() (ControllerEnv, error) {
 		user:    controllers.UserController{UserService: servs.user},
 		req:     controllers.RequestController{Serv: servs.req},
 		version: controllers.VersionController{Serv: servs.version},
-		thread: controllers.ThreadController{ThreadService: servs.thread,
-			CommitThreadService:  servs.commitThread,
-			RequestThreadService: servs.requestThread,
-			CommentService:       servs.comment,
-			ReviewThreadService:  servs.reviewThread},
+		thread:  controllers.ThreadController{ThreadService: servs.thread},
 	}, nil
 }
 
