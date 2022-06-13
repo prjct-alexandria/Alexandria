@@ -91,7 +91,7 @@ func initControllerEnv(cfg *config.Config, servs ServiceEnv) ControllerEnv {
 
 func Init() {
 	// read config file
-	cfg := config.ReadConfig("../config.json")
+	cfg := config.ReadConfig("./config.json")
 
 	database := db.Connect(&cfg.Database)
 
