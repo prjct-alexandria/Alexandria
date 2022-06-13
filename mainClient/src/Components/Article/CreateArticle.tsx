@@ -61,7 +61,6 @@ export default function CreateArticle() {
       headers: { "Content-Type": "application/json" },
       mode: "cors",
       body: JSON.stringify(body),
-      credentials: "include"
     }).then(
       // Success
       async (response) => {

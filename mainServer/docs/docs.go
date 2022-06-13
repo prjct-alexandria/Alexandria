@@ -17,27 +17,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/articles": {
-            "get": {
-                "description": "Gets a list of all articles in the database + some metadata about the main version.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get a list of all articles",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ArticleListElement"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "server could not retrieve article list"
-                    }
-                }
-            },
             "post": {
                 "description": "Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.",
                 "consumes": [
@@ -183,108 +162,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Error creating request on server"
-                    }
-                }
-            }
-        },
-        "/articles/{articleID}/requests/{requestID}/accept": {
-            "put": {
-                "description": "Accepts request to merge one article versions' changes into another. Updates target version and archives the request, by recording the current latest commits and setting its state to 'accepted'.",
-                "consumes": [
-                    "text/plain"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Accepts request",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Article ID",
-                        "name": "articleID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Request ID",
-                        "name": "requestID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/{articleID}/requests/{requestID}/reject": {
-            "put": {
-                "description": "Rejects request to merge one article versions' changes into another.",
-                "consumes": [
-                    "text/plain"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Reject request",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Article ID",
-                        "name": "articleID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Request ID",
-                        "name": "requestID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httperror.HTTPError"
-                        }
                     }
                 }
             }
@@ -595,11 +472,6 @@ const docTemplate = `{
     "definitions": {
         "entities.Comment": {
             "type": "object",
-            "required": [
-                "authorId",
-                "content",
-                "creationDate"
-            ],
             "properties": {
                 "authorId": {
                     "type": "string"
@@ -663,32 +535,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ArticleListElement": {
-            "type": "object",
-            "required": [
-                "articleId",
-                "mainVersionId",
-                "owners",
-                "title"
-            ],
-            "properties": {
-                "articleId": {
-                    "type": "integer"
-                },
-                "mainVersionId": {
-                    "type": "integer"
-                },
-                "owners": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "models.LoginForm": {
             "type": "object",
             "required": [
@@ -733,12 +579,20 @@ const docTemplate = `{
         "models.RequestCreationForm": {
             "type": "object",
             "required": [
+                "sourceHistoryID",
                 "sourceVersionID",
+                "targetHistoryID",
                 "targetVersionID"
             ],
             "properties": {
+                "sourceHistoryID": {
+                    "type": "string"
+                },
                 "sourceVersionID": {
                     "type": "integer"
+                },
+                "targetHistoryID": {
+                    "type": "string"
                 },
                 "targetVersionID": {
                     "type": "integer"
@@ -747,13 +601,8 @@ const docTemplate = `{
         },
         "models.ReturnThreadIds": {
             "type": "object",
-            "required": [
-                "CommentId",
-                "id",
-                "threadId"
-            ],
             "properties": {
-                "CommentId": {
+                "commentId": {
                     "type": "integer"
                 },
                 "id": {
@@ -766,11 +615,6 @@ const docTemplate = `{
         },
         "models.Thread": {
             "type": "object",
-            "required": [
-                "articleId",
-                "comment",
-                "specificId"
-            ],
             "properties": {
                 "articleId": {
                     "type": "integer"

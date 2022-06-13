@@ -136,64 +136,23 @@ export default function VersionList() {
 
     // Send HTTP request and reload, so that the style (see "acceptButton") is updated.
     const handleAcceptClick = async () => {
-        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId + '/accept'
-        fetch(url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-            credentials: "include"
-        }).then(
-            // Success
-            (response) => {
-                console.log(response)
-            },
-            (error) => {
-                // Request returns an error
-                console.error("Error:", error);
-            }
-        );
+        const acceptRequest = await axios.get('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
+            + params.requestId + '/merge')
         window.location.reload()
     }
 
     // Send HTTP request and reload, so that the style (see "rejectButton") is updated.
     const handleRejectClick = async () => {
-        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId + '/reject'
-        fetch(url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-            credentials: "include"
-        }).then(
-            // Success
-            (response) => {
-                console.log(response)
-            },
-            (error) => {
-                // Request returns an error
-                console.error("Error:", error);
-            }
-        );
+        const rejectRequest = await axios.get('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
+            + params.requestId + '/reject')
         window.location.reload()
     }
 
     // Send HTTP request and reload, so that the style (see "deleteButton") is updated.
     const handleDeleteClick = async () => {
-        const url = 'http://localhost:8080/articles/' + params.articleId + '/requests/' + params.requestId
-        fetch(url, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-            credentials: "include"
-        }).then(
-            // Success
-            (response) => {
-                console.log(response)
-            },
-            (error) => {
-                // Request returns an error
-                console.error("Error:", error);
-            }
-        );
+        const deleteRequest = await axios.delete('/articles/' + params.articleId + '/versions/' + params.versionId + '/requests/'
+            + params.requestId + '/delete')
+        window.location.reload()
     }
 
     const view = () => {

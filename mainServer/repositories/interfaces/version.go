@@ -14,7 +14,4 @@ type VersionRepository interface {
 
 	// GetVersionsByArticle gets the version entities related to a specific article, links the owners
 	GetVersionsByArticle(article int64) ([]entities.Version, error)
-
-	// CheckIfOwner returns directly with a query whether the specified user owns an article version
-	CheckIfOwner(version int64, email string) (bool, error)
 }

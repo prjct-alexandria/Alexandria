@@ -12,6 +12,4 @@ type ArticleRepository interface {
 	// this should only be set during the initial article creation step
 	UpdateMainVersion(id int64, id2 int64) error
 	GetMainVersion(article int64) (int64, error)
-
-	GetAllArticles() ([]entities.Article, error)
 }

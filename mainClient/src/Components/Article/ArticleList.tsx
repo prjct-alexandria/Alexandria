@@ -4,13 +4,10 @@ import ArticleListElement from "./ArticleListElement";
 import LoadingSpinner from "../LoadingSpinner";
 
 type Article = {
-  articleId: string;
-  mainVersionId: string;
-
-  //Following attributes are from the main Version, but displayed as if they were from the article itself
+  id: string;
   title: string;
   date_created: string;
-  owners: string[];
+  author: string;
   description: string;
 };
 
@@ -20,8 +17,8 @@ export default function ArticleList() {
   let [error, setError] = useState(null);
 
   useEffect(() => {
-    const url = "http://localhost:8080/articles";
-    // const url = "/articleList.json"; // Placeholder
+    // const url = "http://localhost:8080/articles/";
+    const url = "/articleList.json"; // Placeholder
 
     fetch(url, {
       method: "GET",

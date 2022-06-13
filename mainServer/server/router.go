@@ -19,7 +19,6 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.Use(middlewares.AuthMiddleware())
 	router.Use(middlewares.CorsHeaders())
 
-	router.GET("/articles", contrs.article.ArticleList)
 	router.POST("/articles", contrs.article.CreateArticle)
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.POST("/articles/:articleID/versions", contrs.version.CreateVersionFrom)
@@ -28,9 +27,6 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 	router.GET("/articles/:articleID/versions", contrs.version.ListVersions)
 
 	router.POST("/articles/:articleID/requests", contrs.req.CreateRequest)
-	router.PUT("/articles/:articleID/requests/:requestID/reject", contrs.req.RejectRequest)
-	router.PUT("/articles/:articleID/requests/:requestID/accept", contrs.req.AcceptRequest)
-
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
