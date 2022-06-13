@@ -46,6 +46,24 @@ definitions:
     - owners
     - title
     type: object
+  models.ArticleListElement:
+    properties:
+      articleId:
+        type: integer
+      mainVersionId:
+        type: integer
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - articleId
+    - mainVersionId
+    - owners
+    - title
+    type: object
   models.LoginForm:
     properties:
       email:
@@ -154,6 +172,21 @@ info:
   version: 1.0.0
 paths:
   /articles:
+    get:
+      description: Gets a list of all articles in the database + some metadata about
+        the main version.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ArticleListElement'
+            type: array
+        "500":
+          description: server could not retrieve article list
+      summary: Get a list of all articles
     post:
       consumes:
       - application/json
@@ -255,6 +288,76 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
+  /articles/{articleID}/requests/{requestID}/accept:
+    put:
+      consumes:
+      - text/plain
+      description: Accepts request to merge one article versions' changes into another.
+        Updates target version and archives the request, by recording the current
+        latest commits and setting its state to 'accepted'.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Accepts request
+  /articles/{articleID}/requests/{requestID}/reject:
+    put:
+      consumes:
+      - text/plain
+      description: Rejects request to merge one article versions' changes into another.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Reject request
   /articles/{articleID}/versions:
     get:
       description: Gets all versions belonging to a specific article. Does not include

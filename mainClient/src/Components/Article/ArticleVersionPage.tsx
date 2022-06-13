@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {useParams, useSearchParams} from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
+import CreateArticleVersion from "./CreateArticleVersion";
 import CreateMR from "./CreateMR";
 import FileDownload from "./FileDownload";
 
@@ -94,6 +95,19 @@ export default function ArticleVersionPage() {
               <CreateMR />
             </div>
             )}
+            {!viewingOldVersion && (
+            <div className="col-2">
+              <button
+                  type="button"
+                  className="btn btn-primary btn-lg"
+                  data-bs-toggle="modal"
+                  data-bs-target="#createNewVersion"
+              >
+                Clone this version
+              </button>
+              <CreateArticleVersion />
+            </div>
+            )}
           </div>
           <div>
             <h4>Owners:</h4>
@@ -109,6 +123,7 @@ export default function ArticleVersionPage() {
           <div className="articleContent">
             <div style={{ whiteSpace: "pre-line" }}>{versionData.content}</div>
           </div>
+
         </div>
       )}
     </div>
