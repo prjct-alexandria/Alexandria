@@ -11,6 +11,10 @@ definitions:
         type: integer
       threadId:
         type: integer
+    required:
+    - authorId
+    - content
+    - creationDate
     type: object
   entities.User:
     properties:
@@ -39,6 +43,24 @@ definitions:
       title:
         type: string
     required:
+    - owners
+    - title
+    type: object
+  models.ArticleListElement:
+    properties:
+      articleId:
+        type: integer
+      mainVersionId:
+        type: integer
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - articleId
+    - mainVersionId
     - owners
     - title
     type: object
@@ -81,12 +103,16 @@ definitions:
     type: object
   models.ReturnThreadIds:
     properties:
-      commentId:
+      CommentId:
         type: integer
       id:
         type: integer
       threadId:
         type: integer
+    required:
+    - CommentId
+    - id
+    - threadId
     type: object
   models.Thread:
     properties:
@@ -100,6 +126,10 @@ definitions:
         type: integer
       specificId:
         type: integer
+    required:
+    - articleId
+    - comment
+    - specificId
     type: object
   models.Version:
     properties:
@@ -142,6 +172,21 @@ info:
   version: 1.0.0
 paths:
   /articles:
+    get:
+      description: Gets a list of all articles in the database + some metadata about
+        the main version.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ArticleListElement'
+            type: array
+        "500":
+          description: server could not retrieve article list
+      summary: Get a list of all articles
     post:
       consumes:
       - application/json
