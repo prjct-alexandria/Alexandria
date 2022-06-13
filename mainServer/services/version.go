@@ -16,6 +16,41 @@ type VersionService struct {
 	Versionrepo interfaces.VersionRepository
 }
 
+func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
+
+	// Get file contents from Git
+	err := serv.Gitrepo.CheckoutCommit(article, commit)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	path, err := serv.Gitrepo.GetArticlePath(article)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	fileContent, err := ioutil.ReadFile(filepath.Join(path, "main.qmd"))
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	// Get other version info from database
+	entity, err := serv.Versionrepo.GetVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	fullVersion := models.Version{
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
+		Content:   string(fileContent),
+		Status:    entity.Status,
+	}
+	return fullVersion, nil
+}
+
 func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
 
 	// Get entities from database

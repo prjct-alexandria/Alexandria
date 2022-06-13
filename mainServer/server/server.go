@@ -65,7 +65,7 @@ func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
 		article:       services.NewArticleService(repos.article, repos.version, repos.git),
 		user:          services.UserService{UserRepository: repos.user},
-		req:           services.RequestService{Repo: repos.req},
+		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
 		version:       services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
 		thread:        services.ThreadService{ThreadRepository: repos.thread},
 		comment:       services.CommentService{CommentRepository: repos.comment},

@@ -4,10 +4,13 @@ import ArticleListElement from "./ArticleListElement";
 import LoadingSpinner from "../LoadingSpinner";
 
 type Article = {
-  id: string;
+  articleId: string;
+  mainVersionId: string;
+
+  //Following attributes are from the main Version, but displayed as if they were from the article itself
   title: string;
   date_created: string;
-  author: string;
+  owners: string[];
   description: string;
 };
 
@@ -17,8 +20,8 @@ export default function ArticleList() {
   let [error, setError] = useState(null);
 
   useEffect(() => {
-    // const url = "http://localhost:8080/articles/";
-    const url = "/articleList.json"; // Placeholder
+    const url = "http://localhost:8080/articles";
+    // const url = "/articleList.json"; // Placeholder
 
     fetch(url, {
       method: "GET",
@@ -43,13 +46,15 @@ export default function ArticleList() {
   }, []);
 
   return (
-    <div className={"accordion"}>
-      {!isLoaded && <LoadingSpinner />}
-      {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
-      {articleListData != null &&
-        articleListData.map((article, i) => (
-          <ArticleListElement key={i} article={article} />
-        ))}
+    <div className="wrapper col-8 m-auto">
+      <div className={"accordion"}>
+        {!isLoaded && <LoadingSpinner />}
+        {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
+        {articleListData != null &&
+          articleListData.map((article, i) => (
+            <ArticleListElement key={i} article={article} />
+          ))}
+      </div>
     </div>
   );
 }

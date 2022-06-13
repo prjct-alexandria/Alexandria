@@ -1,15 +1,25 @@
 package repositories
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/ldez/go-git-cmd-wrapper/v2/checkout"
+	git2 "github.com/ldez/go-git-cmd-wrapper/v2/git"
+	"github.com/ldez/go-git-cmd-wrapper/v2/merge"
+	"github.com/ldez/go-git-cmd-wrapper/v2/reset"
+	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
+	"github.com/ldez/go-git-cmd-wrapper/v2/types"
 	"mainServer/server/config"
 	"mainServer/utils/clock"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type GitRepository struct {
@@ -89,6 +99,21 @@ func (r GitRepository) Commit(article int64) error {
 		},
 	})
 	return nil
+}
+
+// CheckoutCommit checks out the specified commit in the specified article repo
+func (r GitRepository) CheckoutCommit(article int64, commit [20]byte) error {
+	w, err := r.getWorktree(article)
+	if err != nil {
+		return err
+	}
+
+	// checkout
+	err = w.Checkout(&git.CheckoutOptions{
+		Hash: commit,
+	})
+
+	return err
 }
 
 // CheckoutBranch checks out the specified version in the specified article repo
@@ -210,4 +235,71 @@ func (r GitRepository) renameInitialBranch(article int64, version int64) error {
 	}
 
 	return nil
+}
+
+// GetLatestCommit returns the commit ID of the latest commit on the specified article version
+func (r GitRepository) GetLatestCommit(article int64, version int64) (string, error) {
+	path, err := r.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+	versionStr := strconv.FormatInt(version, 10)
+
+	// call the git command rev-parse, which returns a commit hash when given a branch name
+	output, err := git2.RevParse(revparse.Args(versionStr), runGitIn(path))
+	if err != nil {
+		return "", errors.New(output)
+	}
+
+	return output, nil
+}
+
+// Merge merges the source branch (version) into the target branch (version) of the specified repository (article)
+func (r GitRepository) Merge(article int64, source int64, target int64) error {
+	sourceStr := strconv.FormatInt(source, 10)
+	targetStr := strconv.FormatInt(target, 10)
+
+	path, err := r.GetArticlePath(article)
+	if err != nil {
+		return err
+	}
+
+	// checkout target
+	res, err := git2.Checkout(checkout.Branch(targetStr), runGitIn(path))
+	if err != nil {
+		return errors.New(res)
+	}
+
+	// revert any possible un-committed changes left over from previous failed executions
+	// without a clean worktree, aborting a failed merge might not be possible
+	// should be redundant, but the guarantee is good to have
+	res, err = git2.Reset(reset.Hard, runGitIn(path))
+	if err != nil {
+		return errors.New(res)
+	}
+
+	// merge source into target and commit immediately
+	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, runGitIn(path))
+	if err != nil {
+		res2, err := git2.Merge(merge.Abort, runGitIn(path))
+		if err != nil {
+			return fmt.Errorf("failed aborting merge with message: %s, merge itself failed with error %s", res, res2)
+		}
+		return errors.New(res)
+	}
+	return nil
+}
+
+// custom option made for use with the go-git-cmd-wrapper library,
+// enables execution in specific paths, without using os change dir, which possibly interferes with other operations
+func runGitIn(path string) types.Option {
+	return git2.CmdExecutor(
+		func(ctx context.Context, name string, debug bool, args ...string) (string, error) {
+			cmd := exec.CommandContext(ctx, name, args...)
+			cmd.Dir = path
+
+			output, err := cmd.CombinedOutput()
+			return strings.TrimSuffix(string(output), "\n"), err
+		},
+	)
 }
