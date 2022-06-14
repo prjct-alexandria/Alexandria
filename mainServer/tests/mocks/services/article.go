@@ -1,51 +1,50 @@
 package services
 
-import "mainServer/entities"
+import (
+	"mainServer/entities"
+	mocks "mainServer/tests/util"
+)
 
-// ArticleServiceMock mocks class using publicly modifiable mock functions
+// ArticleServiceMock mocks the ArticleService with function responses,
+// Storing function calls in the Mock field
 type ArticleServiceMock struct {
-	// mock tracks what functions were called and with what parameters
-	Called *map[string]bool
-	Params *map[string]map[string]interface{}
+	Mock *mocks.Mock
 }
 
-// NewArticleServiceMock initializes a mock with variables that are passed by reference,
-// so the values can be retrieved from anywhere in the program
+// NewArticleServiceMock initializes a mock that records function calls
 func NewArticleServiceMock() ArticleServiceMock {
-	return ArticleServiceMock{
-		Called: &map[string]bool{},
-		Params: &map[string]map[string]interface{}{},
-	}
+	return ArticleServiceMock{Mock: mocks.NewMock()}
 }
 
 var CreateArticleMock func() (entities.Article, error)
-var UpdateMainVersionMock func(id int64, id2 int64) error
-var GetMainVersionMock func(article int64) (int64, error)
-var GetAllArticlesMock func() ([]entities.Article, error)
 
 func (m ArticleServiceMock) CreateArticle() (entities.Article, error) {
-	(*m.Called)["CreateArticle"] = true
+	m.Mock.CallFunc("CreateArticle", &map[string]interface{}{})
 	return CreateArticleMock()
 }
 
+var UpdateMainVersionMock func(id int64, id2 int64) error
+
 func (m ArticleServiceMock) UpdateMainVersion(id int64, id2 int64) error {
-	(*m.Called)["UpdateMainVersion"] = true
-	(*m.Params)["UpdateMainVersion"] = map[string]interface{}{
+	m.Mock.CallFunc("UpdateMainVersion", &map[string]interface{}{
 		"id":  id,
 		"id2": id2,
-	}
+	})
 	return UpdateMainVersionMock(id, id2)
 }
 
+var GetMainVersionMock func(article int64) (int64, error)
+
 func (m ArticleServiceMock) GetMainVersion(article int64) (int64, error) {
-	(*m.Called)["GetMainVersion"] = true
-	(*m.Params)["GetMainVersion"] = map[string]interface{}{
+	m.Mock.CallFunc("GetMainVersion", &map[string]interface{}{
 		"article": article,
-	}
+	})
 	return GetMainVersionMock(article)
 }
 
+var GetAllArticlesMock func() ([]entities.Article, error)
+
 func (m ArticleServiceMock) GetAllArticles() ([]entities.Article, error) {
-	(*m.Called)["GetAllArticles"] = true
+	m.Mock.CallFunc("GetAllArticles", &map[string]interface{}{})
 	return GetAllArticlesMock()
 }
