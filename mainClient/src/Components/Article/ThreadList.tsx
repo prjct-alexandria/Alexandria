@@ -18,7 +18,7 @@ type ThreadEntity = {
 }
 
 export default function ThreadList(props: ThreadListProps) {
-    let baseUrl= configData.back_end_url +"";
+    let baseUrl= configData.back_end_url;
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
