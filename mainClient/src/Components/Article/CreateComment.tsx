@@ -10,7 +10,7 @@ type ThreadProps = {
 };
 
 export default function CreateComment(props: ThreadProps) {
-+    let baseUrl= configData.back_end_url;
+    let baseUrl= configData.back_end_url;
     let [error, setError] = useState(null);
     let [newCommentContent, setNewCommentContent] = useState<string>("");
     let [threadId, setThreadId] = useState((props.id) ? props.id : undefined)
