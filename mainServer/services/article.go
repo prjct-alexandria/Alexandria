@@ -110,3 +110,32 @@ func (serv ArticleService) commitDefaultFile(article int64) error {
 	}
 	return nil
 }
+
+func (serv ArticleService) GetArticleList() ([]models.ArticleListElement, error) {
+	articleList, err := serv.articlerepo.GetAllArticles()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var res []models.ArticleListElement
+
+	for _, element := range articleList {
+		versionData, err := serv.versionrepo.GetVersion(element.MainVersionID)
+		if err != nil {
+			continue
+		}
+
+		listElement := models.ArticleListElement{
+			Id:            element.Id,
+			MainVersionId: element.MainVersionID,
+			Title:         versionData.Title,
+			Owners:        versionData.Owners,
+			//TODO: Get owners name instead of email?
+			//TODO: CreatedAt = ?? (Sort by creation date)
+			//TODO: Article Description = ??
+		}
+		res = append(res, listElement)
+	}
+	return res, nil
+}

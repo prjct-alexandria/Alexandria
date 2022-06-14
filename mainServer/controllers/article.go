@@ -78,3 +78,19 @@ func (contr ArticleController) GetMainVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, strconv.FormatInt(mv, 10))
 }
+
+// ArticleList godoc
+// @Summary      Get a list of all articles
+// @Description  Gets a list of all articles in the database + some metadata about the main version.
+// @Produce      json
+// @Success      200  {object} []models.ArticleListElement
+// @Failure 	 500  "server could not retrieve article list"
+// @Router       /articles [get]
+func (contr ArticleController) ArticleList(c *gin.Context) {
+	list, err := contr.serv.GetArticleList()
+	if err != nil {
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("server could not retrieve article list"))
+		return
+	}
+	c.IndentedJSON(http.StatusOK, list)
+}
