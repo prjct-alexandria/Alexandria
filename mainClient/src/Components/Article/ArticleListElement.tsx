@@ -15,7 +15,7 @@ export default function ArticleListElement(props: ArticleListProps) {
   return (
     <div className="accordion-item">
       <div className="article-elem-header accordion-header">
-        <h5 className="article-elem-title">
+        <h5 className="article-elem-title" data-testid={"title" + props.article.id}>
           <Link to={"/articles/" + props.article.id + "/versions/1"}>
             {props.article.title}
           </Link>
@@ -29,7 +29,7 @@ export default function ArticleListElement(props: ArticleListProps) {
           aria-controls={"panelsStayOpen-collapse" + props.article.id}
         >
           <div className="d-flex justify-content-between flex-fill">
-            <span className="p-2 flex-grow-1">By {props.article.author}</span>
+            <span className="p-2 flex-grow-1" data-testid={"author" + props.article.id}>By {props.article.author}</span>
             <span className="p-2">See details</span>
           </div>
         </button>
@@ -39,7 +39,7 @@ export default function ArticleListElement(props: ArticleListProps) {
         className="accordion-collapse collapse"
         aria-labelledby={"panelsStayOpen-heading" + props.article.id}
       >
-        <div className="accordion-body">{props.article.description}</div>
+        <div className="accordion-body" data-testid={"description" + props.article.id}>{props.article.description}</div>
       </div>
     </div>
   );
