@@ -146,7 +146,7 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 // @Param		 article ID 		path	int64		true 	"Article ID"
 // @Param		 request ID 		path	int64		true 	"Request ID"
 // @Produce      json
-// @Success      200  {object} models.Thread
+// @Success      200  {object} []models.Thread
 // @Failure      400  {object} httperror.HTTPError
 // @Router       /articles/:articleID/requests/:requestID/threads [get]
 func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
