@@ -32,7 +32,9 @@ export default function ArticleListElement(props: ArticleListProps) {
           aria-controls={"panelsStayOpen-collapse" + props.article.articleId}
         >
           <div className="d-flex justify-content-between flex-fill">
-            <span className="p-2 flex-grow-1" data-testid={"author" + props.article.articleId}>By {props.article.owners.join(", ")}</span>
+            <span className="p-2 flex-grow-1" data-testid={"owners" + props.article.articleId}>
+              By {props.article.owners && props.article.owners.join(", ")}
+            </span>
             <span className="p-2">See details</span>
           </div>
         </button>
