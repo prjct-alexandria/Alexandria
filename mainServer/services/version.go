@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io"
 	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
@@ -16,19 +15,20 @@ import (
 )
 
 type VersionService struct {
-	Gitrepo     repositories.GitRepository
-	Versionrepo interfaces.VersionRepository
+	GitRepo        repositories.GitRepository
+	VersionRepo    interfaces.VersionRepository
+	FilesystemRepo repositories.FilesystemRepository
 }
 
 func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
 
 	// Get file contents from Git
-	err := serv.Gitrepo.CheckoutCommit(article, commit)
+	err := serv.GitRepo.CheckoutCommit(article, commit)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	path, err := serv.Gitrepo.GetArticlePath(article)
+	path, err := serv.GitRepo.GetArticlePath(article)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -39,7 +39,7 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 	}
 
 	// Get other version info from database
-	entity, err := serv.Versionrepo.GetVersion(version)
+	entity, err := serv.VersionRepo.GetVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -58,7 +58,7 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
 
 	// Get entities from database
-	entities, err := serv.Versionrepo.GetVersionsByArticle(article)
+	entities, err := serv.VersionRepo.GetVersionsByArticle(article)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +82,12 @@ func (serv VersionService) ListVersions(article int64) ([]models.Version, error)
 func (serv VersionService) GetVersion(article int64, version int64) (models.Version, error) {
 
 	// Get file contents from Git
-	err := serv.Gitrepo.CheckoutBranch(article, version)
+	err := serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	path, err := serv.Gitrepo.GetArticlePath(article)
+	path, err := serv.GitRepo.GetArticlePath(article)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -98,7 +98,7 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 	}
 
 	// Get other version info from database
-	entity, err := serv.Versionrepo.GetVersion(version)
+	entity, err := serv.VersionRepo.GetVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -125,13 +125,13 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 	}
 
 	// Store entity in db and receive one with an ID attached
-	entity, err := serv.Versionrepo.CreateVersion(version)
+	entity, err := serv.VersionRepo.CreateVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}
 
 	// Use ID to create new branch in git
-	err = serv.Gitrepo.CreateBranch(article, source, entity.Id)
+	err = serv.GitRepo.CreateBranch(article, source, entity.Id)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -151,13 +151,13 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	// TODO: check if user of authenticated session is version owner
 
 	// Checkout
-	err := serv.Gitrepo.CheckoutBranch(article, version)
+	err := serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {
 		return err
 	}
 
 	// Get folder to save file to
-	base, err := serv.Gitrepo.GetArticlePath(article)
+	base, err := serv.GitRepo.GetArticlePath(article)
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	}
 
 	// Commit
-	err = serv.Gitrepo.Commit(article)
+	err = serv.GitRepo.Commit(article)
 	if err != nil {
 		return err
 	}
@@ -180,27 +180,21 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 
 func (serv VersionService) GetVersionFiles(article int64, version int64) (string, error) {
 	// Checkout
-	err := serv.Gitrepo.CheckoutBranch(article, version)
+	err := serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {
 		return "", err
 	}
 
 	// Get folder to save file to
-	base, err := serv.Gitrepo.GetArticlePath(article)
+	base, err := serv.GitRepo.GetArticlePath(article)
 	if err != nil {
 		return "", err
 	}
 
-	versionEntity, err := serv.Versionrepo.GetVersion(version)
+	versionEntity, err := serv.VersionRepo.GetVersion(version)
 	versionName := versionEntity.Title
 
-	err = os.MkdirAll(filepath.Join(serv.Gitrepo.Path, "cache", "downloads"), os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-
-	//TODO: Replace forbidden characters
-	path := filepath.Join(serv.Gitrepo.Path, "cache", "downloads", versionName+".zip")
+	path := filepath.Join(serv.GitRepo.Path, "cache", "downloads", versionName+".zip")
 	versionZip, err := os.Create(path)
 	if err != nil {
 		fmt.Println(err)
@@ -210,7 +204,7 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 
 	zipWriter := zip.NewWriter(versionZip)
 
-	err = addFilesInDirToZip(zipWriter, base, "")
+	err = serv.FilesystemRepo.AddFilesInDirToZip(zipWriter, base, "")
 	if err != nil {
 		return path, err
 	}
@@ -218,52 +212,4 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 	defer zipWriter.Close()
 
 	return path, nil
-}
-
-//@Reviewers does this needs to be moved to repositories/git or repositories/filesystem?
-func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
-	files, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		return err
-	}
-
-	for _, file := range files {
-		// Wrapped in function to allow for "defer file.close()"
-		err := func() error {
-			if file.IsDir() {
-				//Check if it is not the git folder
-				if file.Name() != ".git" {
-					err := addFilesInDirToZip(zipWriter, filepath.Join(dirPath, file.Name()), file.Name())
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				//Create file in zip
-				zipFile, err := zipWriter.Create(filepath.Join(dirInZip, file.Name()))
-				if err != nil {
-					return err
-				}
-
-				//Open file on branch
-				fileReader, err := os.Open(filepath.Join(dirPath, file.Name()))
-				if err != nil {
-					return err
-				}
-				defer fileReader.Close()
-
-				//Copy contents over
-				_, err = io.Copy(zipFile, fileReader)
-				if err != nil {
-					return err
-				}
-			}
-			return nil
-		}()
-
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
