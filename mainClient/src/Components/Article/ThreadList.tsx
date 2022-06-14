@@ -6,24 +6,24 @@ import Thread from "./Thread"
 import CreateThread from "./CreateThread";
 
 type ThreadListProps = {
-    threadType: string
-    specificId: number
+    "threadType": string
+    "specificId": number
 };
 
 
 type ThreadComment = {
-    id: number,
-    authorId: string,
-    threadId: number
+    "id": number,
+    "authorId": string,
+    "threadId": number
     "content": string,
     "creationDate": string,
 }
 
 type ThreadEntity = {
-    articleId:	number
-    comment: ThreadComment[]
-    id: number
-    specificId: number
+    "articleId":	number
+    "comment": ThreadComment[]
+    "id": number
+    "specificId": number
 }
 
 
@@ -45,8 +45,7 @@ export default function ThreadList(props: ThreadListProps) {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/request/" + params.requestId +
                 "/threads";
         }
-        // urlThreadList = "/threadList.json"
-        // Placeholder
+        // urlThreadList = "/threadList.json" // Placeholder
 
         // get list of threads
         fetch(urlThreadList, {
