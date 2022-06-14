@@ -168,7 +168,7 @@ func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
 	}
 
 	threads, err := contr.RequestThreadService.GetRequestThreads(intAid, intRid)
-	if err != nil || threads == nil {
+	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find requestthreads for this request"))
 		return

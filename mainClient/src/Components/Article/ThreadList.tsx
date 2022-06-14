@@ -42,7 +42,7 @@ export default function ThreadList(props: ThreadListProps) {
             // "/history/" + params.historyId + "/threads";
                 "/history/" + 1 + "/threads";
         } else if (props.threadType === "request") {
-            urlThreadList = baseUrl + "/articles/" + params.articleId + "/request/" + params.requestId +
+            urlThreadList = baseUrl + "/articles/" + params.articleId + "/requests/" + params.requestId +
                 "/threads";
         }
         // urlThreadList = "/threadList.json" // Placeholder
