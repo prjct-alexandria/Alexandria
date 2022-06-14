@@ -200,7 +200,7 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 	}
 
 	//TODO: Replace forbidden characters
-	path := filepath.Join(serv.Gitrepo.Path, "cache/downloads/"+versionName+".zip")
+	path := filepath.Join(serv.Gitrepo.Path, "cache", "downloads", versionName+".zip")
 	versionZip, err := os.Create(path)
 	if err != nil {
 		fmt.Println(err)

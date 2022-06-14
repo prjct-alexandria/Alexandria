@@ -219,9 +219,14 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 	vid := c.Param("versionID")
 
 	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("article id must be an integer"))
+		return
+	}
+
 	version, err := strconv.ParseInt(vid, 10, 64)
 	if err != nil {
-		httperror.NewError(c, http.StatusBadRequest, errors.New("article and version id must be integers"))
+		httperror.NewError(c, http.StatusBadRequest, errors.New("version id must an integer"))
 		return
 	}
 
