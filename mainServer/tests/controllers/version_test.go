@@ -75,14 +75,11 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	}
 
 	// check the service mock
-	if !(*servMock.Called)["UpdateVersion"] {
-		t.Errorf("Expected UpdateVersion to be called")
-	}
-	a := (*servMock.Params)["UpdateVersion"]["article"]
-	v := (*servMock.Params)["UpdateVersion"]["version"]
-	if a != article || v != version {
-		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
-	}
+	servMock.Mock.AssertCalled(t, "UpdateVersion", 1)
+	servMock.Mock.AssertCalledWith(t, "UpdateVersion", &map[string]interface{}{
+		"article": article,
+		"version": version,
+	})
 }
 
 func TestUpdateVersionFail(t *testing.T) {
@@ -116,14 +113,11 @@ func TestUpdateVersionFail(t *testing.T) {
 	}
 
 	// check the service mock
-	if !(*servMock.Called)["UpdateVersion"] {
-		t.Errorf("Expected UpdateVersion to be called")
-	}
-	a := (*servMock.Params)["UpdateVersion"]["article"]
-	v := (*servMock.Params)["UpdateVersion"]["version"]
-	if a != article || v != version {
-		t.Errorf("Expected different function params, got article=%v and version=%v", a, v)
-	}
+	servMock.Mock.AssertCalled(t, "UpdateVersion", 1)
+	servMock.Mock.AssertCalledWith(t, "UpdateVersion", &map[string]interface{}{
+		"article": article,
+		"version": version,
+	})
 }
 
 func TestUpdateVersionNoFile(t *testing.T) {
@@ -156,9 +150,7 @@ func TestUpdateVersionNoFile(t *testing.T) {
 	}
 
 	// check the service mock
-	if (*servMock.Called)["UpdateVersion"] {
-		t.Errorf("Expected UpdateVersion to not be called")
-	}
+	servMock.Mock.AssertCalled(t, "UpdateVersion", 0)
 }
 
 // fileUploaderHelper creates a http request with a file in the form data
