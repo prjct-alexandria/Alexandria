@@ -10,20 +10,22 @@ type ThreadListProps = {
     specificId: number
 };
 
-type ThreadEntity = {
-    articleId:	number
-    id: number
-    specificId: number
-    comments: ThreadComment[]
-}
 
 type ThreadComment = {
-    "authorId": string,
+    id: number,
+    authorId: string,
+    threadId: number
     "content": string,
     "creationDate": string,
-    "commentId": number,
-    "threadId": number
 }
+
+type ThreadEntity = {
+    articleId:	number
+    comment: ThreadComment[]
+    id: number
+    specificId: number
+}
+
 
 export default function ThreadList(props: ThreadListProps) {
     let baseUrl = "http://localhost:8080";
@@ -37,13 +39,14 @@ export default function ThreadList(props: ThreadListProps) {
         let urlThreadList = "";
         if (props.threadType === "commit") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-             "/history/" + params.historyId + "/threads";
-            //    "/history/" + 1 + "/threads";
+            // "/history/" + params.historyId + "/threads";
+                "/history/" + 1 + "/threads";
         } else if (props.threadType === "request") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/request/" + params.requestId +
                 "/threads";
         }
-        // urlThreadList = "/threadList.json"; // Placeholder
+        // urlThreadList = "/threadList.json"
+        // Placeholder
 
         // get list of threads
         fetch(urlThreadList, {
@@ -60,6 +63,9 @@ export default function ThreadList(props: ThreadListProps) {
                 (result) => {
                     setLoaded(true);
                     setData(result);
+                     //console.log(result)
+                    //console.log(result.$dataMetaSchema)
+                     console.log(threadListData)
                 },
                 (error) => {
                     setLoaded(true);
@@ -70,12 +76,12 @@ export default function ThreadList(props: ThreadListProps) {
 
     return (
         <div>
-            {/*{!isLoaded && <LoadingSpinner />}*/}
+            {!isLoaded && <LoadingSpinner />}
             {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
             <div id="accordionPanelsStayOpenExample">
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <Thread key={i} id={thread.id} specificId={props.specificId} threadType={props.threadType} comments={thread.comments}/>
+                        <Thread key={i} id={thread.id} specificId={props.specificId} threadType={props.threadType} comments={thread.comment}/>
                     ))}
             </div>
             <CreateThread id={undefined} specificId={props.specificId} threadType={props.threadType}/>

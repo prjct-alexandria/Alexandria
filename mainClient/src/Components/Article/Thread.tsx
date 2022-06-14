@@ -6,17 +6,24 @@ import CreateComment from "./CreateComment"
 
 type ThreadProps = {
     "id": number,
-    "specificId": number
-    threadType: string
-    comments: ThreadComment[]
+    "specificId": number,
+    threadType: string,
+    comments: ThreadComment[],
 };
 
+type ThreadEntity = {
+    articleId:	number,
+    id: number,
+    specificId: number,
+    comment: ThreadComment[],
+}
+
 type ThreadComment = {
+    "id": number,
     "authorId": string,
+    "threadId": number,
     "content": string,
     "creationDate": string,
-    "commentId": number,
-    "threadId": number
 }
 
 export default function Thread(props: ThreadProps) {
