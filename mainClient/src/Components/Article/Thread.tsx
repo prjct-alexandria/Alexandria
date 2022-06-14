@@ -20,7 +20,7 @@ type ThreadComment = {
 }
 
 export default function Thread(props: ThreadProps) {
-    let baseUrl= configData.back_end_url +"";
+    let baseUrl= configData.back_end_url;
     let [commentData, setData] = useState<ThreadComment[]>();
     let [isLoaded, setLoaded] = useState(false);
     let [error, setError] = useState(null);
