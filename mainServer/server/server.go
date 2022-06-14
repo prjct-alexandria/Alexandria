@@ -27,7 +27,7 @@ type RepoEnv struct {
 
 type ServiceEnv struct {
 	version       servinterfaces.VersionService
-	article       services.ArticleService
+	article       servinterfaces.ArticleService
 	user          services.UserService
 	req           services.RequestService
 	thread        services.ThreadService

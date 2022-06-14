@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
 
 type ArticleController struct {
-	serv services.ArticleService
+	serv interfaces.ArticleService
 }
 
-func NewArticleController(serv services.ArticleService) ArticleController {
+func NewArticleController(serv interfaces.ArticleService) ArticleController {
 	return ArticleController{serv: serv}
 }
 
