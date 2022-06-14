@@ -1,6 +1,7 @@
 package thread
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	"mainServer/tests/mocks/services"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -131,14 +133,19 @@ func TestGetCommitThreadsSuccess(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	// check the response
+	b, err := ioutil.ReadAll(w.Body)
 	if w.Code != 200 {
-		b, _ := ioutil.ReadAll(w.Body)
 		t.Error(w.Code, string(b))
+	}
+	var threads []models.Thread
+	err = json.Unmarshal(b, &threads)
+	if !reflect.DeepEqual(threads, exampleThreads) {
+		t.Errorf("Expected expected=%v but got actual=%v", exampleThreads, threads)
 	}
 
 	// check the service mock
 	if !(*commitThreadServMock.Called)["GetCommitThreads"] {
-		t.Errorf("Expected GetRequestThreads to be called")
+		t.Errorf("Expected GetCommitThreads to be called")
 	}
 	a := (*commitThreadServMock.Params)["GetCommitThreads"]["aid"]
 	c := (*commitThreadServMock.Params)["GetCommitThreads"]["cid"]
@@ -213,9 +220,14 @@ func TestGetRequestThreadsSuccess(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	// check the response
+	b, err := ioutil.ReadAll(w.Body)
 	if w.Code != 200 {
-		b, _ := ioutil.ReadAll(w.Body)
 		t.Error(w.Code, string(b))
+	}
+	var threads []models.Thread
+	err = json.Unmarshal(b, &threads)
+	if !reflect.DeepEqual(threads, exampleThreads) {
+		t.Errorf("Expected expected=%v but got actual=%v", exampleThreads, threads)
 	}
 
 	// check the service mock
