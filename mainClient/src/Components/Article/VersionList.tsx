@@ -22,8 +22,8 @@ export default function VersionList() {
     "http://localhost:8080/articles/" + params.articleId + "/versions";
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
-  let [isLoadedVersions, setLoadedVersions] = useState(false);
-  let [errorVersions, setErrorVersions] = useState(null);
+  let [isLoadedVersions, setLoadedVersions] = useState<boolean>(false);
+  let [errorVersions, setErrorVersions] = useState<Error>();
 
   useEffect(() => {
     fetch(urlVersions, {
@@ -34,25 +34,27 @@ export default function VersionList() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (response) => {
-          if (response.ok) {
-            setDataVersions(response);
-            setErrorVersions(null);
-            setLoadedVersions(true);
-          } else {
-            let serverMessage: string = response.message;
-            setError(new Error(serverMessage));
-          }
-        },
-        (error) => {
-          setErrorVersions(error.message);
-          setDataVersions(error);
-          setLoadedVersions(true);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let versionList: Version[] = await response.json();
+          setDataVersions(versionList);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setErrorVersions(new Error(serverMessage));
         }
-      );
+        setLoadedVersions(true);
+      },
+      (error) => {
+        setLoadedVersions(true);
+        setErrorVersions(error);
+      }
+    );
   }, [urlVersions]);
 
   // const urlMain = "/mainVersion.json"; // Placeholder
@@ -60,8 +62,8 @@ export default function VersionList() {
     "http://localhost:8080/articles/" + params.articleId + "/mainVersion";
 
   let [dataMain, setDataMain] = useState<string>();
-  let [isLoadedMain, setLoadedMain] = useState(false);
-  let [errorMain, setErrorMain] = useState(null);
+  let [isLoadedMain, setLoadedMain] = useState<boolean>(false);
+  let [errorMain, setErrorMain] = useState<Error>();
 
   useEffect(() => {
     fetch(urlMain, {
@@ -72,25 +74,27 @@ export default function VersionList() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (response) => {
-          if (response.ok) {
-            setDataMain(response);
-            setErrorMain(null);
-            setLoadedMain(true);
-          } else {
-            let serverMessage: string = response.message;
-            setError(new Error(serverMessage));
-          }
-        },
-        (error) => {
-          setErrorMain(error.message);
-          setDataMain(error);
-          setLoadedMain(true);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let main: string = await response.json();
+          setDataMain(main);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setErrorMain(new Error(serverMessage));
         }
-      );
+        setLoadedMain(true);
+      },
+      (error) => {
+        setLoadedMain(true);
+        setErrorMain(error);
+      }
+    );
   }, [urlVersions]);
 
   return (
@@ -111,8 +115,8 @@ export default function VersionList() {
             message={"Something went wrong. " + errorVersions + errorMain}
           />
         )}
-        {dataVersions != null &&
-          dataMain != null &&
+        {dataVersions &&
+          dataMain &&
           dataVersions.map((version, i) => (
             <VersionListElement key={i} version={version} mv={dataMain} />
           ))}

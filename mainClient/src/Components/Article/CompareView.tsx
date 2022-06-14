@@ -200,6 +200,11 @@ export default function VersionList() {
     }
   };
 
+  let [acceptSuccess, setAcceptSuccess] = useState<boolean>(false);
+  let [rejectSuccess, setRejectSuccess] = useState<boolean>(false);
+  let [deleteSuccess, setDeleteSuccess] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
+
   // Send HTTP request and reload, so that the style (see "acceptButton") is updated.
   const handleAcceptClick = async () => {
     const url =
@@ -214,13 +219,24 @@ export default function VersionList() {
       mode: "cors",
       credentials: "include",
     }).then(
-      // Success
-      (response) => {
-        console.log(response);
+      async (response) => {
+        if (response.ok) {
+          // Set success in state to show success alert
+          setAcceptSuccess(true);
+
+          // After 3s, remove success from state to hide success alert
+          setTimeout(() => setAcceptSuccess(false), 3000);
+        } else {
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
+        }
       },
       (error) => {
-        // Request returns an error
-        console.error("Error:", error);
+        setError(error);
       }
     );
     window.location.reload();
@@ -240,13 +256,24 @@ export default function VersionList() {
       mode: "cors",
       credentials: "include",
     }).then(
-      // Success
-      (response) => {
-        console.log(response);
+      async (response) => {
+        if (response.ok) {
+          // Set success in state to show success alert
+          setRejectSuccess(true);
+
+          // After 3s, remove success from state to hide success alert
+          setTimeout(() => setRejectSuccess(false), 3000);
+        } else {
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
+        }
       },
       (error) => {
-        // Request returns an error
-        console.error("Error:", error);
+        setError(error);
       }
     );
     window.location.reload();
@@ -265,13 +292,24 @@ export default function VersionList() {
       mode: "cors",
       credentials: "include",
     }).then(
-      // Success
-      (response) => {
-        console.log(response);
+      async (response) => {
+        if (response.ok) {
+          // Set success in state to show success alert
+          setDeleteSuccess(true);
+
+          // After 3s, remove success from state to hide success alert
+          setTimeout(() => setDeleteSuccess(false), 3000);
+        } else {
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
+        }
       },
       (error) => {
-        // Request returns an error
-        console.error("Error:", error);
+        setError(error);
       }
     );
   };
@@ -344,6 +382,34 @@ export default function VersionList() {
 
   return (
     <div>
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error.message}
+        />
+      )}
+      {acceptSuccess && (
+        <NotificationAlert
+          errorType="success"
+          title="Merging approved! "
+          message={"The merge request has been successfully accepted."}
+        />
+      )}
+      {rejectSuccess && (
+        <NotificationAlert
+          errorType="success"
+          title="Merging rejected! "
+          message={"The merge request has been successfully rejected."}
+        />
+      )}
+      {deleteSuccess && (
+        <NotificationAlert
+          errorType="success"
+          title="Merge request deleted! "
+          message={"The merge request has been successfully deleted."}
+        />
+      )}
       {!isLoadedRequest && !isLoadedSource && !isLoadedTarget && (
         <LoadingSpinner />
       )}

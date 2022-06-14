@@ -7,8 +7,8 @@ import NotificationAlert from "../NotificationAlert";
 type Article = {
   articleId: string;
   mainVersionId: string;
-
-  //Following attributes are from the main Version, but displayed as if they were from the article itself
+  // Following attributes are from the main Version,
+  // but displayed as if they were from the article itself
   title: string;
   date_created: string;
   owners: string[];
