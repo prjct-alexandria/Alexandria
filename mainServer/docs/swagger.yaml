@@ -433,6 +433,10 @@ paths:
         name: versionID
         required: true
         type: string
+      - description: History ID
+        in: query
+        name: historyID
+        type: string
       produces:
       - application/json
       responses:

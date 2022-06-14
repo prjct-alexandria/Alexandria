@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ type VersionController struct {
 // @Description	Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.
 // @Param		articleID	path	string	true	"Article ID"
 // @Param		versionID	path	string	true	"Version ID"
+// @Param 		historyID	query	string	false	"History ID"
 // @Produce		json
 // @Success		200 {object} models.Version
 // @Failure 	400 {object} httperror.HTTPError
@@ -47,13 +49,38 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		return
 	}
 
-	// get version
-	res, err := contr.Serv.GetVersion(article, version)
+	// get optional query parameter for specific history/commit ID
+	values := c.Request.URL.Query()
+	var usingCommit bool
+	var commitHashArr *[20]byte
+	if commitStr, ok := values["historyID"]; ok {
+		// read the string like 'a8fc73280...' into a byte array for the commit hash
+		commitHashSlice, err := hex.DecodeString(commitStr[0])
+		if err != nil || len(commitHashSlice) != 20 {
+			fmt.Println(err)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitStr[0]))
+			return
+		}
+
+		// cast the Go slice to a fixed length array, after having checked if the slice had the right length
+		commitHashArr = (*[20]byte)(commitHashSlice)
+		usingCommit = true
+	}
+
+	// Get either a specific version or just the latest
+	var res models.Version
+	if usingCommit {
+		res, err = contr.Serv.GetVersionByCommitID(article, version, *commitHashArr)
+	} else {
+		res, err = contr.Serv.GetVersion(article, version)
+	}
+
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, res)
 }
 
