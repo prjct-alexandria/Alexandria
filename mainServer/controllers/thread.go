@@ -184,7 +184,7 @@ func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
 // @Param		 article ID 		path	int64		true 	"Article ID"
 // @Param		 commit ID 			path	int64		true 	"Commit ID"
 // @Produce      json
-// @Success      200  {object} models.Thread
+// @Success      200  {object} []models.Thread
 // @Failure      400  {object} httperror.HTTPError
 // @Router       /articles/:articleID/versions/:versionID/history/:commitID/threads [get]
 func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
