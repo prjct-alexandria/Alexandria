@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
+import configData from "../../config.json"
 
 type Version = {
   articleID: string;
@@ -24,7 +25,7 @@ export default function CreateMR() {
 
   const [selectedVersion, setSelectedVersion] = useState("");
 
-  const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
+  const urlCurrentArticle = configData.back_end_url + "/articles/" + params.articleId + "/versions/" + params.versionId;
   // const urlCurrentArticle = "/article_version1.json";
   // retrieving the list of versions
   useEffect(() => {
@@ -60,8 +61,8 @@ export default function CreateMR() {
     );
   }, [urlCurrentArticle]);
 
-  const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
-  // const urlArticleVersions = "/versionList.json";
+  const urlArticleVersions = configData.back_end_url + "/articles/" + params.articleId + "/versions";
+  //const urlArticleVersions = "/versionList.json";
   useEffect(() => {
     fetch(urlArticleVersions, {
       method: "GET",
@@ -101,8 +102,7 @@ export default function CreateMR() {
     setSelectedVersion(event.target.value);
   }
 
-  const urlSubmitMR =
-    "http://localhost:8080/articles/" + params.articleId + "/requests";
+  const urlSubmitMR = configData.back_end_url +"/articles/" + params.articleId + "/requests";
   // post the new merge request
   const submitMR = () => {
     fetch(urlSubmitMR, {

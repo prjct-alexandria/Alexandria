@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import configData from "../../config.json"
 import NotificationAlert from "../NotificationAlert";
 
 export default function CreateArticle() {
@@ -30,7 +31,7 @@ export default function CreateArticle() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = "http://localhost:8080/articles";
+    const url= configData.back_end_url +"/articles";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = mainVersionTags.split(",");
@@ -77,7 +78,7 @@ export default function CreateArticle() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              "http://localhost:3000/articles/" +
+              configData.front_end_url +"/articles/" +
               articleId +
               "/versions/" +
               versionId;

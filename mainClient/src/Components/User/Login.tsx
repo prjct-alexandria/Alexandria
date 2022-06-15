@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import LoginForm from "./LoginForm";
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import $ from "jquery";
 import setUserInLocalStorage from "./AuthHelpers/setUserInLocalStorage";
@@ -16,8 +17,7 @@ export default function Login() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    // Login endpoint url
-    const url = "http://localhost:8080/login";
+    const url = configData.back_end_url +"/login";
 
     // Construct request body
     const body = {

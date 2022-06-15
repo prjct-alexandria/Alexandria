@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 
 export default function FileUpload() {
@@ -14,7 +15,7 @@ export default function FileUpload() {
 
   let params = useParams();
   const url =
-    "http://localhost:8080/articles/" +
+    configData.back_end_url +"/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId;
@@ -103,8 +104,6 @@ export default function FileUpload() {
                 />
               )}
 
-              <h5>Upload a file</h5>
-              <hr />
               <input
                 className="file-upload-input"
                 type="file"

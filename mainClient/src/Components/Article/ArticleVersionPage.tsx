@@ -7,6 +7,7 @@ import CreateMR from "./CreateMR";
 import ThreadList from "./ThreadList";
 import CreateArticleVersion from "./CreateArticleVersion";
 import FileDownload from "./FileDownload";
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
@@ -29,9 +30,8 @@ export default function ArticleVersionPage() {
 
   let params = useParams();
 
-  let url =
-    // "/article_version1.json"; // Placeholder
-    "http://localhost:8080/articles/" +
+  let url = //"/article_version1.json";
+  configData.back_end_url +"/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId;
