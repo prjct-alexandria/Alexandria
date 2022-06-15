@@ -265,6 +265,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/{articleID}/requests/{requestID}": {
+            "get": {
+                "description": "Returns the information of a given request, including the information of both versions. Note that comparing target and source versions directly, isn't reliable as before-and-after comparison. That's why, instead of filling in the contents of the version fields, a before and after string is included in the response.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestWithComparison"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/requests/{requestID}/accept": {
             "put": {
                 "description": "Accepts request to merge one article versions' changes into another. Updates target version and archives the request, by recording the current latest commits and setting its state to 'accepted'.",
@@ -535,6 +583,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/{articleID}/versions/{versionID}/files": {
+            "get": {
+                "description": "Get all the files of an article version as a zip, should be accessible without being authenticated.",
+                "produces": [
+                    "application/x-zip-compressed"
+                ],
+                "summary": "Get all the files of a version as a zip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/comments/thread/:threadID": {
             "post": {
                 "description": "Save all types (commit/request/review) of comments to the database",
@@ -637,6 +721,37 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Could not create token"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "Sets an expired cookie with an empty email and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging out",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "500": {
+                        "description": "Could not update token"
                     }
                 }
             }
@@ -794,6 +909,9 @@ const docTemplate = `{
                 "articleID": {
                     "type": "integer"
                 },
+                "conflicted": {
+                    "type": "boolean"
+                },
                 "requestID": {
                     "type": "integer"
                 },
@@ -803,7 +921,7 @@ const docTemplate = `{
                 "sourceVersionID": {
                     "type": "integer"
                 },
-                "state": {
+                "status": {
                     "type": "string"
                 },
                 "targetHistoryID": {
@@ -826,6 +944,26 @@ const docTemplate = `{
                 },
                 "targetVersionID": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.RequestWithComparison": {
+            "type": "object",
+            "properties": {
+                "after": {
+                    "type": "string"
+                },
+                "before": {
+                    "type": "string"
+                },
+                "request": {
+                    "$ref": "#/definitions/models.Request"
+                },
+                "source": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "target": {
+                    "$ref": "#/definitions/models.Version"
                 }
             }
         },
@@ -852,8 +990,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "articleId",
-                "comment",
-                "specificId"
+                "comment"
             ],
             "properties": {
                 "articleId": {
@@ -867,9 +1004,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "specificId": {
-                    "type": "integer"
                 }
             }
         },
@@ -880,6 +1014,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "content": {
+                    "type": "string"
+                },
+                "latestHistoryID": {
                     "type": "string"
                 },
                 "owners": {

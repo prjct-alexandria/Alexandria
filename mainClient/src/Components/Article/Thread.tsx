@@ -9,15 +9,15 @@ import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type ThreadProps = {
     "id": number,
-    "specificId": number,
+    "specificId": string | undefined,
     "threadType": string,
     "comments": ThreadComment[],
 };
 
 type ThreadEntity = {
-    "articleId":	number,
+    "articleId": number,
     "id": number,
-    "specificId": number,
+    "specificId": string | undefined,
     "comment": ThreadComment[],
 }
 

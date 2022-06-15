@@ -9,6 +9,8 @@ import (
 	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -78,7 +80,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
-
+	fmt.Println(res.LatestCommitID)
 	c.IndentedJSON(http.StatusOK, res)
 }
 
@@ -201,4 +203,50 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	// Return version
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, version)
+}
+
+// GetVersionFiles 	godoc
+// @Summary		Get all the files of a version as a zip
+// @Description	Get all the files of an article version as a zip, should be accessible without being authenticated.
+// @Param		articleID	path	string	true	"Article ID"
+// @Param		versionID	path	string	true	"Version ID"
+// @Produce		application/x-zip-compressed
+// @Success		200
+// @Failure 	400 {object} httperror.HTTPError
+// @Router		/articles/{articleID}/versions/{versionID}/files [get]
+func (contr VersionController) GetVersionFiles(c *gin.Context) {
+	aid := c.Param("articleID")
+	vid := c.Param("versionID")
+
+	article, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("article id must be an integer"))
+		return
+	}
+
+	version, err := strconv.ParseInt(vid, 10, 64)
+	if err != nil {
+		httperror.NewError(c, http.StatusBadRequest, errors.New("version id must an integer"))
+		return
+	}
+
+	path, err := contr.Serv.GetVersionFiles(article, version)
+	if err != nil {
+		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
+		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
+		return
+	}
+
+	//GetVersionFiles creates a temporary zip file, which needs to be removed after this method is finished
+
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(path)
+
+	//Return files
+	c.Header("Access-Control-Expose-Headers", "content-disposition")
+	c.FileAttachment(path, filepath.Base(path))
 }

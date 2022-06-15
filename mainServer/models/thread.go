@@ -7,7 +7,7 @@ import (
 type Thread struct {
 	Id         int64              `json:"id"`
 	ArticleId  int64              `json:"articleId"       binding:"required"`
-	SpecificId int64              `json:"specificId"      binding:"required"`
+	SpecificId string             `json:"specificId"`
 	Comment    []entities.Comment `json:"comment"         binding:"required"`
 }
 

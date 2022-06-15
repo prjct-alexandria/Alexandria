@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
+	"strconv"
 )
 
 type PgRequestThreadRepository struct {
@@ -64,7 +65,7 @@ func (r PgRequestThreadRepository) GetRequestThreads(aid int64, rid int64) ([]mo
 			threads = append(threads, models.Thread{
 				Id:         tid,
 				ArticleId:  aid,
-				SpecificId: rid,
+				SpecificId: strconv.FormatInt(rid, 10),
 				Comment:    comments,
 			})
 		} else {
@@ -104,13 +105,13 @@ func (r PgRequestThreadRepository) createRequestThreadTable() error {
 	return err
 }
 
-func (r PgRequestThreadRepository) CreateRequestThread(thread models.Thread, tid int64) (int64, error) {
+func (r PgRequestThreadRepository) CreateRequestThread(rid int64, tid int64) (int64, error) {
 	stmt, err := r.Db.Prepare(`INSERT INTO requestthread (requestthreadid, requestid, threadid)
 	VALUES (DEFAULT, $1, $2) RETURNING requestthreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateThread: %v", err)
 	}
-	row := stmt.QueryRow(thread.SpecificId, tid)
+	row := stmt.QueryRow(rid, tid)
 
 	var id int64
 	err = row.Scan(&id)

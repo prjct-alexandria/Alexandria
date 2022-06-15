@@ -27,8 +27,8 @@ export default function FileDownload() {
       method: "GET",
       mode: "cors",
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        "Content-Type": "application/x-zip-compressed",
+        Accept: "application/x-zip-compressed",
       },
       credentials: "include",
     }).then(
@@ -39,7 +39,8 @@ export default function FileDownload() {
           // Put the file in the DOM
           const windowUrl = window.URL.createObjectURL(blob);
           // Set filename
-          setFilename("source-file.zip");
+          let filename = response.headers.get("content-disposition")!.split('"')[1];
+          setFilename(filename)
 
           // Add a hidden <a> element to DOM, that downloads the file when clicking on it
           const a = document.createElement("a");

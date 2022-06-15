@@ -10,7 +10,7 @@ import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type ThreadListProps = {
     "threadType": string
-    "specificId": number
+    "specificId": string | undefined
 };
 
 type ThreadComment = {
@@ -25,7 +25,7 @@ type ThreadEntity = {
     "articleId": number
     "comment": ThreadComment[]
     "id": number
-    "specificId": number
+    "specificId": string | undefined
 }
 
 export default function ThreadList(props: ThreadListProps) {
@@ -47,8 +47,8 @@ export default function ThreadList(props: ThreadListProps) {
         let urlThreadList = "";
         if (props.threadType === "commit") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-                // "/history/" + params.historyId + "/threads";
-                "/history/" + 1 + "/threads";
+                "/history/" + props.specificId + "/threads";
+                // "/history/" + 1 + "/threads";
         } else if (props.threadType === "request") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/requests/" + params.requestId +
                 "/threads";

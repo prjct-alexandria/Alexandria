@@ -39,6 +39,11 @@ func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title
 	panic("implement me")
 }
 
+func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewVersionServiceMock initializes a mock with variables that are passed by reference,
 // so the values can be retrieved from anywhere in the program
 func NewVersionServiceMock() VersionServiceMock {

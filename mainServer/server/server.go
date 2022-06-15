@@ -15,6 +15,7 @@ import (
 
 type RepoEnv struct {
 	git           repositories.GitRepository
+	filesystem    repositories.FilesystemRepository
 	article       interfaces.ArticleRepository
 	user          interfaces.UserRepository
 	version       interfaces.VersionRepository
@@ -49,6 +50,7 @@ type ControllerEnv struct {
 func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 	return RepoEnv{
 		git:           repositories.NewGitRepository(&cfg.Git),
+		filesystem:    repositories.NewFilesystemRepository(&cfg.Git),
 		article:       postgres.NewPgArticleRepository(database),
 		user:          postgres.NewPgUserRepository(database),
 		version:       postgres.NewPgVersionRepository(database),
@@ -66,7 +68,7 @@ func initServiceEnv(repos RepoEnv) ServiceEnv {
 		article:       services.NewArticleService(repos.article, repos.version, repos.git),
 		user:          services.UserService{UserRepository: repos.user},
 		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
-		version:       services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
+		version:       services.VersionService{GitRepo: repos.git, VersionRepo: repos.version, FilesystemRepo: repos.filesystem},
 		thread:        services.ThreadService{ThreadRepository: repos.thread},
 		comment:       services.CommentService{CommentRepository: repos.comment},
 		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},

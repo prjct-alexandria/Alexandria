@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
 import configData from "../../config.json"
+import { Request } from "./CompareView"
 
 type Version = {
   articleID: string;
@@ -118,10 +119,21 @@ export default function CreateMR() {
         targetVersionID: parseInt(selectedVersion as string),
       }),
     }).then(
-      (response) => {
-        if (response.status === 200) {
+      async (response) => {
+        if (response.ok) {
           // Set success in state to show success alert
           setCreateMRSuccess(true);
+
+          //
+          let request: Request = await response.json();
+
+          if (typeof window !== "undefined") {
+            window.location.href =
+                configData.front_end_url +"/articles/" +
+                params.articleId +
+                "/requests/" +
+                request.requestID;
+          }
 
           // After 3s, remove success from state to hide success alert
           setTimeout(() => setCreateMRSuccess(false), 3000);
@@ -135,7 +147,7 @@ export default function CreateMR() {
   };
 
   return (
-    <>
+    <div>
       {createMRSuccess && (
         <NotificationAlert
           errorType="success"
@@ -218,6 +230,6 @@ export default function CreateMR() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

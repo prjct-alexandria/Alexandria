@@ -15,6 +15,7 @@ type ArticleVersion = {
   owners: Array<string>;
   title: string;
   content: string;
+  latestHistoryID: string;
 };
 
 export default function ArticleVersionPage() {
@@ -59,9 +60,7 @@ export default function ArticleVersionPage() {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
           setData(VersionData);
-          setLoaded(true);
         } else {
-          setLoaded(true);
           // Set error with message returned from the server
           let responseJSON: {
             message: string;
@@ -70,13 +69,14 @@ export default function ArticleVersionPage() {
           let serverMessage: string = responseJSON.message;
           setError(new Error(serverMessage));
         }
+        setLoaded(true);
       },
       (error) => {
         setLoaded(true);
         setError(error);
       }
     );
-  }, [url]);
+  }, []);
 
   return (
     <div className={"row justify-content-center wrapper"}>
@@ -188,10 +188,10 @@ export default function ArticleVersionPage() {
             </div>
             <div className="col-3">
               {/*TODO: The specificID is supposed to be the commitID */}
-              <ThreadList
+              {versionData && <ThreadList
                 threadType={"commit"}
-                specificId={parseInt(params.versionId as string)}
-              />
+                specificId={versionData && versionData.latestHistoryID}
+              />}
             </div>
           </div>
         </div>

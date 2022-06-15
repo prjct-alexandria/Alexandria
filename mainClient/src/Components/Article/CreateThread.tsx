@@ -4,8 +4,8 @@ import CreateComment from "./CreateComment";
 
 type ThreadProps = {
     "id": undefined | number,
-    "specificId": number
-    threadType: string
+    "specificId": string | undefined,
+    "threadType": string
 };
 
 export default function CreateThread(props: ThreadProps) {

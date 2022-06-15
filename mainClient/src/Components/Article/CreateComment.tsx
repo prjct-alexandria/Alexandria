@@ -6,7 +6,7 @@ import configData from "../../config.json"
 
 type ThreadProps = {
   id: undefined | number;
-  specificId: number;
+  specificId: string | undefined;
   threadType: string;
 };
 
