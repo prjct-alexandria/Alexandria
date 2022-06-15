@@ -66,7 +66,7 @@ export default function MRList() {
 
   const mrListMap = () => {
     return (
-      <div className="wrapper col-8 m-auto">
+      <div>
         {!isLoaded && <LoadingSpinner />}
         {MRListData != null &&
           MRListData.map((mr, i) => <MRListElement key={i} MR={mr} />)}
@@ -87,7 +87,7 @@ export default function MRList() {
       {
         <div>
           <h2 className="text-center mb-5">See all requests</h2>
-          <div className="row row-no-gutters col-md-12 m-1">
+          <div className="row wrapper col-8 m-auto">
             <div className="col-md-4">
               <h5>From</h5>
             </div>
@@ -95,25 +95,19 @@ export default function MRList() {
               <h5>To</h5>
             </div>
             <div className="col-md-4">
-              <h5>State</h5>
+              <h5>Status</h5>
             </div>
             <div className="col-md-4">
-              <h6>Source Version:</h6>
+              <h6>Source Version</h6>
+            </div>
+            <div className="col-md-4">
+              <h6>Target Version</h6>
             </div>
             {/*<div className="col-md-2">*/}
             {/*  <h6>History:</h6>*/}
             {/*</div>*/}
-            <div className="col-md-4">
-              <h6>Target Version:</h6>
-            </div>
-            <div className="col-md-4">
-              <h6>Status:</h6>
-            </div>
-            {/*<div className="col-md-2">*/}
-            {/*  <h6>History:</h6>*/}
-            {/*</div>*/}
+            {mrListMap()}
           </div>
-          <div>{mrListMap()}</div>
         </div>
       }
     </div>
