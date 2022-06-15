@@ -72,11 +72,11 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	switch threadType {
 	case "commit":
 		// check if the specific thread ID string can actually be a commit ID
-		//_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
-		//if len(sid) != 40 && err == nil {
-		//	httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
-		//	return
-		//}
+		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
+		if len(sid) != 40 && err == nil {
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+			return
+		}
 		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
