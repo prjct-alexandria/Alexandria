@@ -647,6 +647,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/logout": {
+            "post": {
+                "description": "Sets an expired cookie with an empty email and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging out",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "500": {
+                        "description": "Could not update token"
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.",

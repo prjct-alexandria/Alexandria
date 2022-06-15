@@ -194,12 +194,12 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 // updateLatestCommit stores the latest git commit ID of the version in the database entity
 func (serv VersionService) UpdateLatestCommit(article int64, version int64) error {
 	// Get the latest commit ID from the git branch
-	commit, err := serv.Gitrepo.GetLatestCommit(article, version)
+	commit, err := serv.GitRepo.GetLatestCommit(article, version)
 	if err != nil {
 		return err
 	}
 	// Store the commit id in the database
-	err = serv.Versionrepo.UpdateVersionLatestCommit(version, commit)
+	err = serv.VersionRepo.UpdateVersionLatestCommit(version, commit)
 	if err != nil {
 		return err
 	}
