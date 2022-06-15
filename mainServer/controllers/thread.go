@@ -43,12 +43,6 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	sid := c.Param("specificID")
 	threadType := c.Param("threadType")
 
-	intSid, err := strconv.ParseInt(sid, 10, 64)
-	if err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
-		return
-	}
 	intAid, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
@@ -57,7 +51,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// save thread in the db
-	tid, err := contr.ThreadService.StartThread(thread, intAid, intSid)
+	tid, err := contr.ThreadService.StartThread(thread, intAid)
 	if err != nil {
 		fmt.Println(err)
 		c.Status(http.StatusBadRequest)
@@ -73,14 +67,33 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
+	// TODO: split these things up over three different endpoints instead of using one with multiple responsibilities
 	var id int64
 	switch threadType {
 	case "commit":
-		id, err = contr.CommitThreadService.StartCommitThread(thread, tid)
+		// check if the specific thread ID string can actually be a commit ID
+		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
+		if len(sid) != 40 && err == nil {
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+			return
+		}
+		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "request":
-		id, err = contr.RequestThreadService.StartRequestThread(thread, tid)
+		intSid, err := strconv.ParseInt(sid, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			c.Status(http.StatusBadRequest)
+			return
+		}
+		id, err = contr.RequestThreadService.StartRequestThread(intSid, tid)
 	case "review":
-		id, err = contr.ReviewThreadService.StartReviewThread(thread, tid)
+		intSid, err := strconv.ParseInt(sid, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			c.Status(http.StatusBadRequest)
+			return
+		}
+		id, err = contr.ReviewThreadService.StartReviewThread(intSid, tid)
 	default:
 		id, err = -1, errors.New("invalid thread type")
 	}
