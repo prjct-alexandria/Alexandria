@@ -62,9 +62,6 @@ export default function ThreadList(props: ThreadListProps) {
                 (result) => {
                     setLoaded(true);
                     setData(result);
-                     //console.log(result)
-                    //console.log(result.$dataMetaSchema)
-                     console.log(threadListData)
                 },
                 (error) => {
                     setLoaded(true);
