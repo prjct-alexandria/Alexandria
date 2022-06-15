@@ -88,7 +88,7 @@ export default function ArticleVersionPage() {
         />
       )}
       <div className={"col-10"}>
-        <h3>{versionData && versionData.title}</h3>
+        <h3 className={"mt-3"}>{versionData && versionData.title}</h3>
         <div>
           <ul>
             <li className="ownersLi">Owners: </li>
