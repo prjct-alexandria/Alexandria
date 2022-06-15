@@ -19,25 +19,14 @@ type MR = {
 export default function MRList() {
   let params = useParams(); // used for the articleId
   const [searchParams] = useSearchParams(); // used for the source and target
-  let sourceVersionID = searchParams.get("source");
-  let targetVersionID = searchParams.get("target");
 
   let [MRListData, setMRListData] = useState<MR[]>();
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
 
-    const baseUrl = configData.back_end_url +"/articles/" + params.articleId + "/requests";
+  const baseUrl = configData.back_end_url +"/articles/" + params.articleId + "/requests";
 
-  let appendUrl = "";
-  if (sourceVersionID != null && targetVersionID != null) {
-    appendUrl = "?source=" + sourceVersionID + "&target=" + targetVersionID;
-  } else if (sourceVersionID != null) {
-    appendUrl = "?source=" + sourceVersionID;
-  } else if (targetVersionID != null) {
-    appendUrl = "?target=" + targetVersionID;
-  }
-
-  // const url = "/requestList.json"; // Placeholder
+  let appendUrl = "?" + searchParams.toString();
   const url = baseUrl + appendUrl;
 
   useEffect(() => {

@@ -1,6 +1,9 @@
 package interfaces
 
-import "mainServer/entities"
+import (
+	"mainServer/entities"
+	"mainServer/models"
+)
 
 type RequestRepository interface {
 
@@ -16,4 +19,7 @@ type RequestRepository interface {
 
 	// UpdateRequest replaces all the fields with the entity specified, in the row with matching id
 	UpdateRequest(req entities.Request) error
+
+	// GetRequestList returns a list of request models related to specified article, with possible filters
+	GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.Request, error)
 }
