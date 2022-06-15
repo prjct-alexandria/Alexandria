@@ -123,7 +123,7 @@ export default function ArticleVersionPage() {
               <FileDownload />
             </a>
           </li>
-          {!viewingOldVersion && (
+          {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
