@@ -20,7 +20,7 @@ func NewRequestThreadServiceMock() RequestThreadServiceMock {
 	}
 }
 
-func (m RequestThreadServiceMock) StartRequestThread(thread models.Thread, tid int64) (int64, error) {
+func (m RequestThreadServiceMock) StartRequestThread(rid int64, tid int64) (int64, error) {
 	panic("implement me")
 }
 

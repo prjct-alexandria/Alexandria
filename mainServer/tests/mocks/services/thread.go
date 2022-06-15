@@ -18,6 +18,6 @@ func NewThreadServiceMock() ThreadServiceMock {
 	}
 }
 
-func (m ThreadServiceMock) StartThread(thread models.Thread, aid int64, sid int64) (int64, error) {
+func (m ThreadServiceMock) StartThread(thread models.Thread, aid int64) (int64, error) {
 	panic("implement me")
 }

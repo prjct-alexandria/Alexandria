@@ -69,15 +69,15 @@ func TestGetCommitThreadFail(t *testing.T) {
 	localSetup()
 
 	//define service mock behaviour
-	services.GetCommitThreadsMock = func(aid int64, cid int64) ([]models.Thread, error) {
+	services.GetCommitThreadsMock = func(aid int64, cid string) ([]models.Thread, error) {
 		return []models.Thread{}, errors.New("cannot get commit threads")
 	}
 
 	// set request url
 	const aid int64 = 2
 	const vid int64 = 1
-	const cid int64 = 3
-	url := fmt.Sprintf("/articles/%d/versions/%d/history/%d/threads", aid, vid, cid)
+	const cid string = "3"
+	url := fmt.Sprintf("/articles/%d/versions/%d/history/%s/threads", aid, vid, cid)
 
 	// create request
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -111,15 +111,15 @@ func TestGetCommitThreadsSuccess(t *testing.T) {
 	localSetup()
 
 	//define service mock behaviour
-	services.GetCommitThreadsMock = func(aid int64, cid int64) ([]models.Thread, error) {
+	services.GetCommitThreadsMock = func(aid int64, cid string) ([]models.Thread, error) {
 		return exampleThreads, nil
 	}
 
 	// set request url
 	const aid int64 = 2
 	const vid int64 = 1
-	const cid int64 = 3
-	url := fmt.Sprintf("/articles/%d/versions/%d/history/%d/threads", aid, vid, cid)
+	const cid string = "3"
+	url := fmt.Sprintf("/articles/%d/versions/%d/history/%s/threads", aid, vid, cid)
 
 	// create request
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -245,7 +245,7 @@ var exampleThreads = []models.Thread{
 	{
 		Id:         1,
 		ArticleId:  2,
-		SpecificId: 3,
+		SpecificId: "2",
 		Comment: []entities.Comment{
 			{
 				Id:           1,
@@ -264,7 +264,7 @@ var exampleThreads = []models.Thread{
 	{
 		Id:         2,
 		ArticleId:  2,
-		SpecificId: 3,
+		SpecificId: "3",
 		Comment: []entities.Comment{
 			{
 				Id:           1,

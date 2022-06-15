@@ -2,7 +2,7 @@ package services
 
 import "mainServer/models"
 
-var GetCommitThreadsMock func(aid int64, cid int64) ([]models.Thread, error)
+var GetCommitThreadsMock func(aid int64, cid string) ([]models.Thread, error)
 
 // CommitThreadServiceMock mocks class using publicly modifiable mock functions
 type CommitThreadServiceMock struct {
@@ -20,11 +20,11 @@ func NewCommitThreadServiceMock() CommitThreadServiceMock {
 	}
 }
 
-func (m CommitThreadServiceMock) StartCommitThread(thread models.Thread, tid int64) (int64, error) {
+func (m CommitThreadServiceMock) StartCommitThread(cid string, tid int64) (int64, error) {
 	panic("implement me")
 }
 
-func (m CommitThreadServiceMock) GetCommitThreads(aid int64, cid int64) ([]models.Thread, error) {
+func (m CommitThreadServiceMock) GetCommitThreads(aid int64, cid string) ([]models.Thread, error) {
 	(*m.Called)["GetCommitThreads"] = true
 	(*m.Params)["GetCommitThreads"] = map[string]interface{}{
 		"aid": aid,
