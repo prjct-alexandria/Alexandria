@@ -15,6 +15,7 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
 	"io/ioutil"
 	"mainServer/entities"
+	"mainServer/server/config"
 	"mainServer/utils/clock"
 	"os"
 	"os/exec"
@@ -31,19 +32,19 @@ type GitRepository struct {
 // NewGitRepository creates a new GitRepository class.
 // This is NOT the function used to create a folder/git repository to store an article in.
 // See CreateRepo instead
-func NewGitRepository(path string) (GitRepository, error) {
+func NewGitRepository(cfg *config.GitConfig) GitRepository {
 
 	// make folders for git files
-	err := os.MkdirAll(filepath.Join(path, "persistent"), os.ModePerm)
+	err := os.MkdirAll(filepath.Join(cfg.Path, "persistent"), os.ModePerm)
 	if err != nil {
-		return GitRepository{}, err
+		panic(err)
 	}
-	err = os.MkdirAll(filepath.Join(path, "requests"), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(cfg.Path, "requests"), os.ModePerm)
 	if err != nil {
-		return GitRepository{}, err
+		panic(err)
 	}
 
-	return GitRepository{Path: path, Clock: clock.RealClock{}}, nil
+	return GitRepository{Path: cfg.Path, Clock: clock.RealClock{}}
 }
 
 // CreateRepo creates a new folder/git repository to store an article in, including main version branch.

@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import * as React from "react";
-import SuccessAlert from "../SuccessAlert";
-import ErrorAlert from "../ErrorAlert";
+import NotificationAlert from "../NotificationAlert";
+import configData from "../../config.json";
 
 export default function FileDownload() {
-  let [error, setError] = useState(null);
+  let [error, setError] = useState<Error>();
   let [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
-  let [filename, setFilename] = useState("");
+  let [filename, setFilename] = useState<string>("");
 
   // Make url for request to access ../files endpoint. Debug with url "/source-file.txt"
   let params = useParams();
 
   const endpointUrl =
-    "http://localhost:8080/articles/" +
+    configData.back_end_url +"/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId +
@@ -31,13 +31,13 @@ export default function FileDownload() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.blob())
-      .then(
-        // Process the response as a BLOB (Binary large object)
-        (result) => {
+    }).then(
+      // Process the response as a BLOB (Binary large object)
+      async (response) => {
+        if (response.ok) {
+          let blob = await response.blob();
           // Put the file in the DOM
-          const windowUrl = window.URL.createObjectURL(result);
+          const windowUrl = window.URL.createObjectURL(blob);
           // Set filename
           setFilename("source-file.zip");
 
@@ -54,27 +54,35 @@ export default function FileDownload() {
           // Remove <a> from DOM
           window.URL.revokeObjectURL(windowUrl);
 
-          // Set success in state to show success alert
+          // Set success in state to show success alert for 3 seconds
           setDownloadSuccess(true);
-
-          // After 3s, remove success from state to hide success alert
           setTimeout(() => setDownloadSuccess(false), 3000);
-        },
-        (error) => {
-          setError(error);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+      },
+      (error) => {
+        setError(error);
+      }
+    );
   };
 
   return (
     <div>
       <form>
-        <button className="btn btn-primary" onClick={downloadFileHandler}>
+        <button className="btn  btn-light" onClick={downloadFileHandler}>
           Download source files
         </button>
       </form>
       {downloadSuccess && (
-        <SuccessAlert
+        <NotificationAlert
+          errorType="success"
           title="Download successful! "
           message={
             "The source file " + filename + " has been successfully downloaded."
@@ -82,7 +90,8 @@ export default function FileDownload() {
         />
       )}
       {error && (
-        <ErrorAlert
+        <NotificationAlert
+          errorType="danger"
           title={"Error: "}
           message={"Something went wrong, please try again."}
         />

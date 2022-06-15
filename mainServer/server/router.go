@@ -6,6 +6,7 @@ import (
 	"github.com/swaggo/gin-swagger"
 	_ "mainServer/docs"
 	"mainServer/middlewares"
+	"mainServer/server/config"
 )
 
 // @title API documentation
@@ -14,10 +15,10 @@ import (
 
 // @host      localhost:8080
 
-func SetUpRouter(contrs ControllerEnv) *gin.Engine {
+func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
-	router.Use(middlewares.AuthMiddleware())
-	router.Use(middlewares.CorsHeaders())
+	router.Use(middlewares.AuthMiddleware(cfg))
+	router.Use(middlewares.CorsHeaders(cfg))
 
 	router.GET("/articles", contrs.article.ArticleList)
 	router.POST("/articles", contrs.article.CreateArticle)
@@ -34,6 +35,7 @@ func SetUpRouter(contrs ControllerEnv) *gin.Engine {
 
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
+	router.POST("/logout", contrs.user.Logout)
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 
 	//Example of how to make an endpoint use the authentication

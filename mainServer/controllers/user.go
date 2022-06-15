@@ -7,6 +7,7 @@ import (
 	"mainServer/entities"
 	"mainServer/middlewares"
 	"mainServer/models"
+	"mainServer/server/config"
 	"mainServer/services"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 type UserController struct {
 	UserService services.UserService
+	Cfg         *config.Config
 }
 
 // Register		godoc
@@ -78,13 +80,34 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	err = middlewares.UpdateJwtCookie(c, cred.Email)
+	err = middlewares.UpdateJwtCookie(c, cred.Email, u.Cfg)
 
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))
 		return
 	}
 	c.IndentedJSON(http.StatusOK, models.User{Name: dbUser.Name, Email: dbUser.Email})
+}
+
+// Logout		godoc
+// @Summary		Endpoint for user logging out
+// @Description	Sets an expired cookie with an empty email and returns a JWT token
+// @Accept		json
+// @Param		credentials	body	models.LoginForm true "User credentials"
+// @Success		200 "Success"
+// @Failure		400 "Could not read request body"
+// @Failure		400 "Invalid JSON provided"
+// @Failure		500 "Could not update token"
+// @Router		/logout	[post]
+func (u *UserController) Logout(c *gin.Context) {
+	err := middlewares.ExpireJwtCookie(c)
+
+	if err != nil {
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not delete token to logout user"))
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, models.User{Name: "", Email: ""})
 }
 
 // CreateExampleUser godoc
