@@ -15,6 +15,7 @@ type ArticleVersion = {
   owners: Array<string>;
   title: string;
   content: string;
+  latestCommitID: string;
 };
 
 export default function ArticleVersionPage() {
@@ -39,10 +40,10 @@ export default function ArticleVersionPage() {
   // get the optional specific history param
   const [searchParams] = useSearchParams(); // used for the source and target
   let historyID = searchParams.get("history");
-  const viewingOldVersion = historyID != null;
-  if (viewingOldVersion) {
+  if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
+  let viewingOldVersion = false;
 
   useEffect(() => {
     fetch(url, {
@@ -58,6 +59,7 @@ export default function ArticleVersionPage() {
         if (response.ok) {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
+          viewingOldVersion = VersionData.latestCommitID != historyID
           setData(VersionData);
           setLoaded(true);
         } else {
