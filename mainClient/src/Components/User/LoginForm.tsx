@@ -30,6 +30,7 @@ export default function LoginForm(props: LoginFormProps) {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
+              id="btn-close-login-form"
             ></button>
           </div>
           <form onSubmit={props.submitHandler} data-testid="login-form">

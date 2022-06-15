@@ -88,3 +88,28 @@ func UpdateJwtCookie(c *gin.Context, email string, cfg *config.Config) error {
 
 	return nil
 }
+
+// ExpireJwtCookie Function for expiring the JWT token for logging out
+func ExpireJwtCookie(c *gin.Context) error {
+	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
+	cl := clock.RealClock{}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":     "",
+		"expiresAt": cl.Now().Add(time.Hour * -3600).Unix(),
+		"issuedAt":  cl.Now().Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(jwtSecret))
+
+	if err != nil {
+		return err
+	}
+
+	//TODO: Add domain when necessary
+	//TODO: Make secure once HTTPS connection is established
+	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", "localhost", false, true)
+
+	return nil
+
+}

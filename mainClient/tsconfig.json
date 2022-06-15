@@ -101,7 +101,7 @@
   },
   "include": [
     "jsx/**/*",
-    "src/*"
+    "src/*",
   ],
   "exclude": [
     "node_modules"

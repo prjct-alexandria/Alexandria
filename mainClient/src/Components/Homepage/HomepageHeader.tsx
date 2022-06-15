@@ -2,9 +2,16 @@ import * as React from "react";
 import CreateArticle from "../Article/CreateArticle";
 import Login from "../User/Login";
 import Signup from "../User/Signup";
+import { useState } from "react";
+import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 export default function HomepageHeader() {
-  let loggedUser = localStorage.getItem("loggedUserEmail");
+  let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+
+  // Listen for userAccountEvent that fires when user in localstorage changes
+  window.addEventListener("userAccountEvent", () => {
+    setLoggedIn(isUserLoggedIn());
+  });
 
   return (
     <header>
@@ -24,7 +31,7 @@ export default function HomepageHeader() {
               >
                 Browse articles
               </a>
-              {loggedUser && (
+              {isLoggedIn && (
                 <div>
                   <button
                     type="button"
@@ -37,7 +44,7 @@ export default function HomepageHeader() {
                   <CreateArticle />
                 </div>
               )}
-              {!loggedUser && (
+              {!isLoggedIn && (
                 <div>
                   <div className="btn-group" role="group">
                     <button

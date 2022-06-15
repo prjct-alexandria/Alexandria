@@ -34,6 +34,7 @@ func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
+	router.POST("/logout", contrs.user.Logout)
 	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
 
 	//Example of how to make an endpoint use the authentication
