@@ -21,7 +21,7 @@ func NewPgCommitThreadRepository(db *sql.DB) PgCommitThreadRepository {
 func (r PgCommitThreadRepository) createCommitThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitThread (
     	commitThreadId SERIAL,
-    	commitId BIGINT NOT NULL,
+    	commitId NCHAR(40) NOT NULL,
         threadId BIGINT NOT NULL,
     	PRIMARY KEY (commitThreadId)
     )`)

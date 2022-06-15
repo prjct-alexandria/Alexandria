@@ -139,18 +139,17 @@ definitions:
         type: array
       id:
         type: integer
-      specificId:
-        type: integer
     required:
     - articleId
     - comment
-    - specificId
     type: object
   models.Version:
     properties:
       articleID:
         type: integer
       content:
+        type: string
+      latestHistoryID:
         type: string
       owners:
         items:

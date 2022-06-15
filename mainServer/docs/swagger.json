@@ -837,8 +837,7 @@
             "type": "object",
             "required": [
                 "articleId",
-                "comment",
-                "specificId"
+                "comment"
             ],
             "properties": {
                 "articleId": {
@@ -852,9 +851,6 @@
                 },
                 "id": {
                     "type": "integer"
-                },
-                "specificId": {
-                    "type": "integer"
                 }
             }
         },
@@ -865,6 +861,9 @@
                     "type": "integer"
                 },
                 "content": {
+                    "type": "string"
+                },
+                "latestHistoryID": {
                     "type": "string"
                 },
                 "owners": {

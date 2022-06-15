@@ -845,8 +845,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "articleId",
-                "comment",
-                "specificId"
+                "comment"
             ],
             "properties": {
                 "articleId": {
@@ -860,9 +859,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "specificId": {
-                    "type": "integer"
                 }
             }
         },
@@ -873,6 +869,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "content": {
+                    "type": "string"
+                },
+                "latestHistoryID": {
                     "type": "string"
                 },
                 "owners": {
