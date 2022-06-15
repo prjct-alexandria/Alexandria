@@ -3,7 +3,6 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"mainServer/models"
 )
 
 type PgReviewThreadRepository struct {
@@ -29,13 +28,13 @@ func (r PgReviewThreadRepository) createReviewThreadTable() error {
 	return err
 }
 
-func (r PgReviewThreadRepository) CreateReviewThread(thread models.Thread, tid int64) (int64, error) {
+func (r PgReviewThreadRepository) CreateReviewThread(rid int64, tid int64) (int64, error) {
 	stmt, err := r.Db.Prepare(`INSERT INTO reviewthread (reviewthreadid, reviewid, threadid)
 		VALUES (DEFAULT, $1, $2) RETURNING reviewthreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateReviewThread: %v", err)
 	}
-	row := stmt.QueryRow(thread.SpecificId, tid)
+	row := stmt.QueryRow(rid, tid)
 
 	var id int64
 	err = row.Scan(&id)

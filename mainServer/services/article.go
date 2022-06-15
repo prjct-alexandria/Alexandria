@@ -57,6 +57,17 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		return models.Version{}, err
 	}
 
+	// Get the initial commit ID from the git branch
+	commit, err := serv.gitrepo.GetLatestCommit(article.Id, version.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+	// Store the commit id in the database
+	err = serv.versionrepo.UpdateVersionLatestCommit(version.Id, commit)
+	if err != nil {
+		return models.Version{}, err
+	}
+
 	// Return frontend-readable description of created data, (excluding file contents)
 	return models.Version{
 		ArticleID: version.ArticleID,

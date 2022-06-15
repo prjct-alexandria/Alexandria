@@ -13,10 +13,10 @@ type ThreadService struct {
 
 // StartThread creates thread entity in db
 // returns thread id
-func (serv ThreadService) StartThread(thread models.Thread, aid int64, sid int64) (int64, error) {
+func (serv ThreadService) StartThread(thread models.Thread, aid int64) (int64, error) {
 	// TODO: check if user is authenticated
 	// check model has same aid and cid as params
-	if thread.SpecificId != sid || thread.ArticleId != aid {
+	if thread.ArticleId != aid {
 		return 0, errors.New("parameters in url not equal to the thread object")
 	}
 
