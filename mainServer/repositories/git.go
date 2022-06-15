@@ -38,7 +38,7 @@ func NewGitRepository(path string) (GitRepository, error) {
 	if err != nil {
 		return GitRepository{}, err
 	}
-	err = os.MkdirAll(filepath.Join(path, "cache"), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(path, "requests"), os.ModePerm)
 	if err != nil {
 		return GitRepository{}, err
 	}
@@ -190,13 +190,13 @@ func (r GitRepository) GetArticlePath(article int64) (string, error) {
 	return filepath.Clean(path), err
 }
 
-// GetRequestCachePath returns the path to a cache folder for a request
-// makes sure that the folder is created, including nested /old and /new folders
-func (r GitRepository) GetRequestCachePath(article int64, sourceHistoryID string, targetHistoryID string) (string, error) {
+// GetRequestComparisonPath returns the path to a with /old and /new folders,
+// for viewing what a request did or will do when accepted
+func (r GitRepository) GetRequestComparisonPath(article int64, request int64) (string, error) {
 
 	// get the path by generating a unique cache id
-	id := fmt.Sprintf("%d-%s-%s", article, sourceHistoryID, targetHistoryID)
-	path, err := filepath.Abs(filepath.Join(r.Path, "cache", "requests", id))
+	id := fmt.Sprintf("%d-%d", article, request)
+	path, err := filepath.Abs(filepath.Join(r.Path, "requests", id))
 	if err != nil {
 		return "", err
 	}
@@ -319,38 +319,18 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 	return nil
 }
 
-// RequestPreviewExists stores whether there is already a preview of the specified request,
-// this requires the historyID's to be set in the req struct
-func (r GitRepository) RequestPreviewExists(req entities.Request) (bool, error) {
-	path, err := r.GetRequestCachePath(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
-	if err != nil {
-		return false, err
-	}
-
-	// check if the file exists, using errors because there is no direct exists function from os
-	// testing for file, because folder was automatically created by calling GetRequestCachePath
-	_, err = os.Stat(filepath.Join(path, "new", "main.qmd"))
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
-// StoreRequestPreview performs a merge without committing.
+// StoreRequestComparison performs a merge without committing.
 // Stores the before-and-after in a cache folder
 // Requires the commit/history ID's to be specified in the req struct
 // Might leave the repo behind with a detached HEAD
-// Returns true iff there are no conflicts
-func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
+// Returns whether there are conflicts
+func (r GitRepository) StoreRequestComparison(req entities.Request) (bool, error) {
 	// get paths
 	repo, err := r.GetArticlePath(req.ArticleID)
 	if err != nil {
 		return false, err
 	}
-	cache, err := r.GetRequestCachePath(req.ArticleID, req.SourceHistoryID, req.TargetHistoryID)
+	comparison, err := r.GetRequestComparisonPath(req.ArticleID, req.RequestID)
 	if err != nil {
 		return false, err
 	}
@@ -366,7 +346,7 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = ioutil.WriteFile(filepath.Join(cache, "old", "main.qmd"), input, 0644)
+	err = ioutil.WriteFile(filepath.Join(comparison, "old", "main.qmd"), input, 0644)
 	if err != nil {
 		return false, err
 	}
@@ -383,7 +363,7 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = ioutil.WriteFile(filepath.Join(cache, "new", "main.qmd"), input, 0644)
+	err = ioutil.WriteFile(filepath.Join(comparison, "new", "main.qmd"), input, 0644)
 	if err != nil {
 		return false, err
 	}
@@ -395,24 +375,24 @@ func (r GitRepository) StoreRequestPreview(req entities.Request) (bool, error) {
 			return false, errors.New(res)
 		}
 	}
-	return !conflicts, nil
+	return conflicts, nil
 }
 
-// GetRequestPreview returns the before and after main article file of a request
+// GetRequestComparison returns the before and after main article file of a request
 // requires the history ID's to be up-to-date in the req parameter
-func (r GitRepository) GetRequestPreview(article int64, sourceHistoryID string, targetHistoryID string) (string, string, error) {
+func (r GitRepository) GetRequestComparison(article int64, request int64) (string, string, error) {
 	// get paths
-	cache, err := r.GetRequestCachePath(article, sourceHistoryID, targetHistoryID)
+	path, err := r.GetRequestComparisonPath(article, request)
 	if err != nil {
 		return "", "", err
 	}
 
 	// read both old and new file from the cache
-	oldFile, err := ioutil.ReadFile(filepath.Join(cache, "old", "main.qmd"))
+	oldFile, err := ioutil.ReadFile(filepath.Join(path, "old", "main.qmd"))
 	if err != nil {
 		return "", "", err
 	}
-	newFile, err := ioutil.ReadFile(filepath.Join(cache, "new", "main.qmd"))
+	newFile, err := ioutil.ReadFile(filepath.Join(path, "new", "main.qmd"))
 	if err != nil {
 		return "", "", err
 	}

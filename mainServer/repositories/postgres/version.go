@@ -132,7 +132,7 @@ func (r PgVersionRepository) createVersionTable() error {
     			articleID int NOT NULL,
     			title VARCHAR(255) NOT NULL,
     			status VARCHAR(16) NOT NULL DEFAULT 'draft',
-    			latestCommit NCHAR(40),
+    			latestCommit CHAR(40),
     			FOREIGN KEY (articleID) REFERENCES article(id)    			
     )`)
 	return err
