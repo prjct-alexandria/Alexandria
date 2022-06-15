@@ -24,8 +24,8 @@ export default function CreateMR() {
 
   const [selectedVersion, setSelectedVersion] = useState("");
 
-  // const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
-  const urlCurrentArticle = "/article_version1.json";
+  const urlCurrentArticle = "http://localhost:8080/articles/" + params.articleId + "/versions/" + params.versionId;
+  // const urlCurrentArticle = "/article_version1.json";
   // retrieving the list of versions
   useEffect(() => {
     fetch(urlCurrentArticle, {
@@ -60,8 +60,8 @@ export default function CreateMR() {
     );
   }, [urlCurrentArticle]);
 
-  // const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
-  const urlArticleVersions = "/versionList.json";
+  const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
+  // const urlArticleVersions = "/versionList.json";
   useEffect(() => {
     fetch(urlArticleVersions, {
       method: "GET",

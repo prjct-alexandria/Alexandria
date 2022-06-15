@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import {Link, useParams, useSearchParams} from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
 import CreateMR from "./CreateMR";
@@ -103,6 +103,20 @@ export default function ArticleVersionPage() {
         </div>
         <hr />
         <ul className="nav justify-content-end d-grid gap-2 d-md-flex justify-content-md-end">
+          <li className="nav-item">
+            <a className="nav-link">
+            <Link to={"/articles/" + params.articleId + "/versions"}>
+              <button
+                  type="button"
+                  className="btn  btn-light"
+                  data-bs-toggle="modal"
+                  data-bs-target="#listVersions"
+              >
+                View list of versions
+              </button>
+            </Link>
+            </a>
+          </li>
           {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
