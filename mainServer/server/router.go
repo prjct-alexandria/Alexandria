@@ -18,7 +18,7 @@ import (
 func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
 	router.Use(middlewares.AuthMiddleware(cfg))
-	router.Use(middlewares.CorsHeaders())
+	router.Use(middlewares.CorsHeaders(cfg))
 
 	router.GET("/articles", contrs.article.ArticleList)
 	router.POST("/articles", contrs.article.CreateArticle)
