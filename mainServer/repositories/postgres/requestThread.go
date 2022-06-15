@@ -14,7 +14,7 @@ type PgRequestThreadRepository struct {
 //GetRequestThreads gets the request comment threads from the database, using the article id (aid) and request id (rid)
 func (r PgRequestThreadRepository) GetRequestThreads(aid int64, rid int64) ([]models.Thread, error) {
 	// construct list of threads
-	stmt, err := r.Db.Prepare("SELECT t.threadid, articleid, requestid, commentid, authorid, creationdate, content FROM requestthread rt JOIN thread t on rt.threadid = t.threadid JOIN comment c on t.threadid = c.threadid WHERE t.articleid = $1 AND rt.requestid = $2")
+	stmt, err := r.Db.Prepare("SELECT t.threadid, articleid, requestid, commentid, authorid, creationdate, content FROM requestthread rt JOIN thread t on rt.threadid = t.threadid JOIN comment c on t.threadid = c.threadid WHERE t.articleid = $1 AND rt.requestid = $2 ORDER BY creationdate")
 	if err != nil {
 		return nil, fmt.Errorf("GetRequestThreads: %v", err)
 	}
