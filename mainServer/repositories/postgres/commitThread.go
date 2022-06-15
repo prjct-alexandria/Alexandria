@@ -3,7 +3,6 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"mainServer/models"
 )
 
 type PgCommitThreadRepository struct {
@@ -22,20 +21,20 @@ func NewPgCommitThreadRepository(db *sql.DB) PgCommitThreadRepository {
 func (r PgCommitThreadRepository) createCommitThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitThread (
     	commitThreadId SERIAL,
-    	commitId BIGINT NOT NULL,
+    	commitId NCHAR(40) NOT NULL,
         threadId BIGINT NOT NULL,
     	PRIMARY KEY (commitThreadId)
     )`)
 	return err
 }
 
-func (r PgCommitThreadRepository) CreateCommitThread(thread models.Thread, tid int64) (int64, error) {
+func (r PgCommitThreadRepository) CreateCommitThread(cid string, tid int64) (int64, error) {
 	stmt, err := r.Db.Prepare(`INSERT INTO committhread (committhreadid, commitid, threadid) 
 	VALUES (DEFAULT, $1, $2) RETURNING committhreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateThread: %v", err)
 	}
-	row := stmt.QueryRow(thread.SpecificId, tid)
+	row := stmt.QueryRow(cid, tid)
 
 	var id int64
 	err = row.Scan(&id)

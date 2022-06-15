@@ -78,13 +78,15 @@ definitions:
     properties:
       articleID:
         type: integer
+      conflicted:
+        type: boolean
       requestID:
         type: integer
       sourceHistoryID:
         type: string
       sourceVersionID:
         type: integer
-      state:
+      status:
         type: string
       targetHistoryID:
         type: string
@@ -100,6 +102,19 @@ definitions:
     required:
     - sourceVersionID
     - targetVersionID
+    type: object
+  models.RequestWithComparison:
+    properties:
+      after:
+        type: string
+      before:
+        type: string
+      request:
+        $ref: '#/definitions/models.Request'
+      source:
+        $ref: '#/definitions/models.Version'
+      target:
+        $ref: '#/definitions/models.Version'
     type: object
   models.ReturnThreadIds:
     properties:
@@ -124,18 +139,17 @@ definitions:
         type: array
       id:
         type: integer
-      specificId:
-        type: integer
     required:
     - articleId
     - comment
-    - specificId
     type: object
   models.Version:
     properties:
       articleID:
         type: integer
       content:
+        type: string
+      latestHistoryID:
         type: string
       owners:
         items:
@@ -288,6 +302,42 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
+  /articles/{articleID}/requests/{requestID}:
+    get:
+      consumes:
+      - text/plain
+      description: Returns the information of a given request, including the information
+        of both versions. Note that comparing target and source versions directly,
+        isn't reliable as before-and-after comparison. That's why, instead of filling
+        in the contents of the version fields, a before and after string is included
+        in the response.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RequestWithComparison'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get Request
   /articles/{articleID}/requests/{requestID}/accept:
     put:
       consumes:

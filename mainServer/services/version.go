@@ -136,6 +136,12 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 		return models.Version{}, err
 	}
 
+	// Store the latest git commit ID of the version in the database entity
+	err = serv.UpdateLatestCommit(article, entity.Id)
+	if err != nil {
+		return models.Version{}, err
+	}
+
 	// Return model, made from entity
 	return models.Version{
 		ArticleID: entity.ArticleID,
@@ -172,6 +178,28 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 
 	// Commit
 	err = serv.GitRepo.Commit(article)
+	if err != nil {
+		return err
+	}
+
+	// Store the latest git commit ID of the version in the database entity
+	err = serv.UpdateLatestCommit(article, version)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// updateLatestCommit stores the latest git commit ID of the version in the database entity
+func (serv VersionService) UpdateLatestCommit(article int64, version int64) error {
+	// Get the latest commit ID from the git branch
+	commit, err := serv.Gitrepo.GetLatestCommit(article, version)
+	if err != nil {
+		return err
+	}
+	// Store the commit id in the database
+	err = serv.Versionrepo.UpdateVersionLatestCommit(version, commit)
 	if err != nil {
 		return err
 	}
