@@ -25,6 +25,7 @@ func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router.POST("/articles/:articleID/versions/:versionID", contrs.version.UpdateVersion)
 	router.POST("/articles/:articleID/versions", contrs.version.CreateVersionFrom)
 	router.GET("/articles/:articleID/versions/:versionID", contrs.version.GetVersion)
+	router.GET("/articles/:articleID/versions/:versionID/files", contrs.version.GetVersionFiles)
 	router.GET("/articles/:articleID/mainVersion", contrs.article.GetMainVersion)
 	router.GET("/articles/:articleID/versions", contrs.version.ListVersions)
 

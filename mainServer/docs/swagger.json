@@ -497,6 +497,42 @@
                 }
             }
         },
+        "/articles/{articleID}/versions/{versionID}/files": {
+            "get": {
+                "description": "Get all the files of an article version as a zip, should be accessible without being authenticated.",
+                "produces": [
+                    "application/x-zip-compressed"
+                ],
+                "summary": "Get all the files of a version as a zip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/comments/thread/:threadID": {
             "post": {
                 "description": "Save all types (commit/request/review) of comments to the database",

@@ -524,6 +524,31 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
+  /articles/{articleID}/versions/{versionID}/files:
+    get:
+      description: Get all the files of an article version as a zip, should be accessible
+        without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/x-zip-compressed
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all the files of a version as a zip
   /comments/thread/:threadID:
     post:
       consumes:
