@@ -56,6 +56,7 @@ export default function ArticleVersionPage() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           let VersionData: ArticleVersion = await response.json();
           setData(VersionData);
           setLoaded(true);

@@ -27,8 +27,8 @@ type Version = {
 export default function MRListElement(props: MRListProps) {
   let [sourceVersionData, setSourceVersionData] = useState<Version>();
   let [targetVersionData, setTargetVersionData] = useState<Version>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
 
   // use these URLs to get the name of the versions
   // const urlSource = "/version.json"; // Placeholder
@@ -47,18 +47,27 @@ export default function MRListElement(props: MRListProps) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setLoaded(true);
-          setSourceVersionData(result);
-        },
-        (error) => {
-          setLoaded(true);
-          setError(error);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let sourceData: Version = await response.json();
+          setSourceVersionData(sourceData);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+        setLoaded(true);
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -70,18 +79,27 @@ export default function MRListElement(props: MRListProps) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setLoaded(true);
-          setTargetVersionData(result);
-        },
-        (error) => {
-          setLoaded(true);
-          setError(error);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let targetData: Version = await response.json();
+          setSourceVersionData(targetData);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+        setLoaded(true);
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, []);
 
   return (
@@ -94,7 +112,7 @@ export default function MRListElement(props: MRListProps) {
           message={"Something went wrong. " + error}
         />
       )}
-      {sourceVersionData !== null && targetVersionData !== null && (
+      {sourceVersionData && targetVersionData && (
         <Link
           to={
             "/articles/" +
@@ -106,11 +124,11 @@ export default function MRListElement(props: MRListProps) {
         >
           <button className="row row-no-gutters col-md-12 m-1">
             <div className="col-md-2">
-              {sourceVersionData !== undefined && sourceVersionData.title}
+              {sourceVersionData && sourceVersionData.title}
             </div>
             <div className="col-md-2">{props.MR.sourceHistoryID}</div>
             <div className="col-md-2">
-              {targetVersionData !== undefined && targetVersionData.title}
+              {targetVersionData && targetVersionData.title}
             </div>
             <div className="col-md-2">{props.MR.targetHistoryID}</div>
             <div className="col-md-4">{props.MR.state}</div>

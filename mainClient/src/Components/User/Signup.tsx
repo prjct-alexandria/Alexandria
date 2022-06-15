@@ -51,6 +51,7 @@ export default function Signup() {
     }).then(
       (response) => {
         if (response.ok) {
+          setError(undefined);
           setSignupSuccess(response.ok);
           // Use JQuery to "simulate" button presses,
           // which close the signup modal, then open the login

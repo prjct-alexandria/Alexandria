@@ -18,6 +18,7 @@ export default function Logout() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           // Set session details in localStorage
           removeUserFromLocalStorage();
 

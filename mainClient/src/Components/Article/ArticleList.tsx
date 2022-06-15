@@ -35,8 +35,9 @@ export default function ArticleList() {
     }).then(
       async (response) => {
         if (response.ok) {
-          let ArticleList: Article[] = await response.json();
-          setArticleList(ArticleList);
+          setError(undefined);
+          let articleList: Article[] = await response.json();
+          setArticleList(articleList);
         } else {
           // Set error with message returned from the server
           let responseJSON: {

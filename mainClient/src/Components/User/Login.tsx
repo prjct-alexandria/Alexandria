@@ -35,6 +35,7 @@ export default function Login() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           let responseJSON: {
             name: string;
             email: string;

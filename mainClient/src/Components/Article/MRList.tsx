@@ -22,8 +22,8 @@ export default function MRList() {
   let targetVersionID = searchParams.get("target");
 
   let [MRListData, setMRListData] = useState<MR[]>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
 
   const baseUrl =
     "http://localhost:8080/articles/" + params.articleId + "/requests";
@@ -49,18 +49,27 @@ export default function MRList() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setLoaded(true);
-          setMRListData(result);
-        },
-        (error) => {
-          setLoaded(true);
-          setError(error);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let MRList: MR[] = await response.json();
+          setMRListData(MRList);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+        setLoaded(true);
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, []);
 
   const mrListMap = () => {

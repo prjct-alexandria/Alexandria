@@ -5,7 +5,7 @@ import NotificationAlert from "../NotificationAlert";
 
 export default function FileUpload() {
   let [selectedFile, setSelectedFile] = useState<string | Blob>("file");
-  let [error, setError] = useState(null);
+  let [error, setError] = useState<Error>();
   let [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
 
   const onChangeFile = (e: any) => {
@@ -33,19 +33,24 @@ export default function FileUpload() {
       credentials: "include",
       body: formData,
     }).then(
-      (response) => {
+      async (response) => {
         // refresh page
         window.location.reload();
-        if (response.status === 200) {
-          // Set success in state to show success alert
+        if (response.ok) {
+          // Set success in state to show success alert for 3 seconds
           setUploadSuccess(true);
-
-          // After 3s, remove success from state to hide success alert
           setTimeout(() => setUploadSuccess(false), 3000);
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
       },
       (error) => {
-        console.error("Error: ", error);
         setError(error);
       }
     );

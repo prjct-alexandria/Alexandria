@@ -16,8 +16,8 @@ export default function CreateMR() {
   let params = useParams();
 
   let [dataCurVersion, setDataCurVersion] = useState<Version>();
-  let [isLoaded, setLoaded] = useState(false);
-  let [error, setError] = useState(null);
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
   let [createMRSuccess, setCreateMRSuccess] = useState<boolean>(false);
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
@@ -36,18 +36,28 @@ export default function CreateMR() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setDataCurVersion(result);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let versionData: Version = await response.json();
+          setDataCurVersion(versionData);
           setLoaded(true);
-        },
-        (error) => {
-          setError(error.message);
+        } else {
           setLoaded(true);
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, [urlCurrentArticle]);
 
   // const urlArticleVersions = "http://localhost:8080/articles/" + params.articleId + "/versions";
@@ -61,18 +71,28 @@ export default function CreateMR() {
         Accept: "application/json",
       },
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setDataVersions(result);
+    }).then(
+      async (response) => {
+        if (response.ok) {
+          let versionList: Version[] = await response.json();
+          setDataVersions(versionList);
           setLoaded(true);
-        },
-        (error) => {
-          setError(error.message);
+        } else {
           setLoaded(true);
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
-      );
+      },
+      (error) => {
+        setLoaded(true);
+        setError(error);
+      }
+    );
   }, [urlArticleVersions]);
 
   function handleSelectChange(event: {

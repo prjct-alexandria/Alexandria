@@ -62,10 +62,11 @@ export default function CreateArticle() {
       headers: { "Content-Type": "application/json" },
       mode: "cors",
       body: JSON.stringify(body),
-      credentials: "include"
+      credentials: "include",
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           let responseJSON: {
             articleID: string;
             versionID: string;

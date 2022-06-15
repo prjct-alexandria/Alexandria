@@ -26,11 +26,12 @@ function getRequest(
   url: string,
   setData: (r: Request) => void,
   setLoaded: (b: boolean) => void,
-  setError: (e: Error) => void
+  setError: (e: Error | undefined) => void
 ) {
   fetch(url).then(
     async (response) => {
       if (response.ok) {
+        setError(undefined);
         let requestData: Request = await response.json();
         setData(requestData);
         setLoaded(true);
@@ -55,11 +56,12 @@ function getVersion(
   url: string,
   setData: (v: ArticleVersion) => void,
   setLoaded: (b: boolean) => void,
-  setError: (e: Error) => void
+  setError: (e: Error | undefined) => void
 ) {
   fetch(url).then(
     async (response) => {
       if (response.ok) {
+        setError(undefined);
         let articleSourceData: ArticleVersion = await response.json();
         setData(articleSourceData);
       } else {
@@ -221,6 +223,7 @@ export default function VersionList() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           // Set success in state to show success alert
           setAcceptSuccess(true);
 
@@ -258,6 +261,7 @@ export default function VersionList() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           // Set success in state to show success alert
           setRejectSuccess(true);
 
@@ -294,6 +298,7 @@ export default function VersionList() {
     }).then(
       async (response) => {
         if (response.ok) {
+          setError(undefined);
           // Set success in state to show success alert
           setDeleteSuccess(true);
 
