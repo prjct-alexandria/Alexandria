@@ -59,7 +59,7 @@ export default function ArticleVersionPage() {
         if (response.ok) {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
-          setOldVersion(VersionData.latestHistoryID != historyID)
+          setOldVersion(historyID != null && VersionData.latestHistoryID != historyID)
           setData(VersionData);
           setLoaded(true);
         } else {
