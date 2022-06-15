@@ -6,6 +6,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import ThreadList from "./ThreadList";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import configData from "../../config.json";
 
 type Request = {
   sourceVersionID: number;
@@ -92,7 +93,7 @@ export default function VersionList() {
   let params = useParams();
 
   const urlRequest = "/request.json";
-  //const urlRequest = 'http://localhost:8080/articles/' + params.articleId  + "/requests/" + params.requestId;
+  // const urlRequest = configData.back_end_url + "/articles/" + params.articleId  + "/requests/" + params.requestId;
 
   let [dataRequest, setDataRequest] = useState<Request>();
   let [isLoadedRequest, setLoadedRequest] = useState<boolean>(false);
@@ -108,14 +109,14 @@ export default function VersionList() {
 
   if (dataRequest !== undefined) {
     urlArticleSource =
-      "http://localhost:8080/articles/" +
+      configData.back_end_url + "/articles/" +
       params.articleId +
       "/versions/" +
       params.versionId +
       "/history/" +
       dataRequest.sourceHistoryID;
     urlArticleTarget =
-      "http://localhost:8080/articles/" +
+      configData.back_end_url + "/articles/" +
       params.articleId +
       "/versions/" +
       dataRequest.targetVersionID +
@@ -210,7 +211,7 @@ export default function VersionList() {
   // Send HTTP request and reload, so that the style (see "acceptButton") is updated.
   const handleAcceptClick = async () => {
     const url =
-      "http://localhost:8080/articles/" +
+      configData.back_end_url + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId +
@@ -248,7 +249,7 @@ export default function VersionList() {
   // Send HTTP request and reload, so that the style (see "rejectButton") is updated.
   const handleRejectClick = async () => {
     const url =
-      "http://localhost:8080/articles/" +
+      configData.back_end_url + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId +
@@ -286,7 +287,7 @@ export default function VersionList() {
   // Send HTTP request and reload, so that the style (see "deleteButton") is updated.
   const handleDeleteClick = async () => {
     const url =
-      "http://localhost:8080/articles/" +
+      configData.back_end_url + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId;

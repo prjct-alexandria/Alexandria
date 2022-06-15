@@ -1,0 +1,31 @@
+{
+  "hosting":  {
+    "back-end": {
+      "host" : "localhost",
+      "port": 8080,
+      "use-ssl": false
+    },
+    "front-end": {
+      "host" : "localhost",
+      "port": 3000,
+      "use-ssl": false
+    }
+  },
+  "database": {
+    "url" : {
+      "host": "localhost",
+      "port": 5432,
+      "use-ssl": false
+    },
+    "user": "postgres",
+    "pwd": "admin",
+    "dbname": "AlexandriaPG"
+  },
+  "auth": {
+    "jwt-secret": "thisShouldBeKeptVerySecret",
+    "token-expire-minutes": 15
+  },
+  "git": {
+    "path": "../../gitfiles"
+  }
+}

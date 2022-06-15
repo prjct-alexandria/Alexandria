@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
+import configData from "../../config.json";
 
 type MRListProps = {
   MR: {
@@ -33,10 +34,10 @@ export default function MRListElement(props: MRListProps) {
   // use these URLs to get the name of the versions
   // const urlSource = "/version.json"; // Placeholder
   // const urlTarget = "/version.json"; // Placeholder
-  const urlSource =
-    "/articles/" + props.MR.articleID + "/versions/" + props.MR.sourceVersionID;
-  const urlTarget =
-    "/articles/" + props.MR.articleID + "/versions/" + props.MR.targetVersionID;
+  const urlSource = configData.back_end_url
+    + "/articles/" + props.MR.articleID + "/versions/" + props.MR.sourceVersionID;
+  const urlTarget = configData.back_end_url
+    + "/articles/" + props.MR.articleID + "/versions/" + props.MR.targetVersionID;
 
   useEffect(() => {
     fetch(urlSource, {

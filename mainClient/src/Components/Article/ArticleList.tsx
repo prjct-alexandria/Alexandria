@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ArticleListElement from "./ArticleListElement";
 import LoadingSpinner from "../LoadingSpinner";
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 
 type Article = {
@@ -21,8 +22,8 @@ export default function ArticleList() {
   let [error, setError] = useState<Error>();
 
   useEffect(() => {
-    const url = "http://localhost:8080/articles";
-    // const url = "/articleList.json"; // Placeholder
+    const url = configData.back_end_url + "/articles";
+    //const url = "/articleList.json"; // Placeholder
 
     fetch(url, {
       method: "GET",

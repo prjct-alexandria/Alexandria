@@ -2,6 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import NotificationAlert from "../NotificationAlert";
+import configData from "../../config.json"
 
 type ThreadProps = {
   id: undefined | number;
@@ -10,7 +11,7 @@ type ThreadProps = {
 };
 
 export default function CreateComment(props: ThreadProps) {
-  let baseUrl = "http://localhost:8080";
+  let baseUrl= configData.back_end_url;
   let [error, setError] = useState<Error>();
   let [newCommentContent, setNewCommentContent] = useState<string>("");
   let [threadId, setThreadId] = useState(props.id ? props.id : undefined);

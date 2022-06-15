@@ -4,6 +4,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import MRListElement from "./MRListElement";
 import { useParams, useSearchParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
+import configData from "../../config.json";
 
 type MR = {
   requestID: number;
@@ -25,8 +26,7 @@ export default function MRList() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
 
-  const baseUrl =
-    "http://localhost:8080/articles/" + params.articleId + "/requests";
+    const baseUrl = configData.back_end_url +"/articles/" + params.articleId + "/requests";
 
   let appendUrl = "";
   if (sourceVersionID != null && targetVersionID != null) {

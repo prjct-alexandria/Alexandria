@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment";
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
@@ -21,7 +22,7 @@ type ThreadComment = {
 };
 
 export default function Thread(props: ThreadProps) {
-  let baseUrl = "http://localhost:8080";
+  let baseUrl = configData.back_end_url;
   let [commentData, setData] = useState<ThreadComment[]>();
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
