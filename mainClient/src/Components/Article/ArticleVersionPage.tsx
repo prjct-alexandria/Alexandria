@@ -128,7 +128,7 @@ export default function ArticleVersionPage() {
               <a className="nav-link">
                 <button
                   type="button"
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-light"
                   data-bs-toggle="modal"
                   data-bs-target="#createNewVersion"
                 >
@@ -143,7 +143,7 @@ export default function ArticleVersionPage() {
               <a className="nav-link">
                 <button
                   type="button"
-                  className="btn  btn-light"
+                  className="btn btn-light"
                   data-bs-toggle="modal"
                   data-bs-target="#createMR"
                 >
