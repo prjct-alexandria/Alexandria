@@ -51,11 +51,11 @@ export default function MRListElement(props: MRListProps) {
           className="text-decoration-none"
         >
           <button className="row row-no-gutters col-md-12 m-1">
-            <div className="col-md-2">
+            <div className="col-md-4">
               {props.MR.sourceTitle}
             </div>
             {/*<div className="col-md-2">{props.MR.sourceHistoryID}</div>*/}
-            <div className="col-md-2">
+            <div className="col-md-4">
               {props.MR.targetTitle}
             </div>
             {/*<div className="col-md-2">{props.MR.targetHistoryID}</div>*/}

@@ -92,23 +92,26 @@ export default function MRList() {
               <h5>From</h5>
             </div>
             <div className="col-md-4">
-              <h5>to</h5>
+              <h5>To</h5>
             </div>
             <div className="col-md-4">
               <h5>State</h5>
             </div>
-            <div className="col-md-2">
-              <h6>Version:</h6>
+            <div className="col-md-4">
+              <h6>Source Version:</h6>
             </div>
-            <div className="col-md-2">
-              <h6>History:</h6>
+            {/*<div className="col-md-2">*/}
+            {/*  <h6>History:</h6>*/}
+            {/*</div>*/}
+            <div className="col-md-4">
+              <h6>Target Version:</h6>
             </div>
-            <div className="col-md-2">
-              <h6>Version:</h6>
+            <div className="col-md-4">
+              <h6>Status:</h6>
             </div>
-            <div className="col-md-2">
-              <h6>History:</h6>
-            </div>
+            {/*<div className="col-md-2">*/}
+            {/*  <h6>History:</h6>*/}
+            {/*</div>*/}
           </div>
           <div>{mrListMap()}</div>
         </div>
