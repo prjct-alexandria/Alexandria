@@ -5,16 +5,10 @@ import MRListElement from "./MRListElement";
 import { useParams, useSearchParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
 import configData from "../../config.json";
+import {Request} from "./CompareView";
 
 type MR = {
-  requestID: number;
-  articleID: number;
-  sourceVersionID: number;
-  sourceHistoryID: number;
-  targetVersionID: number;
-  targetHistoryID: number;
-  status: string;
-  conflicted: boolean;
+  request: Request
   sourceTitle: string;
   targetTitle: string;
 };

@@ -4,17 +4,11 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
 import configData from "../../config.json";
+import {Request} from "./CompareView";
 
 type MRListProps = {
   MR: {
-    requestID: number;
-    articleID: number;
-    sourceVersionID: number;
-    sourceHistoryID: number;
-    targetVersionID: number;
-    targetHistoryID: number;
-    status: string;
-    conflicted: boolean;
+    request: Request;
     sourceTitle: string;
     targetTitle: string;
   };
@@ -44,9 +38,9 @@ export default function MRListElement(props: MRListProps) {
         <Link
           to={
             "/articles/" +
-            props.MR.articleID +
+            props.MR.request.articleID +
             "/requests/" +
-            props.MR.requestID
+            props.MR.request.requestID
           }
           className="text-decoration-none"
         >
@@ -59,7 +53,7 @@ export default function MRListElement(props: MRListProps) {
               {props.MR.targetTitle}
             </div>
             {/*<div className="col-md-2">{props.MR.targetHistoryID}</div>*/}
-            <div className="col-md-4">{props.MR.status}</div>
+            <div className="col-md-4">{props.MR.request.status}</div>
           </button>
         </Link>
       )}

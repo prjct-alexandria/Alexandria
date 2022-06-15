@@ -118,10 +118,12 @@ func (r PgRequestRepository) GetRequestList(articleId int64, sourceId int64, tar
 	}
 
 	for rows.Next() {
-		var request models.RequestListElement
+		var request models.Request
+		var mergeRequest models.RequestListElement
 		err = rows.Scan(&request.RequestID, &request.ArticleID, &request.SourceVersionID, &request.SourceHistoryID, &request.TargetVersionID,
-			&request.TargetHistoryID, &request.Status, &request.Conflicted, &request.SourceTitle, &request.TargetTitle)
-		list = append(list, request)
+			&request.TargetHistoryID, &request.Status, &request.Conflicted, &mergeRequest.SourceTitle, &mergeRequest.TargetTitle)
+		mergeRequest.Request = request
+		list = append(list, mergeRequest)
 	}
 	return list, nil
 }

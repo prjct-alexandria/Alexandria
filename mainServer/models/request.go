@@ -25,14 +25,7 @@ type RequestCreationForm struct {
 }
 
 type RequestListElement struct {
-	RequestID       int64  `json:"requestID"`
-	ArticleID       int64  `json:"articleID"`
-	SourceVersionID int64  `json:"sourceVersionID"`
-	SourceHistoryID string `json:"sourceHistoryID"`
-	TargetVersionID int64  `json:"targetVersionID"`
-	TargetHistoryID string `json:"targetHistoryID"`
-	Status          string `json:"status"`
-	Conflicted      bool   `json:"conflicted"`
-	SourceTitle     string `json:"sourceTitle"`
-	TargetTitle     string `json:"targetTitle"`
+	Request     Request `json:"request"`
+	SourceTitle string  `json:"sourceTitle"`
+	TargetTitle string  `json:"targetTitle"`
 }
