@@ -92,8 +92,8 @@ export default function VersionList() {
 
   let params = useParams();
 
-  //const urlRequest = "/request.json";
-  const urlRequest = configData.back_end_url + "/articles/" + params.articleId  + "/requests/" + params.requestId;
+  const urlRequest = "/request.json";
+  // const urlRequest = configData.back_end_url + "/articles/" + params.articleId  + "/requests/" + params.requestId;
 
   let [dataRequest, setDataRequest] = useState<Request>();
   let [isLoadedRequest, setLoadedRequest] = useState<boolean>(false);
