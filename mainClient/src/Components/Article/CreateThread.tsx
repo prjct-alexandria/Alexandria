@@ -27,6 +27,5 @@ export default function CreateThread(props: ThreadProps) {
             {newThreadList.slice(1)}
             <button className="btn btn-primary m-2" type="submit" onClick={addThread}>+</button>
         </div>
-
     );
 }

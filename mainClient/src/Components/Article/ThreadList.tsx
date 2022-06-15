@@ -13,7 +13,6 @@ type ThreadListProps = {
     "specificId": number
 };
 
-
 type ThreadComment = {
     "id": number,
     "authorId": string,
@@ -28,8 +27,6 @@ type ThreadEntity = {
     "id": number
     "specificId": number
 }
-
-
 
 export default function ThreadList(props: ThreadListProps) {
   let baseUrl= configData.back_end_url;
@@ -67,31 +64,58 @@ export default function ThreadList(props: ThreadListProps) {
                 Accept: "application/json",
             },
             credentials: 'include',
-        })
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    setLoaded(true);
-                    setData(result);
-                },
-                (error) => {
-                    setLoaded(true);
-                    setError(error);
+        }).then(
+            async (response) => {
+                if (response.ok) {
+                    let threadListData: ThreadEntity[] = await response.json();
+                    setData(threadListData);
+                } else {
+                    // Set error with message returned from the server
+                    let responseJSON: {
+                        message: string;
+                    } = await response.json();
+
+                    let serverMessage: string = responseJSON.message;
+                    setError(new Error(serverMessage));
                 }
-            );
+                setLoaded(true);
+            },
+            (error) => {
+                setLoaded(true);
+                setError(error);
+            }
+        );
     }, []);
 
     return (
         <div>
             {!isLoaded && <LoadingSpinner />}
-            {error && <div>{`There is a problem fetching the data - ${error}`}</div>}
+            {error && (
+                <NotificationAlert
+                    errorType="danger"
+                    title={"Error: "}
+                    message={"Something went wrong. " + error}
+                />
+            )}
             <div id="accordionPanelsStayOpenExample">
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <Thread key={i} id={thread.id} specificId={props.specificId} threadType={props.threadType} comments={thread.comment}/>
+                        <Thread
+                            key={i}
+                            id={thread.id}
+                            specificId={props.specificId}
+                            threadType={props.threadType}
+                            comments={thread.comment}
+                        />
                     ))}
             </div>
-            <CreateThread id={undefined} specificId={props.specificId} threadType={props.threadType}/>
+            {isLoggedIn && (
+                <CreateThread
+                    id={undefined}
+                    specificId={props.specificId}
+                    threadType={props.threadType}
+                />
+            )}
         </div>
     );
 }
