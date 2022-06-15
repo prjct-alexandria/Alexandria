@@ -621,6 +621,26 @@ paths:
         "500":
           description: Could not create token
       summary: Endpoint for user logging in
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Sets an expired cookie with an empty email and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginForm'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "500":
+          description: Could not update token
+      summary: Endpoint for user logging out
   /users:
     post:
       consumes:
