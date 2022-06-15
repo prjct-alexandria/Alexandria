@@ -1,9 +1,11 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import {useParams} from "react-router-dom";
-import Thread from "./Thread"
+import { useParams } from "react-router-dom";
+import Thread from "./Thread";
 import CreateThread from "./CreateThread";
+import NotificationAlert from "../NotificationAlert";
+import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type ThreadListProps = {
     "threadType": string
@@ -20,18 +22,26 @@ type ThreadComment = {
 }
 
 type ThreadEntity = {
-    "articleId":	number
+    "articleId": number
     "comment": ThreadComment[]
     "id": number
     "specificId": number
 }
 
 
+
 export default function ThreadList(props: ThreadListProps) {
-    let baseUrl = "http://localhost:8080";
-    let [threadListData, setData] = useState<ThreadEntity[]>();
-    let [isLoaded, setLoaded] = useState(false);
-    let [error, setError] = useState(null);
+  let baseUrl = "http://localhost:8080";
+  let [threadListData, setData] = useState<ThreadEntity[]>();
+  let [isLoaded, setLoaded] = useState<boolean>(false);
+  let [error, setError] = useState<Error>();
+
+  let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+
+  // Listen for userAccountEvent that fires when user in localstorage changes
+    window.addEventListener("userAccountEvent", () => {
+        setLoggedIn(isUserLoggedIn());
+    });
 
     const params = useParams();
 
@@ -39,7 +49,7 @@ export default function ThreadList(props: ThreadListProps) {
         let urlThreadList = "";
         if (props.threadType === "commit") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-            // "/history/" + params.historyId + "/threads";
+                // "/history/" + params.historyId + "/threads";
                 "/history/" + 1 + "/threads";
         } else if (props.threadType === "request") {
             urlThreadList = baseUrl + "/articles/" + params.articleId + "/requests/" + params.requestId +

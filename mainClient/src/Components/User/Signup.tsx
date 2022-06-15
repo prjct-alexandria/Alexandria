@@ -2,14 +2,15 @@ import * as React from "react";
 import { useState } from "react";
 import $ from "jquery";
 import SignupForm from "./SignupForm";
+import NotificationAlert from "../NotificationAlert";
 
 export default function Signup() {
   let [username, setUsername] = useState<string>();
   let [email, setEmail] = useState<string>();
   let [password, setPassword] = useState<string>();
   let [confirmPassword, setConfirmPassword] = useState<string>();
-  let [error, setError] = useState(null);
-  let [httpResponse, setHttpResponse] = useState<Response>();
+  let [error, setError] = useState<Error>();
+  let [signupSuccess, setSignupSuccess] = useState<boolean>(false);
 
   const onChangeUsername = (e: { target: { value: any } }) => {
     setUsername(e.target.value);
@@ -48,15 +49,17 @@ export default function Signup() {
       mode: "cors",
       body: JSON.stringify(body),
     }).then(
-      // Success
       (response) => {
-        console.log("Success:", response);
-        setHttpResponse(response);
-
-        // Use JQuery to "simulate" button presses,
-        // which close the signup modal, then open the login
-        $('#btn-close-signup-form').trigger('click');
-        $('#btn-open-login-form').trigger('click');
+        if (response.ok) {
+          setError(undefined);
+          setSignupSuccess(response.ok);
+          // Use JQuery to "simulate" button presses,
+          // which close the signup modal, then open the login
+          $("#btn-close-signup-form").trigger("click");
+          $("#btn-open-login-form").trigger("click");
+        } else {
+          setError(new Error(response.statusText));
+        }
       },
       (error) => {
         // Request returns an error
@@ -68,7 +71,20 @@ export default function Signup() {
 
   return (
     <div>
-      {error && <div>{`There is a problem - ${error}`}</div>}
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error}
+        />
+      )}
+      {signupSuccess && (
+        <NotificationAlert
+          errorType="success"
+          title="Account successfully created! "
+          message={"You can now log into your account."}
+        />
+      )}
       {
         <SignupForm
           username={username}

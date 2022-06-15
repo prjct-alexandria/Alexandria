@@ -90,6 +90,7 @@ func (contr ArticleController) ArticleList(c *gin.Context) {
 	list, err := contr.serv.GetArticleList()
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("server could not retrieve article list"))
+		return
 	}
 	c.IndentedJSON(http.StatusOK, list)
 }

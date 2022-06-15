@@ -477,6 +477,12 @@ const docTemplate = `{
                         "name": "versionID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "History ID",
+                        "name": "historyID",
+                        "in": "query"
                     }
                 ],
                 "responses": {
