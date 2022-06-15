@@ -146,7 +146,8 @@ export default function CompareView() {
   let [error, setError] = useState<Error>();
 
   // Send HTTP request and reload, so that the style (see "acceptButton") is updated.
-  const handleAcceptClick = async () => {
+  const handleAcceptClick = async (e: { preventDefault: () => void; }) => {
+      e.preventDefault()
     const url =
       configData.back_end_url + "/articles/" +
       params.articleId +
@@ -167,6 +168,8 @@ export default function CompareView() {
 
           // After 3s, remove success from state to hide success alert
           setTimeout(() => setAcceptSuccess(false), 3000);
+
+          window.location.reload();
         } else {
           let responseJSON: {
             message: string;
@@ -180,11 +183,11 @@ export default function CompareView() {
         setError(error);
       }
     );
-    window.location.reload();
   };
 
   // Send HTTP request and reload, so that the style (see "rejectButton") is updated.
-  const handleRejectClick = async () => {
+  const handleRejectClick = async (e: { preventDefault: () => void; }) => {
+      e.preventDefault()
     const url =
       configData.back_end_url + "/articles/" +
       params.articleId +
@@ -205,6 +208,8 @@ export default function CompareView() {
 
           // After 3s, remove success from state to hide success alert
           setTimeout(() => setRejectSuccess(false), 3000);
+
+          window.location.reload();
         } else {
           let responseJSON: {
             message: string;
@@ -218,11 +223,11 @@ export default function CompareView() {
         setError(error);
       }
     );
-    window.location.reload();
   };
 
   // Send HTTP request and reload, so that the style (see "deleteButton") is updated.
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = async (e: { preventDefault: () => void; }) => {
+      e.preventDefault()
     const url =
       configData.back_end_url + "/articles/" +
       params.articleId +
@@ -242,6 +247,8 @@ export default function CompareView() {
 
           // After 3s, remove success from state to hide success alert
           setTimeout(() => setDeleteSuccess(false), 3000);
+
+          window.location.reload();
         } else {
           let responseJSON: {
             message: string;
@@ -282,9 +289,10 @@ export default function CompareView() {
               <div className='col-1'>
                   {rejectButton()}
               </div>
-              <div className='col-1'>
-                  {deleteButton()}
-              </div>
+              {/*TODO: un hide when delete implemented on backend*/}
+              {/*<div className='col-1'>*/}
+              {/*    {deleteButton()}*/}
+              {/*</div>*/}
 
           </div>
 

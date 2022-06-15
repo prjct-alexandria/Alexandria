@@ -76,7 +76,7 @@ export default function ArticleVersionPage() {
         setError(error);
       }
     );
-  }, [url]);
+  }, []);
 
   return (
     <div className={"row justify-content-center wrapper"}>
