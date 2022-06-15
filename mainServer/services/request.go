@@ -210,6 +210,6 @@ func (s RequestService) UpdateRequestComparison(req entities.Request, source ent
 	return nil
 }
 
-func (s RequestService) GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.Request, error) {
+func (s RequestService) GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
 	return s.Repo.GetRequestList(articleId, sourceId, targetId, relatedId)
 }

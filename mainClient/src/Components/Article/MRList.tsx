@@ -13,7 +13,10 @@ type MR = {
   sourceHistoryID: number;
   targetVersionID: number;
   targetHistoryID: number;
-  state: string;
+  status: string;
+  conflicted: boolean;
+  sourceTitle: string;
+  targetTitle: string;
 };
 
 export default function MRList() {

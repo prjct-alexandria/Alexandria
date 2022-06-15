@@ -21,5 +21,5 @@ type RequestRepository interface {
 	UpdateRequest(req entities.Request) error
 
 	// GetRequestList returns a list of request models related to specified article, with possible filters
-	GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.Request, error)
+	GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error)
 }
