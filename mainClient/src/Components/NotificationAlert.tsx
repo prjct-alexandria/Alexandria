@@ -1,13 +1,16 @@
 type alertProps = {
+  errorType: string; // success or danger
   title: string;
   message: string;
 };
 
-export default function ErrorAlert(props: alertProps) {
+export default function NotificationAlert(props: alertProps) {
   return (
     <div
-      id="error-alert"
-      className="alert alert-danger alert-dismissible fade show"
+      id={props.errorType + "-alert"}
+      className={
+        "alert alert-" + props.errorType + " alert-dismissible fade show"
+      }
       role="alert"
     >
       <strong>{props.title}</strong> {props.message}
