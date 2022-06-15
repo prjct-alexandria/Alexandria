@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/fs"
 	"io/ioutil"
+	"mainServer/server/config"
 	"os"
 	"path/filepath"
 )
@@ -13,11 +14,14 @@ type FilesystemRepository struct {
 	Path string
 }
 
-func NewFilesystemRepository(path string) (FilesystemRepository, error) {
-	repo := FilesystemRepository{path}
+func NewFilesystemRepository(cfg *config.GitConfig) FilesystemRepository {
+	repo := FilesystemRepository{Path: cfg.Path}
 
-	err := os.MkdirAll(filepath.Join(repo.Path, "cache", "downloads"), os.ModePerm)
-	return repo, err
+	err := os.MkdirAll(filepath.Join(cfg.Path, "cache", "downloads"), os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	return repo
 }
 
 func (repo FilesystemRepository) AddFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
