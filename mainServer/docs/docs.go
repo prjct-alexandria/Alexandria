@@ -144,6 +144,57 @@ const docTemplate = `{
             }
         },
         "/articles/{articleID}/requests": {
+            "get": {
+                "description": "Gets a list of merge requests (with possible filtering conditions)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a list of merge requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source version",
+                        "name": "sourceID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Target version",
+                        "name": "targetID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source or Target version",
+                        "name": "relatedID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Request"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid article ID provided"
+                    },
+                    "404": {
+                        "description": "Could not find merge requests for this article"
+                    }
+                }
+            },
             "post": {
                 "description": "Creates request to merge one article versions' changes into another",
                 "consumes": [

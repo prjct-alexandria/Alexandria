@@ -13,7 +13,7 @@ type VListProps = {
 
 export default function VersionListElement(props: VListProps) {
   let params = useParams();
-  let baseLink = '/articles/' + params.aid + '/requests'
+  let baseLink = '/articles/' + params.articleId + '/requests'
 
   return (
     <div className="row row-no-gutters col-md-12 text-wrap">
@@ -27,9 +27,9 @@ export default function VersionListElement(props: VListProps) {
           {props.version.title}
         </Link>
       </div>
-      <div className="col-md-2"><Link to={baseLink}>See all requests</Link></div>
-      <div className="col-md-2"><Link to={baseLink + '?source=' + props.version.versionID}>See requests as source</Link></div>
-      <div className="col-md-2"><Link to={baseLink + '?target=' + props.version.versionID}>See requests as target</Link></div>
+      <div className="col-md-2"><Link to={baseLink + '?relatedID=' + props.version.versionID}>See all related requests</Link></div>
+      <div className="col-md-2"><Link to={baseLink + '?sourceID=' + props.version.versionID}>See requests as source</Link></div>
+      <div className="col-md-2"><Link to={baseLink + '?targetID=' + props.version.versionID}>See requests as target</Link></div>
 
       <div className="col-md-2">{props.version.owners.join(', ')}</div>
       <div className="col-md-1">{props.version.status}</div>
