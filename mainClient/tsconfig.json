@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    "resolveJsonModule": true,
 
     /* Projects */
     // "incremental": true,                              /* Enable incremental compilation */
@@ -100,7 +101,7 @@
   },
   "include": [
     "jsx/**/*",
-    "src/*"
+    "src/*",
   ],
   "exclude": [
     "node_modules"
