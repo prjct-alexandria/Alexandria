@@ -274,6 +274,40 @@ paths:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Creates thread entity
   /articles/{articleID}/requests:
+    get:
+      description: Gets a list of merge requests (with possible filtering conditions)
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Source version
+        in: query
+        name: sourceID
+        type: string
+      - description: Target version
+        in: query
+        name: targetID
+        type: string
+      - description: Source or Target version
+        in: query
+        name: relatedID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Request'
+            type: array
+        "400":
+          description: Invalid article ID provided
+        "404":
+          description: Could not find merge requests for this article
+      summary: Get a list of merge requests
     post:
       consumes:
       - application/json

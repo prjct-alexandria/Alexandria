@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"mainServer/entities"
+	"mainServer/models"
 )
 
 type PgRequestRepository struct {
@@ -87,6 +88,44 @@ func (r PgRequestRepository) GetRequest(request int64) (entities.Request, error)
 	}
 
 	return req, nil
+}
+
+func (r PgRequestRepository) GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+	stmt, err := r.Db.Prepare(`SELECT request.id, request.articleid, sourceversionid, sourcehistoryid,
+       targetversionid, targethistoryid, request.status, conflicted, v.title, v2.title
+		FROM request 
+         JOIN version v on request.sourceversionid = v.id
+         JOIN version v2 on request.targetversionid = v2.id
+         WHERE request.articleID=$1 AND (sourceversionid IN ($2, $4)
+    OR targetversionid IN ($3, $4) OR $5)`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var list []models.RequestListElement
+	var rows *sql.Rows
+
+	// Query all rows if no filters have been provided
+	if sourceId == -1 && targetId == -1 && relatedId == -1 {
+		rows, err = stmt.Query(articleId, sourceId, targetId, relatedId, true)
+	} else {
+		rows, err = stmt.Query(articleId, sourceId, targetId, relatedId, false)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var request models.Request
+		var mergeRequest models.RequestListElement
+		err = rows.Scan(&request.RequestID, &request.ArticleID, &request.SourceVersionID, &request.SourceHistoryID, &request.TargetVersionID,
+			&request.TargetHistoryID, &request.Status, &request.Conflicted, &mergeRequest.SourceTitle, &mergeRequest.TargetTitle)
+		mergeRequest.Request = request
+		list = append(list, mergeRequest)
+	}
+	return list, nil
 }
 
 // creates request table, storing history/commit IDs as fixed-length,

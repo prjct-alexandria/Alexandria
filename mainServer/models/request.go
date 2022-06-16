@@ -23,3 +23,9 @@ type RequestCreationForm struct {
 	SourceVersionID int64 `json:"sourceVersionID" binding:"required"`
 	TargetVersionID int64 `json:"targetVersionID" binding:"required"`
 }
+
+type RequestListElement struct {
+	Request     Request `json:"request"`
+	SourceTitle string  `json:"sourceTitle"`
+	TargetTitle string  `json:"targetTitle"`
+}

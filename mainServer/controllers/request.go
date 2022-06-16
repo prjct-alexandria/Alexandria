@@ -206,3 +206,75 @@ func (contr RequestController) GetRequest(c *gin.Context) {
 
 	c.JSON(http.StatusOK, req)
 }
+
+// GetRequestList 	godoc
+// @Summary		Get a list of merge requests
+// @Description	Gets a list of merge requests (with possible filtering conditions)
+// @Param		articleID	path	string	true	"Article ID"
+// @Param		sourceID	query	string	false	"Source version"
+// @Param		targetID	query	string	false	"Target version"
+// @Param		relatedID	query	string	false	"Source or Target version"
+// @Produce		json
+// @Success		200 {object} []models.Request
+// @Failure		400 "Invalid article ID provided"
+// @Failure		404 "Could not find merge requests for this article"
+// @Router		/articles/{articleID}/requests [get]
+func (contr RequestController) GetRequestList(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+
+	aid := c.Param("articleID")
+	articleId, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid article ID, cannot interpret as integer, id=%s ", aid))
+		return
+	}
+
+	var sourceId int64
+	sid := c.Query("sourceID")
+	if sid != "" {
+		sourceId, err = strconv.ParseInt(sid, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid source ID, cannot interpret as integer, id=%s ", sid))
+			return
+		}
+	} else {
+		sourceId = -1
+	}
+
+	var targetId int64
+	tid := c.Query("targetID")
+	if tid != "" {
+		targetId, err = strconv.ParseInt(tid, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid target ID, cannot interpret as integer, id=%s ", tid))
+			return
+		}
+	} else {
+		targetId = -1
+	}
+
+	var relatedId int64
+	rid := c.Query("relatedID")
+	if rid != "" {
+		relatedId, err = strconv.ParseInt(rid, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid related ID, cannot interpret as integer, id=%s ", rid))
+			return
+		}
+	} else {
+		relatedId = -1
+	}
+
+	list, err := contr.Serv.GetRequestList(articleId, sourceId, targetId, relatedId)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("could not fetch request list"))
+		return
+	}
+
+	c.JSON(http.StatusOK, list)
+}
