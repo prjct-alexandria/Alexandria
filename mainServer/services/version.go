@@ -45,12 +45,13 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 	}
 
 	fullVersion := models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   string(fileContent),
-		Status:    entity.Status,
+		ArticleID:      entity.ArticleID,
+		Id:             entity.Id,
+		Title:          entity.Title,
+		Owners:         entity.Owners,
+		Content:        string(fileContent),
+		Status:         entity.Status,
+		LatestCommitID: entity.LatestCommitID,
 	}
 	return fullVersion, nil
 }
@@ -104,12 +105,13 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 	}
 
 	fullVersion := models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   string(fileContent),
-		Status:    entity.Status,
+		ArticleID:      entity.ArticleID,
+		Id:             entity.Id,
+		Title:          entity.Title,
+		Owners:         entity.Owners,
+		Content:        string(fileContent),
+		Status:         entity.Status,
+		LatestCommitID: entity.LatestCommitID,
 	}
 	return fullVersion, nil
 }

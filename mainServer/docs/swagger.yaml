@@ -244,6 +244,33 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Get main version id of article
+  /articles/:articleID/requests/:requestID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific request of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Request ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Thread'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a request
   /articles/:articleID/thread/:threadType/id/:specificID/:
     post:
       consumes:
@@ -273,6 +300,33 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Creates thread entity
+  /articles/:articleID/versions/:versionID/history/:commitID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific commit of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Commit ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Thread'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a commit
   /articles/{articleID}/requests:
     get:
       description: Gets a list of merge requests (with possible filtering conditions)

@@ -316,7 +316,7 @@ export default function CompareView() {
                   </div>
               </div>
               <div className="wrapper col-3">
-                  <ThreadList threadType={"request"} specificId={parseInt(params.requestId as string)}/>
+                  <ThreadList threadType={"request"} specificId={params.requestId as string}/>
               </div>
           </div>
         </div>

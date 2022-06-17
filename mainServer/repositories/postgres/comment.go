@@ -26,7 +26,7 @@ func (r PgCommentRepository) createCommentTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS comment (
     	commentId SERIAL,
     	authorId varchar(64) NOT NULL,
-    	content varchar(64) NOT NULL,
+    	content varchar NOT NULL,
         threadId BIGINT NOT NULL,
         creationDate BIGINT NOT NULL,
     	PRIMARY KEY (commentId)
