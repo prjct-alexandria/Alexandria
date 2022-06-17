@@ -26,6 +26,7 @@ type ThreadController struct {
 // @Description  Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment
 // @Accept		 json
 // @Param		 thread 		body	models.Thread		true 	"Thread"
+// @Param			section		query	string	false	"section"
 // @Produce      json
 // @Success      200  {object} models.ReturnThreadIds
 // @Failure 	 400  {object} httperror.HTTPError
@@ -68,7 +69,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
-	// TODO: split these things up over three different endpoints instead of using one with multiple responsibilities
+	// TODO: split these things up over four different endpoints if needed instead of using one with multiple responsibilities
 	var id int64
 	switch threadType {
 	case "commit":
@@ -86,7 +87,14 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
 			return
 		}
-		id, err = contr.CommitSectionThreadService.StartCommitSectionThread(sid, tid, "")
+
+		section := c.Query("section")
+		if len(section) > 255 || len(section) < 1 {
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid section length, got %d", len(section)))
+			return
+		}
+
+		id, err = contr.CommitSectionThreadService.StartCommitSectionThread(sid, tid, section)
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
