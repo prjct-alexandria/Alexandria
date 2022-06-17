@@ -187,11 +187,14 @@ export default function ArticleVersionPage() {
               </div>
             </div>
             <div className="col-3">
-              {/*TODO: The specificID is supposed to be the commitID */}
-              {versionData && <ThreadList
+              {versionData && !viewingOldVersion && <ThreadList
                 threadType={"commit"}
                 specificId={versionData && versionData.latestHistoryID}
-              />}
+              />
+              || historyID && <ThreadList
+                      threadType={"commit"}
+                      specificId={historyID}
+                  />}
             </div>
           </div>
         </div>
