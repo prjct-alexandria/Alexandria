@@ -104,7 +104,7 @@ export default function CompareView() {
     return (
       <button
         className={className}
-        disabled={disableButton()}
+        disabled={disableButton() || (comparisonData !== undefined && comparisonData.request.conflicted)}
         onClick={handleAcceptClick}
       >
         Accept
@@ -271,6 +271,13 @@ export default function CompareView() {
           <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
             Compare Versions
           </h1>
+
+            {comparisonData !== undefined && comparisonData.request.conflicted &&
+                <div className={'alert alert-danger'} style={{whiteSpace:'pre-line'}}>
+                    <p>{"Warning: There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview below between each set of  '<<<<', '====', and '>>>>' markers."}</p>
+                </div>
+            }
+
           <div className="row justify-content-center">
               {/*Version names*/}
               <div className='row col-8 mb-2'>
