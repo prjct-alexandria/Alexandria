@@ -129,19 +129,40 @@ definitions:
     - id
     - threadId
     type: object
-  models.Thread:
+  models.SectionThread:
     properties:
       articleId:
         type: integer
-      comment:
+      comments:
         items:
           $ref: '#/definitions/entities.Comment'
         type: array
       id:
         type: integer
+      section:
+        type: string
+      specificId:
+        type: string
     required:
     - articleId
-    - comment
+    - comments
+    - section
+    type: object
+  models.Thread:
+    properties:
+      articleId:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      id:
+        type: integer
+      specificId:
+        type: string
+    required:
+    - articleId
+    - comments
     type: object
   models.Version:
     properties:
@@ -265,7 +286,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Thread'
+            items:
+              $ref: '#/definitions/models.Thread'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -284,6 +307,10 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.Thread'
+      - description: section
+        in: query
+        name: section
+        type: string
       produces:
       - application/json
       responses:
@@ -321,12 +348,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Thread'
+            items:
+              $ref: '#/definitions/models.SectionThread'
+            type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/httperror.HTTPError'
-      summary: Get all threads for a commit
+      summary: Get all section threads for a commit
   /articles/{articleID}/requests:
     get:
       description: Gets a list of merge requests (with possible filtering conditions)

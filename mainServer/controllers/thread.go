@@ -238,3 +238,34 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, threads)
 }
+
+// GetCommitSectionThreads godoc
+// @Summary      Get all section threads for a commit
+// @Description  Gets a list with all threads belonging to a specific commit of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 commit ID 			path	int64		true 	"Commit ID"
+// @Produce      json
+// @Success      200  {object} []models.SectionThread
+// @Failure      400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/versions/:versionID/history/:commitID/threads [get]
+func (contr *ThreadController) GetCommitSectionThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	cid := c.Param("commitID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.CommitSectionThreadService.GetCommitSectionThreads(cid, intAid)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
+}

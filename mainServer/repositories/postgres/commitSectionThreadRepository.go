@@ -105,11 +105,11 @@ func (r PgCommitSectionThreadRepository) GetCommitSectionThreads(aid int64, cid 
 				Id:         tid,
 				ArticleId:  aid,
 				SpecificId: cid,
-				Comment:    comments,
+				Comments:   comments,
 				Section:    section,
 			})
 		} else {
-			threads[index].Comment = append(threads[index].Comment, comment)
+			threads[index].Comments = append(threads[index].Comments, comment)
 		}
 	}
 	if err = rows.Err(); err != nil {
