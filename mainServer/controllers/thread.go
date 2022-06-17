@@ -6,18 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
 )
 
 type ThreadController struct {
-	ThreadService        services.ThreadService
-	CommitThreadService  services.CommitThreadService
-	RequestThreadService services.RequestThreadService
-	ReviewThreadService  services.ReviewThreadService
-	CommentService       services.CommentService
+	ThreadService        interfaces.ThreadService
+	CommitThreadService  interfaces.CommitThreadService
+	RequestThreadService interfaces.RequestThreadService
+	ReviewThreadService  interfaces.ReviewThreadService
+	CommentService       interfaces.CommentService
 }
 
 // CreateThread godoc
@@ -141,6 +141,7 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
+
 	id, err := contr.CommentService.SaveComment(comment, intTid)
 	if err != nil {
 		fmt.Println(err)
@@ -150,4 +151,73 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 
 	c.Header("Content-Type", "application/json")
 	c.IndentedJSON(http.StatusOK, id)
+}
+
+// GetRequestThreads godoc
+// @Summary      Get all threads for a request
+// @Description  Gets a list with all threads belonging to a specific request of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 request ID 		path	int64		true 	"Request ID"
+// @Produce      json
+// @Success      200  {object} []models.Thread
+// @Failure      400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/requests/:requestID/threads [get]
+func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	rid := c.Param("requestID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	intRid, err := strconv.ParseInt(rid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.RequestThreadService.GetRequestThreads(intAid, intRid)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find requestthreads for this request"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
+}
+
+// GetCommitThreads godoc
+// @Summary      Get all threads for a commit
+// @Description  Gets a list with all threads belonging to a specific commit of an article
+// @Param		 article ID 		path	int64		true 	"Article ID"
+// @Param		 commit ID 			path	int64		true 	"Commit ID"
+// @Produce      json
+// @Success      200  {object} []models.Thread
+// @Failure      400  {object} httperror.HTTPError
+// @Router       /articles/:articleID/versions/:versionID/history/:commitID/threads [get]
+func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
+	aid := c.Param("articleID")
+	cid := c.Param("commitID")
+
+	intAid, err := strconv.ParseInt(aid, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, cid)
+	if err != nil {
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		return
+	}
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, threads)
 }

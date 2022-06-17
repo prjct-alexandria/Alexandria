@@ -100,6 +100,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/:articleID/requests/:requestID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific request of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Request ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/:articleID/thread/:threadType/id/:specificID/": {
             "post": {
                 "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
@@ -136,6 +175,45 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/httperror.HTTPError"
                         }

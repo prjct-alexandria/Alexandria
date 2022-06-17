@@ -15,6 +15,7 @@ type ArticleVersion = {
   owners: Array<string>;
   title: string;
   content: string;
+  latestHistoryID: string;
 };
 
 export default function ArticleVersionPage() {
@@ -59,9 +60,7 @@ export default function ArticleVersionPage() {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
           setData(VersionData);
-          setLoaded(true);
         } else {
-          setLoaded(true);
           // Set error with message returned from the server
           let responseJSON: {
             message: string;
@@ -70,6 +69,7 @@ export default function ArticleVersionPage() {
           let serverMessage: string = responseJSON.message;
           setError(new Error(serverMessage));
         }
+        setLoaded(true);
       },
       (error) => {
         setLoaded(true);
@@ -187,10 +187,11 @@ export default function ArticleVersionPage() {
               </div>
             </div>
             <div className="col-3">
-              <ThreadList
+              {/*TODO: The specificID is supposed to be the commitID */}
+              {versionData && <ThreadList
                 threadType={"commit"}
-                specificId={parseInt(params.versionId as string)}
-              />
+                specificId={versionData && versionData.latestHistoryID}
+              />}
             </div>
           </div>
         </div>

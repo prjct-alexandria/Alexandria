@@ -4,8 +4,8 @@ import CreateComment from "./CreateComment";
 
 type ThreadProps = {
     "id": undefined | number,
-    "specificId": number
-    threadType: string
+    "specificId": string | undefined,
+    "threadType": string
 };
 
 export default function CreateThread(props: ThreadProps) {
@@ -27,6 +27,5 @@ export default function CreateThread(props: ThreadProps) {
             {newThreadList.slice(1)}
             <button className="btn btn-primary m-2" type="submit" onClick={addThread}>+</button>
         </div>
-
     );
 }
