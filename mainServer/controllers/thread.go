@@ -59,7 +59,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// save first comment in the db
-	coid, err := contr.CommentService.SaveComment(thread.Comment[0], tid)
+	coid, err := contr.CommentService.SaveComment(thread.Comments[0], tid)
 
 	if err != nil {
 		fmt.Println(err)

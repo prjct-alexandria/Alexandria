@@ -68,17 +68,17 @@ func (r PgRequestThreadRepository) GetRequestThreads(aid int64, rid int64) ([]mo
 				Id:         tid,
 				ArticleId:  aid,
 				SpecificId: strconv.FormatInt(rid, 10),
-				Comment:    comments,
+				Comments:   comments,
 			})
 		} else {
 			oldThread := threads[index]
-			oldComments := oldThread.Comment
+			oldComments := oldThread.Comments
 			newComments := append(oldComments, comment)
 			threads[index] = models.Thread{
 				Id:         oldThread.Id,
 				ArticleId:  oldThread.ArticleId,
 				SpecificId: oldThread.SpecificId,
-				Comment:    newComments,
+				Comments:   newComments,
 			}
 		}
 	}

@@ -67,17 +67,17 @@ func (r PgCommitThreadRepository) GetCommitThreads(aid int64, cid string) ([]mod
 				Id:         tid,
 				ArticleId:  aid,
 				SpecificId: cid,
-				Comment:    comments,
+				Comments:   comments,
 			})
 		} else {
 			oldThread := threads[index]
-			oldComments := oldThread.Comment
+			oldComments := oldThread.Comments
 			newComments := append(oldComments, comment)
 			threads[index] = models.Thread{
 				Id:         oldThread.Id,
 				ArticleId:  oldThread.ArticleId,
 				SpecificId: oldThread.SpecificId,
-				Comment:    newComments,
+				Comments:   newComments,
 			}
 		}
 	}

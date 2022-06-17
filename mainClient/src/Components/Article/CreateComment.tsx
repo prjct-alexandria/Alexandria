@@ -41,7 +41,7 @@ export default function CreateComment(props: ThreadProps) {
 
       const bodyThread = {
         articleId: parseInt(params.articleId as string),
-        comment: [
+        comments: [
           {
             authorId: localStorage.getItem("loggedUserEmail"),
             // immediately add comment when creating a new thread to make
