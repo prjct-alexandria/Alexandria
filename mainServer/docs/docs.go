@@ -191,7 +191,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
+        "/articles/:articleID/versions/:versionID/history/:commitID/sectionThreads": {
             "get": {
                 "description": "Gets a list with all threads belonging to a specific commit of an article",
                 "produces": [
@@ -221,6 +221,48 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.SectionThread"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Thread"
                             }
                         }
                     },

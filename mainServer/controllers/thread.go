@@ -247,7 +247,7 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 // @Produce      json
 // @Success      200  {object} []models.SectionThread
 // @Failure      400  {object} httperror.HTTPError
-// @Router       /articles/:articleID/versions/:versionID/history/:commitID/threads [get]
+// @Router       /articles/:articleID/versions/:versionID/history/:commitID/sectionThreads [get]
 func (contr *ThreadController) GetCommitSectionThreads(c *gin.Context) {
 	aid := c.Param("articleID")
 	cid := c.Param("commitID")
