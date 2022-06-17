@@ -8,6 +8,7 @@ type ThreadProps = {
   id: undefined | number;
   specificId: string | undefined;
   threadType: string;
+  selection: string | undefined;
 };
 
 export default function CreateComment(props: ThreadProps) {
@@ -29,7 +30,7 @@ export default function CreateComment(props: ThreadProps) {
 
     // If the comment is not a reply on an existing thread, create a new thread
     if (!threadId) {
-      // the endpoint is depends on what type of thread it is
+      // the endpoint depends on what type of thread it is
       let urlCreateThread =
         baseUrl +
         "/articles/" +
@@ -38,6 +39,10 @@ export default function CreateComment(props: ThreadProps) {
         props.threadType +
         "/id/" +
         props.specificId;
+
+      if (props.threadType == "commitSection") {
+        urlCreateThread += "?section=" + props.selection
+      }
 
       const bodyThread = {
         articleId: parseInt(params.articleId as string),

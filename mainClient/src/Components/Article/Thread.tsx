@@ -52,7 +52,8 @@ export default function Thread(props: ThreadProps) {
                             {comment.content}
                         </div>
                     ))}
-                    <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType}/>
+                    <CreateComment id={props.id} specificId={props.specificId}
+                                   threadType={props.threadType} selection={undefined}/>
                 </div>
             </div>
             }

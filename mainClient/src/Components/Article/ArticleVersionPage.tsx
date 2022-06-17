@@ -10,6 +10,8 @@ import FileDownload from "./FileDownload";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import CreateSectionThread from "./CreateSectionThread";
+import CreateThread from "./CreateThread";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -23,6 +25,11 @@ export default function ArticleVersionPage() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+
+  let [xPosCommentButton, setXPosCommentButton] = useState<number>(0)
+  let [yPosCommentButton, setYPosCommentButton] = useState<number>(0)
+  let [commentButtonHidden, setCommentButtonHidden] = useState<boolean>(true)
+  let [selection, setSelection] = useState<string>("")
 
   // Listen for userAccountEvent that fires when user in localstorage changes
   window.addEventListener("userAccountEvent", () => {
@@ -77,6 +84,24 @@ export default function ArticleVersionPage() {
       }
     );
   }, []);
+
+  function showAddSectionComment(e: React.MouseEvent<HTMLDivElement>) {
+    let selection = window.getSelection()
+    if (selection) {
+      let selectedText = selection.toString()
+      if (selectedText === null || selectedText === "") {
+        setCommentButtonHidden(true)
+        return
+      }
+      setCommentButtonHidden(false)
+      setXPosCommentButton(e.clientX + window.scrollX)
+      setYPosCommentButton(e.clientY + window.scrollY)
+      setSelection(selectedText)
+
+      } else {
+      setCommentButtonHidden(true)
+    }
+  }
 
   return (
     <div className={"row justify-content-center wrapper"}>
@@ -182,7 +207,7 @@ export default function ArticleVersionPage() {
         <div className="row">
           <div className="row mb-2 mt-2">
             <div className="col-8 articleContent">
-              <div style={{ whiteSpace: "pre-line" }}>
+              <div style={{ whiteSpace: "pre-line" }} onMouseUp={(e) => showAddSectionComment(e)}>
                 {versionData && versionData.content}
               </div>
             </div>
@@ -198,7 +223,13 @@ export default function ArticleVersionPage() {
             </div>
           </div>
         </div>
+        <div>
+          <CreateSectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
+                               threadType={"commitSection"} posX={xPosCommentButton} posY={yPosCommentButton}
+                               hidden={commentButtonHidden} selection={selection}/>
+        </div>
       </div>
+
     </div>
   );
 }
