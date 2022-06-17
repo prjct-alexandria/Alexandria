@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/storer"
 )
 
 type RequestService struct {
 	Repo        interfaces.RequestRepository
 	Versionrepo interfaces.VersionRepository
-	Gitrepo     repositories.GitRepository
+	Gitrepo     storer.GitStorer
 }
 
 func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64) (models.Request, error) {

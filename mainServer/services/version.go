@@ -1,23 +1,20 @@
 package services
 
 import (
-	"archive/zip"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/storer"
 	"mime/multipart"
-	"os"
 	"path/filepath"
 )
 
 type VersionService struct {
-	GitRepo        repositories.GitRepository
+	GitRepo        storer.GitStorer
 	VersionRepo    interfaces.VersionRepository
-	FilesystemRepo repositories.FilesystemRepository
+	FilesystemRepo storer.FilesystemRepository
 }
 
 func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
@@ -207,37 +204,17 @@ func (serv VersionService) UpdateLatestCommit(article int64, version int64) erro
 }
 
 func (serv VersionService) GetVersionFiles(article int64, version int64) (string, error) {
-	// Checkout
-	err := serv.GitRepo.CheckoutBranch(article, version)
-	if err != nil {
-		return "", err
-	}
-
-	// Get folder to save file to
-	base, err := serv.GitRepo.GetArticlePath(article)
-	if err != nil {
-		return "", err
-	}
 
 	versionEntity, err := serv.VersionRepo.GetVersion(version)
+	if err != nil {
+		return "", nil
+	}
 	versionName := versionEntity.Title
 
-	path := filepath.Join(serv.GitRepo.Path, "cache", "downloads", versionName+".zip")
-	versionZip, err := os.Create(path)
+	path, err := serv.storer.GetVersionFiles(article, version, versionName)
 	if err != nil {
-		fmt.Println(err)
-		return path, err
+		return "", nil
 	}
-	defer versionZip.Close()
-
-	zipWriter := zip.NewWriter(versionZip)
-
-	err = serv.FilesystemRepo.AddFilesInDirToZip(zipWriter, base, "")
-	if err != nil {
-		return path, err
-	}
-
-	defer zipWriter.Close()
 
 	return path, nil
 }

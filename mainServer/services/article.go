@@ -4,18 +4,18 @@ import (
 	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/storer"
 	"path/filepath"
 )
 
 type ArticleService struct {
 	articlerepo interfaces.ArticleRepository
 	versionrepo interfaces.VersionRepository
-	gitrepo     repositories.GitRepository
+	gitrepo     storer.GitStorer
 }
 
-func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, gitrepo repositories.GitRepository) ArticleService {
+func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, gitrepo storer.GitStorer) ArticleService {
 	return ArticleService{
 		articlerepo: articlerepo,
 		versionrepo: versionrepo,

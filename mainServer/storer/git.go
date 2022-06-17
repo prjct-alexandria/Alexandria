@@ -1,4 +1,4 @@
-package repositories
+package storer
 
 import (
 	"context"
@@ -24,33 +24,29 @@ import (
 	"strings"
 )
 
-type GitRepository struct {
+type GitStorer struct {
 	Path  string
 	Clock clock.Clock
 }
 
-// NewGitRepository creates a new GitRepository class.
+// NewGitStorer creates a new GitStorer class.
 // This is NOT the function used to create a folder/git repository to store an article in.
 // See CreateRepo instead
-func NewGitRepository(cfg *config.GitConfig) GitRepository {
+func NewGitStorer(cfg *config.FileSystemConfig) GitStorer {
 
 	// make folders for git files
 	err := os.MkdirAll(filepath.Join(cfg.Path, "persistent"), os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
-	err = os.MkdirAll(filepath.Join(cfg.Path, "requests"), os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
 
-	return GitRepository{Path: cfg.Path, Clock: clock.RealClock{}}
+	return GitStorer{Path: cfg.Path, Clock: clock.RealClock{}}
 }
 
 // CreateRepo creates a new folder/git repository to store an article in, including main version branch.
 // This is NOT the function used to create the Go repository class,
-// see NewGitRepository instead,
-func (r GitRepository) CreateRepo(article int64, version int64) error {
+// see NewGitStorer instead,
+func (r GitStorer) CreateRepo(article int64, version int64) error {
 	path, err := r.GetArticlePath(article)
 	if err != nil {
 		return err
@@ -83,7 +79,7 @@ func (r GitRepository) CreateRepo(article int64, version int64) error {
 }
 
 // Commit commits all changes in the specified article
-func (r GitRepository) Commit(article int64) error {
+func (r GitStorer) Commit(article int64) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
@@ -108,7 +104,7 @@ func (r GitRepository) Commit(article int64) error {
 }
 
 // CheckoutCommit checks out the specified commit in the specified article repo
-func (r GitRepository) CheckoutCommit(article int64, commit [20]byte) error {
+func (r GitStorer) CheckoutCommit(article int64, commit [20]byte) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
@@ -123,7 +119,7 @@ func (r GitRepository) CheckoutCommit(article int64, commit [20]byte) error {
 }
 
 // CheckoutBranch checks out the specified version in the specified article repo
-func (r GitRepository) CheckoutBranch(article int64, version int64) error {
+func (r GitStorer) CheckoutBranch(article int64, version int64) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
@@ -139,7 +135,7 @@ func (r GitRepository) CheckoutBranch(article int64, version int64) error {
 }
 
 // CreateBranch creates a new branch based on the source one, named as target. Will automatically check out source branch.
-func (r GitRepository) CreateBranch(article int64, source int64, target int64) error {
+func (r GitStorer) CreateBranch(article int64, source int64, target int64) error {
 
 	// Open repository and get worktree
 	dir, err := r.GetArticlePath(article)
@@ -182,7 +178,7 @@ func (r GitRepository) CreateBranch(article int64, source int64, target int64) e
 }
 
 // GetArticlePath returns the path to an article git repository
-func (r GitRepository) GetArticlePath(article int64) (string, error) {
+func (r GitStorer) GetArticlePath(article int64) (string, error) {
 	idString := strconv.FormatInt(article, 10)
 	path, err := filepath.Abs(filepath.Join(r.Path, "persistent", idString))
 	if err != nil {
@@ -191,32 +187,8 @@ func (r GitRepository) GetArticlePath(article int64) (string, error) {
 	return filepath.Clean(path), err
 }
 
-// GetRequestComparisonPath returns the path to a with /old and /new folders,
-// for viewing what a request did or will do when accepted
-func (r GitRepository) GetRequestComparisonPath(article int64, request int64) (string, error) {
-
-	// get the path by generating a unique cache id
-	id := fmt.Sprintf("%d-%d", article, request)
-	path, err := filepath.Abs(filepath.Join(r.Path, "requests", id))
-	if err != nil {
-		return "", err
-	}
-
-	// create nested folders
-	err = os.MkdirAll(filepath.Join(path, "old"), os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-	err = os.MkdirAll(filepath.Join(path, "new"), os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Clean(path), nil
-}
-
 // getWorktree returns the go-git worktree of an article git repository
-func (r GitRepository) getWorktree(article int64) (*git.Worktree, error) {
+func (r GitStorer) getWorktree(article int64) (*git.Worktree, error) {
 	// Open  repository.
 	dir, err := r.GetArticlePath(article)
 	if err != nil {
@@ -240,7 +212,7 @@ func (r GitRepository) getWorktree(article int64) (*git.Worktree, error) {
 // Do not use on git repos that already have commits!
 // The main branch must have a database-usable version ID, not "master"
 // So, a file in .git is edited manually
-func (r GitRepository) renameInitialBranch(article int64, version int64) error {
+func (r GitStorer) renameInitialBranch(article int64, version int64) error {
 	path, err := r.GetArticlePath(article)
 	if err != nil {
 		return err
@@ -268,7 +240,7 @@ func (r GitRepository) renameInitialBranch(article int64, version int64) error {
 }
 
 // GetLatestCommit returns the commit ID of the latest commit on the specified article version
-func (r GitRepository) GetLatestCommit(article int64, version int64) (string, error) {
+func (r GitStorer) GetLatestCommit(article int64, version int64) (string, error) {
 	path, err := r.GetArticlePath(article)
 	if err != nil {
 		return "", err
@@ -285,7 +257,7 @@ func (r GitRepository) GetLatestCommit(article int64, version int64) (string, er
 }
 
 // Merge merges the source branch (version) into the target branch (version) of the specified repository (article)
-func (r GitRepository) Merge(article int64, source int64, target int64) error {
+func (r GitStorer) Merge(article int64, source int64, target int64) error {
 	sourceStr := strconv.FormatInt(source, 10)
 	targetStr := strconv.FormatInt(target, 10)
 
@@ -325,7 +297,7 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 // Requires the commit/history ID's to be specified in the req struct
 // Might leave the repo behind with a detached HEAD
 // Returns whether there are conflicts
-func (r GitRepository) StoreRequestComparison(req entities.Request) (bool, error) {
+func (r GitStorer) StoreRequestComparison(req entities.Request) (bool, error) {
 	// get paths
 	repo, err := r.GetArticlePath(req.ArticleID)
 	if err != nil {
@@ -381,7 +353,7 @@ func (r GitRepository) StoreRequestComparison(req entities.Request) (bool, error
 
 // GetRequestComparison returns the before and after main article file of a request
 // requires the history ID's to be up-to-date in the req parameter
-func (r GitRepository) GetRequestComparison(article int64, request int64) (string, string, error) {
+func (r GitStorer) GetRequestComparison(article int64, request int64) (string, string, error) {
 	// get paths
 	path, err := r.GetRequestComparisonPath(article, request)
 	if err != nil {
