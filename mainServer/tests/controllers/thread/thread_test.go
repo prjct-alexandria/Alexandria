@@ -246,7 +246,7 @@ var exampleThreads = []models.Thread{
 		Id:         1,
 		ArticleId:  2,
 		SpecificId: "2",
-		Comment: []entities.Comment{
+		Comments: []entities.Comment{
 			{
 				Id:           1,
 				AuthorId:     "pietje@gmail.com",
@@ -265,7 +265,7 @@ var exampleThreads = []models.Thread{
 		Id:         2,
 		ArticleId:  2,
 		SpecificId: "3",
-		Comment: []entities.Comment{
+		Comments: []entities.Comment{
 			{
 				Id:           1,
 				AuthorId:     "pietje@gmail.com",
