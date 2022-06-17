@@ -14,13 +14,6 @@ type ThreadProps = {
     "comments": ThreadComment[],
 };
 
-type ThreadEntity = {
-    "articleId": number,
-    "id": number,
-    "specificId": string | undefined,
-    "comment": ThreadComment[],
-}
-
 type ThreadComment = {
     "id": number,
     "authorId": string,

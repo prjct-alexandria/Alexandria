@@ -12,6 +12,7 @@ import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import CreateSectionThread from "./CreateSectionThread";
 import CreateThread from "./CreateThread";
+import SectionThreadList from "./SectionThreadList";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -227,6 +228,16 @@ export default function ArticleVersionPage() {
           <CreateSectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
                                threadType={"commitSection"} posX={xPosCommentButton} posY={yPosCommentButton}
                                hidden={commentButtonHidden} selection={selection}/>
+          <div>
+            {versionData && !viewingOldVersion && <SectionThreadList
+                    threadType={"commitSection"}
+                    specificId={versionData && versionData.latestHistoryID}
+                />
+                || historyID && <ThreadList
+                    threadType={"commitSection"}
+                    specificId={historyID}
+                />}
+          </div>
         </div>
       </div>
 

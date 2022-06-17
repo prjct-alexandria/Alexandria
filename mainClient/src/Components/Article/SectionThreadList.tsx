@@ -7,6 +7,7 @@ import CreateThread from "./CreateThread";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import SectionThread from "./SectionThread";
 
 type ThreadListProps = {
     "threadType": string
@@ -29,7 +30,7 @@ type ThreadEntity = {
     "section": string
 }
 
-export default function ThreadList(props: ThreadListProps) {
+export default function SectionThreadList(props: ThreadListProps) {
     let baseUrl= configData.back_end_url;
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState<boolean>(false);
@@ -57,8 +58,7 @@ export default function ThreadList(props: ThreadListProps) {
         // urlThreadList = "/threadList.json" // Placeholder
 
         let urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-            "/history/" + props.specificId + "/threads";
-        // "/history/" + 1 + "/threads";
+            "/history/" + props.specificId + "/sectionThreads";
 
         // get list of threads
         fetch(urlThreadList, {
@@ -73,6 +73,7 @@ export default function ThreadList(props: ThreadListProps) {
             async (response) => {
                 if (response.ok) {
                     let threadListData: ThreadEntity[] = await response.json();
+                    threadListData = threadListData.reverse()
                     setData(threadListData);
                 } else {
                     // Set error with message returned from the server
@@ -105,12 +106,13 @@ export default function ThreadList(props: ThreadListProps) {
             <div id="accordionPanelsStayOpenExample">
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <Thread
+                        <SectionThread
                             key={i}
                             id={thread.id}
                             specificId={props.specificId}
                             threadType={props.threadType}
                             comments={thread.comments}
+                            section={thread.section}
                         />
                     ))}
             </div>
