@@ -13,11 +13,12 @@ import (
 )
 
 type ThreadController struct {
-	ThreadService        interfaces.ThreadService
-	CommitThreadService  interfaces.CommitThreadService
-	RequestThreadService interfaces.RequestThreadService
-	ReviewThreadService  interfaces.ReviewThreadService
-	CommentService       interfaces.CommentService
+	ThreadService              interfaces.ThreadService
+	CommitThreadService        interfaces.CommitThreadService
+	CommitSectionThreadService interfaces.CommitSectionThreadService
+	RequestThreadService       interfaces.RequestThreadService
+	ReviewThreadService        interfaces.ReviewThreadService
+	CommentService             interfaces.CommentService
 }
 
 // CreateThread godoc
@@ -78,6 +79,14 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			return
 		}
 		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
+	case "commitSection":
+		// check if the specific thread ID string can actually be a commit ID
+		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
+		if len(sid) != 40 && err == nil {
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+			return
+		}
+		id, err = contr.CommitSectionThreadService.StartCommitSectionThread(sid, tid, "")
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
