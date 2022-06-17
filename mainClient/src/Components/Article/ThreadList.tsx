@@ -23,7 +23,7 @@ type ThreadComment = {
 
 type ThreadEntity = {
     "articleId": number
-    "comment": ThreadComment[]
+    "comments": ThreadComment[]
     "id": number
     "specificId": string | undefined
 }
@@ -105,7 +105,7 @@ export default function ThreadList(props: ThreadListProps) {
                             id={thread.id}
                             specificId={props.specificId}
                             threadType={props.threadType}
-                            comments={thread.comment}
+                            comments={thread.comments}
                         />
                     ))}
             </div>

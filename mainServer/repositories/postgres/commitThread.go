@@ -14,7 +14,9 @@ type PgCommitThreadRepository struct {
 // GetCommitThreads  gets the commit comment threads from the database, using the article id (aid) and commit id (cid)
 func (r PgCommitThreadRepository) GetCommitThreads(aid int64, cid string) ([]models.Thread, error) {
 	// construct list of threads
-	stmt, err := r.Db.Prepare("SELECT t.threadid, articleid, commitid, commentid, authorid, creationdate, content FROM committhread ct JOIN thread t on ct.threadid = t.threadid JOIN comment c on t.threadid = c.threadid WHERE t.articleid = $1 AND ct.commitid = $2 ORDER BY creationdate")
+	stmt, err := r.Db.Prepare(`SELECT t.threadid, articleid, commitid, commentid, authorid, creationdate, content 
+				FROM committhread ct JOIN thread t on ct.threadid = t.threadid JOIN comment c on t.threadid = c.threadid 
+				WHERE t.articleid = $1 AND ct.commitid = $2 ORDER BY creationdate`)
 	if err != nil {
 		return nil, fmt.Errorf("GetCommitThreads: %v", err)
 	}
@@ -65,18 +67,10 @@ func (r PgCommitThreadRepository) GetCommitThreads(aid int64, cid string) ([]mod
 				Id:         tid,
 				ArticleId:  aid,
 				SpecificId: cid,
-				Comment:    comments,
+				Comments:   comments,
 			})
 		} else {
-			oldThread := threads[index]
-			oldComments := oldThread.Comment
-			newComments := append(oldComments, comment)
-			threads[index] = models.Thread{
-				Id:         oldThread.Id,
-				ArticleId:  oldThread.ArticleId,
-				SpecificId: oldThread.SpecificId,
-				Comment:    newComments,
-			}
+			threads[index].Comments = append(threads[index].Comments, comment)
 		}
 	}
 	if err = rows.Err(); err != nil {
