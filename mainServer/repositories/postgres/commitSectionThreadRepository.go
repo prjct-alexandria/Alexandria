@@ -9,16 +9,16 @@ type PgCommitSectionThreadRepository struct {
 	Db *sql.DB
 }
 
-func NewPgCommitSectionThreadRepository(db *sql.DB) PgCommitThreadRepository {
-	repo := PgCommitThreadRepository{db}
-	err := repo.createCommitThreadTable()
+func NewPgCommitSectionThreadRepository(db *sql.DB) PgCommitSectionThreadRepository {
+	repo := PgCommitSectionThreadRepository{db}
+	err := repo.createCommitSectionThreadTable()
 	if err != nil {
-		return PgCommitThreadRepository{}
+		return PgCommitSectionThreadRepository{}
 	}
 	return repo
 }
 
-func (r PgCommitThreadRepository) createCommitSectionThreadTable() error {
+func (r PgCommitSectionThreadRepository) createCommitSectionThreadTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitSectionThread (
     	commitSectionThreadId SERIAL,
     	commitId NCHAR(40) NOT NULL,
