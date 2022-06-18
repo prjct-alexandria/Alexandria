@@ -62,7 +62,9 @@ export default function SectionThreadList(props: ThreadListProps) {
             async (response) => {
                 if (response.ok) {
                     let threadListData: ThreadEntity[] = await response.json();
-                    threadListData = threadListData.reverse()
+                    if (threadListData != null) {
+                        threadListData = threadListData.reverse()
+                    }
                     setData(threadListData);
                 } else {
                     // Set error with message returned from the server
