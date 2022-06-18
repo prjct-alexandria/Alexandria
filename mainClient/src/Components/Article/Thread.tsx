@@ -6,6 +6,7 @@ import CreateComment from "./CreateComment";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import moment from 'moment';
 
 type ThreadProps = {
     "id": number,
@@ -30,25 +31,27 @@ type ThreadComment = {
 }
 
 export default function Thread(props: ThreadProps) {
+    const date = new Date(parseInt(props.comments[0].creationDate as string) * 1000);
+    console.log(date)
     return (
         <div>
             {
-                <div className="accordion-item mb-3" style={{border: '1px solid #e9ecef'}}>
-
-
+                <div className="accordion-item mb-3 text-break" style={{border: '1px solid #e9ecef'}}>
                     <button className="accordion-button collapsed"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target={"#panelsStayOpen-collapse" + props.id}
                         aria-expanded="false"
                         aria-controls={"panelsStayOpen-collapse" + props.id}>
-                        <div>
-                            <div className="toast-header mb-2 p-0 row" style={{backgroundColor: 'transparent'}}>
-                                <strong className="me-auto col-6">
+                        <div className="row">
+                            <div className="toast-header mb-2" style={{backgroundColor: 'transparent'}}>
+                                <strong className="me-auto p-1">
                                     {props.comments[0].authorId}
                                 </strong>
-                                <small className="text-muted col-6">
-                                    {props.comments[0].creationDate}
+                                <small className="text-muted">
+                                    {moment(
+                                        new Date(parseInt(props.comments[0].creationDate as string) * 1000)
+                                    ).format('DD-MM-YYYY HH:mm')}
                                 </small>
                             </div>
                             <div>
@@ -65,11 +68,13 @@ export default function Thread(props: ThreadProps) {
                         i !== 0 && // don't show first element in the list
                         <div className="accordion-body" style={{border: '1px solid #e9ecef'}} key={i}>
                             <div className="toast-header mb-2 p-0">
-                                <strong className="me-auto">
+                                <strong className="me-auto p-1">
                                     {comment.authorId}
                                 </strong>
-                                <small className="text-muted">
-                                    {comment.creationDate}
+                                <small className="text-muted float-end">
+                                    {moment(
+                                        new Date(parseInt(comment.creationDate as string) * 1000)
+                                    ).format('DD-MM-YYYY HH:mm')}
                                 </small>
                             </div>
                             <div>
