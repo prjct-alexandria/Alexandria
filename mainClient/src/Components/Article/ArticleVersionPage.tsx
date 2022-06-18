@@ -233,7 +233,7 @@ export default function ArticleVersionPage() {
                     threadType={"commitSection"}
                     specificId={versionData && versionData.latestHistoryID}
                 />
-                || historyID && <ThreadList
+                || historyID && <SectionThreadList
                     threadType={"commitSection"}
                     specificId={historyID}
                 />}

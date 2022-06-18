@@ -15,10 +15,6 @@ type SectionThreadProps = {
 export default function CreateSectionThread(props: SectionThreadProps) {
     let [key, setKey] = useState(1);
 
-
-    //TODO: Create new(?) component for creating section comments
-    //TODO: Create new(?) threadLists components for section comments
-    //TODO: Create new thread components (has to be new, section has to be shown)
     let [newThreadList, setNewThreadList] = useState([
         <CreateComment key={key} id={(props.id) ? undefined : props.id} specificId={props.specificId}
                        threadType={props.threadType} selection={props.selection}/>

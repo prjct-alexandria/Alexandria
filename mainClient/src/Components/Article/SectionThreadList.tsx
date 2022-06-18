@@ -46,17 +46,6 @@ export default function SectionThreadList(props: ThreadListProps) {
     const params = useParams();
 
     useEffect(() => {
-        // let urlThreadList = "";
-        // if (props.threadType === "commit") {
-        //     urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-        //         "/history/" + props.specificId + "/threads";
-        //     // "/history/" + 1 + "/threads";
-        // } else if (props.threadType === "request") {
-        //     urlThreadList = baseUrl + "/articles/" + params.articleId + "/requests/" + params.requestId +
-        //         "/threads";
-        // }
-        // urlThreadList = "/threadList.json" // Placeholder
-
         let urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
             "/history/" + props.specificId + "/sectionThreads";
 
@@ -116,13 +105,6 @@ export default function SectionThreadList(props: ThreadListProps) {
                         />
                     ))}
             </div>
-            {/*{isLoggedIn && (*/}
-            {/*    // <CreateThread*/}
-            {/*    //     id={undefined}*/}
-            {/*    //     specificId={props.specificId}*/}
-            {/*    //     threadType={props.threadType}*/}
-            {/*    // />*/}
-            {/*)}*/}
         </div>
     );
 }
