@@ -32,15 +32,30 @@ type ThreadComment = {
 export default function Thread(props: ThreadProps) {
     return (
         <div>
-            {   <div className="accordion-item mb-3" style={{border: '1px solid #e9ecef'}}>
-                <button className="accordion-button collapsed"
+            {
+                <div className="accordion-item mb-3" style={{border: '1px solid #e9ecef'}}>
+
+
+                    <button className="accordion-button collapsed"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target={"#panelsStayOpen-collapse" + props.id}
                         aria-expanded="false"
                         aria-controls={"panelsStayOpen-collapse" + props.id}>
-                    {props.comments[0].content}
-                </button>
+                        <div>
+                            <div className="toast-header mb-2 p-0 row" style={{backgroundColor: 'transparent'}}>
+                                <strong className="me-auto col-6">
+                                    {props.comments[0].authorId}
+                                </strong>
+                                <small className="text-muted col-6">
+                                    {props.comments[0].creationDate}
+                                </small>
+                            </div>
+                            <div>
+                                {props.comments[0].content}
+                            </div>
+                        </div>
+                    </button>
                 <div
                     id={"panelsStayOpen-collapse" + props.id}
                     className="accordion-collapse collapse"
@@ -49,7 +64,17 @@ export default function Thread(props: ThreadProps) {
                     {props.comments.map((comment, i) => (
                         i !== 0 && // don't show first element in the list
                         <div className="accordion-body" style={{border: '1px solid #e9ecef'}} key={i}>
+                            <div className="toast-header mb-2 p-0">
+                                <strong className="me-auto">
+                                    {comment.authorId}
+                                </strong>
+                                <small className="text-muted">
+                                    {comment.creationDate}
+                                </small>
+                            </div>
+                            <div>
                             {comment.content}
+                            </div>
                         </div>
                     ))}
                     <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType}/>
