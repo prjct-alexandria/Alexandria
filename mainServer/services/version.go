@@ -16,15 +16,15 @@ type VersionService struct {
 
 func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
 
-	// Get entities from database
-	entities, err := serv.VersionRepo.GetVersionsByArticle(article)
+	// Get list from database
+	list, err := serv.VersionRepo.GetVersionsByArticle(article)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert entities to models to send to frontend
-	result := make([]models.Version, len(entities))
-	for i, e := range entities {
+	// Convert list to models to send to frontend
+	result := make([]models.Version, len(list))
+	for i, e := range list {
 		result[i] = models.Version{
 			ArticleID: article,
 			Id:        e.Id,
@@ -103,30 +103,31 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 	}
 
 	// Store entity in db and receive one with an ID attached
-	entity, err := serv.VersionRepo.CreateVersion(version)
+	created, err := serv.VersionRepo.CreateVersion(version)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	// Use ID to create new branch in git
-	err = serv.GitRepo.CreateBranch(article, source, entity.Id)
+	// Use ID to create new branch in git with that name
+	commit, err := serv.Storer.CreateVersionFrom(article, source, created.Id)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	// Store the latest git commit ID of the version in the database entity
-	err = serv.UpdateLatestCommit(article, entity.Id)
+	// Store the commit id in the database
+	err = serv.VersionRepo.UpdateVersionLatestCommit(created.Id, commit)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	// Return model, made from entity
+	// Return model, made from the new created version entity
 	return models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   "",
+		ArticleID:      created.ArticleID,
+		Id:             created.Id,
+		Title:          created.Title,
+		Owners:         created.Owners,
+		Content:        "",
+		LatestCommitID: commit,
 	}, nil
 }
 

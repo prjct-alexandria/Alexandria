@@ -116,14 +116,10 @@ func (r Repo) CheckoutBranch(version int64) error {
 }
 
 // CreateBranch creates a new branch based on the source one, named as target. Will automatically check out source branch.
-func (r Repo) CreateBranch(article int64, source int64, target int64) error {
+func (r Repo) CreateBranch(source int64, target int64) error {
 
 	// Open repository and get worktree
-	dir, err := r.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
-	repo, err := git.PlainOpen(dir)
+	repo, err := git.PlainOpen(r.path)
 	if err != nil {
 		return err
 	}

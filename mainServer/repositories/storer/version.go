@@ -110,3 +110,32 @@ func (s *Storer) UpdateAndCommit(c *gin.Context, file *multipart.FileHeader, art
 	// Return the id of the created commit
 	return repo.GetLatestCommit(version)
 }
+
+// CreateVersionFrom creates a new target version based on a source version, does not modify any file contents
+// Returns the ID of the created commit, which is the same as that of the source version
+func (s *Storer) CreateVersionFrom(article int64, source int64, target int64) (string, error) {
+	s.pool.Lock(article)
+	defer s.pool.Unlock(article)
+
+	// Get the path to the article repository
+	path, err := s.fs.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Checkout source version
+	repo := git.NewRepo(path)
+	err = repo.CheckoutBranch(source)
+	if err != nil {
+		return "", err
+	}
+
+	// Create the new branch
+	err = repo.CreateBranch(source, target)
+	if err != nil {
+		return "", err
+	}
+
+	// Return the commit id of the created version
+	return repo.GetLatestCommit(target)
+}
