@@ -20,19 +20,17 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Repo struct {
-	path   string
-	runner types.Option
+	path string
 }
 
 // NewRepo creates a new GitRepo class. This references a git repository that represents an article.
-// This function does not actually initialize a repository.
-// This is NOT the function used to create a folder/git repository to store an article in.
-// See CreateRepo instead. It
+// This function does not actually initialize a repository or verify that it exists
 func NewRepo(path string) Repo {
-	return Repo{path: path, runner: runGitIn(path)}
+	return Repo{path: path}
 }
 
 // Init initializes
@@ -65,8 +63,8 @@ func (r Repo) Init(mainVersion int64) error {
 }
 
 // Commit commits all changes in the specified article
-func (r Repo) Commit(article int64) error {
-	w, err := r.getWorktree(article)
+func (r Repo) Commit(timestamp time.Time) error {
+	w, err := r.getWorktree()
 	if err != nil {
 		return err
 	}
@@ -83,15 +81,15 @@ func (r Repo) Commit(article int64) error {
 			// TODO: add actual user name?
 			Name:  "Alexandria Git Manager",
 			Email: "",
-			When:  r.Clock.Now(),
+			When:  timestamp,
 		},
 	})
 	return nil
 }
 
 // CheckoutCommit checks out the specified commit in the specified article repo
-func (r Repo) CheckoutCommit(article int64, commit [20]byte) error {
-	w, err := r.getWorktree(article)
+func (r Repo) CheckoutCommit(commit [20]byte) error {
+	w, err := r.getWorktree()
 	if err != nil {
 		return err
 	}
@@ -180,7 +178,7 @@ func (r Repo) GetLatestCommit(version int64) (string, error) {
 	versionStr := strconv.FormatInt(version, 10)
 
 	// call the git command rev-parse, which returns a commit hash when given a branch name
-	output, err := git2.RevParse(revparse.Args(versionStr), r.runner)
+	output, err := git2.RevParse(revparse.Args(versionStr), runGitIn(r.path))
 	if err != nil {
 		return "", errors.New(output)
 	}

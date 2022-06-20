@@ -1,9 +1,14 @@
 package filesystem
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"io/ioutil"
+	"mime/multipart"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type FileSystem struct {
@@ -42,4 +47,35 @@ func (fs FileSystem) GetArticlePath(article int64) (string, error) {
 		return "", err
 	}
 	return filepath.Clean(path), err
+}
+
+// GetDownloadPath returns the path that a (temporary) dow
+func (fs FileSystem) GetDownloadPath(filename string) (string, error) {
+	// check that the filename does not contain illegal characters
+	if !strings.Contains(IllegalChars, filename) {
+		return "", fmt.Errorf("filename for zip contains illegal characters: %s", filename)
+	}
+
+	// create the filepath, absolute and cleaned
+	path := filepath.Join(fs.path, "cache", "downloads", filename+".zip")
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Clean(path), err
+}
+
+// SaveArticleFile saves the file from the multipart file header as the main contents of an article
+func (fs FileSystem) SaveArticleFile(c *gin.Context, file *multipart.FileHeader, articlePath string) error {
+	filePath := filepath.Join(articlePath, "main.qmd")
+	return c.SaveUploadedFile(file, filePath)
+}
+
+// ReadArticleFile returns the main contents of the file
+func (fs FileSystem) ReadArticleFile(articlePath string) (string, error) {
+	fileContent, err := ioutil.ReadFile(filepath.Join(articlePath, "main.qmd"))
+	if err != nil {
+		return "", err
+	}
+	return string(fileContent), nil
 }

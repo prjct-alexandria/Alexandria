@@ -1,29 +1,112 @@
 package storer
 
-import "mainServer/repositories/storer/git"
+import (
+	"github.com/gin-gonic/gin"
+	"mainServer/repositories/storer/git"
+	"mime/multipart"
+)
 
-// GetVersionFiles creates a .zip with all files of an article version at the returned path
-func (s *Storer) GetVersionFiles(article int64, version int64, filename string) (string, error) {
+// GetVersion returns the contents of the specified article version file as string
+func (s *Storer) GetVersion(article int64, version int64) (string, error) {
 	s.pool.Lock(article)
 	defer s.pool.Unlock(article)
 
-	// Create GitRepo that refers to article
+	// Get the path to the article repository
 	path, err := s.fs.GetArticlePath(article)
 	if err != nil {
 		return "", err
 	}
-	repo := git.NewRepo(path)
 
 	// Checkout version
+	repo := git.NewRepo(path)
+	err = repo.CheckoutBranch(version)
+	if err != nil {
+		return "", err
+	}
+
+	// Return the article file contents as string
+	return s.fs.ReadArticleFile(path)
+}
+
+// GetVersionByCommit returns the contents of the specified article at the specified commit
+func (s *Storer) GetVersionByCommit(article int64, commit [20]byte) (string, error) {
+	s.pool.Lock(article)
+	defer s.pool.Unlock(article)
+
+	// Get the path to the article repository
+	path, err := s.fs.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Checkout commit
+	repo := git.NewRepo(path)
+	err = repo.CheckoutCommit(commit)
+	if err != nil {
+		return "", err
+	}
+
+	// Return the article file contents as string
+	return s.fs.ReadArticleFile(path)
+}
+
+// GetVersionZipped creates a .zip, with specified name, with all files of an article version at the returned path
+func (s *Storer) GetVersionZipped(article int64, version int64, filename string) (string, error) {
+	s.pool.Lock(article)
+	defer s.pool.Unlock(article)
+
+	// Get the path to the article repository
+	path, err := s.fs.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Checkout version
+	repo := git.NewRepo(path)
 	err = repo.CheckoutBranch(version)
 	if err != nil {
 		return "", err
 	}
 
 	// Add a .zip with the files to a cache folder and return the path
-	path, err = s.fs.MakeDownloadZip(filename)
+	path, err = s.fs.MakeDownloadZip(filename, path)
 	if err != nil {
 		return "", nil
 	}
 	return path, nil
+}
+
+// UpdateAndCommit overwrites the file content of the specified article version and committing changes.
+// Returns the ID of the created commit.
+func (s *Storer) UpdateAndCommit(c *gin.Context, file *multipart.FileHeader, article int64, version int64) (string, error) {
+	s.pool.Lock(article)
+	defer s.pool.Unlock(article)
+
+	// Get the path to the article repository
+	path, err := s.fs.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Checkout version
+	repo := git.NewRepo(path)
+	err = repo.CheckoutBranch(version)
+	if err != nil {
+		return "", err
+	}
+
+	// Save file
+	err = s.fs.SaveArticleFile(c, file, path)
+	if err != nil {
+		return "", err
+	}
+
+	// Commit
+	err = repo.Commit(s.clock.Now())
+	if err != nil {
+		return "", err
+	}
+
+	// Return the id of the created commit
+	return repo.GetLatestCommit(version)
 }

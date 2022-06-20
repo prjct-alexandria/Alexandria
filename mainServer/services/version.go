@@ -2,53 +2,16 @@ package services
 
 import (
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
 	"mime/multipart"
-	"path/filepath"
 )
 
 type VersionService struct {
 	VersionRepo interfaces.VersionRepository
 	Storer      storer.Storer
-}
-
-func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
-
-	// Get file contents from Git
-	err := serv.GitRepo.CheckoutCommit(article, commit)
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	path, err := serv.GitRepo.GetArticlePath(article)
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	fileContent, err := ioutil.ReadFile(filepath.Join(path, "main.qmd"))
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	// Get other version info from database
-	entity, err := serv.VersionRepo.GetVersion(version)
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	fullVersion := models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   string(fileContent),
-		Status:    entity.Status,
-	}
-	return fullVersion, nil
 }
 
 func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
@@ -74,23 +37,14 @@ func (serv VersionService) ListVersions(article int64) ([]models.Version, error)
 	return result, nil
 }
 
-// GetVersion looks for a version in the filesystem and creates a version entity from it with the appropriate metadata.
+// GetVersion looks for a version in the filesystem and creates a version entity from it,
+// with the appropriate metadata and contents.
 func (serv VersionService) GetVersion(article int64, version int64) (models.Version, error) {
 
-	// Get file contents from Git
-	err := serv.GitRepo.CheckoutBranch(article, version)
+	// Get file contents from the (git) file system
+	content, err := serv.Storer.GetVersion(article, version)
 	if err != nil {
-		return models.Version{}, err
-	}
-
-	path, err := serv.GitRepo.GetArticlePath(article)
-	if err != nil {
-		return models.Version{}, err
-	}
-
-	fileContent, err := ioutil.ReadFile(filepath.Join(path, "main.qmd"))
-	if err != nil {
-		return models.Version{}, err
+		return models.Version{}, nil
 	}
 
 	// Get other version info from database
@@ -104,7 +58,35 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 		Id:        entity.Id,
 		Title:     entity.Title,
 		Owners:    entity.Owners,
-		Content:   string(fileContent),
+		Content:   content,
+		Status:    entity.Status,
+	}
+	return fullVersion, nil
+}
+
+func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
+
+	// TODO: check if the commit is actually part of the specified version,
+	// can be done once the version-commit table exists
+
+	// Get file contents from the (git) file system
+	content, err := serv.Storer.GetVersionByCommit(article, commit)
+	if err != nil {
+		return models.Version{}, nil
+	}
+
+	// Get other version info from database, this should be the same for every commit
+	entity, err := serv.VersionRepo.GetVersion(version)
+	if err != nil {
+		return models.Version{}, err
+	}
+
+	fullVersion := models.Version{
+		ArticleID: entity.ArticleID,
+		Id:        entity.Id,
+		Title:     entity.Title,
+		Owners:    entity.Owners,
+		Content:   content,
 		Status:    entity.Status,
 	}
 	return fullVersion, nil
@@ -150,70 +132,26 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 
 // UpdateVersion overwrites file of specified article version and commits
 func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
-	// TODO: check if user of authenticated session is version owner
 
-	// Checkout
-	err := serv.GitRepo.CheckoutBranch(article, version)
+	// Update the version contents in the (git) file system
+	commit, err := serv.Storer.UpdateAndCommit(c, file, article, version)
 	if err != nil {
 		return err
 	}
 
-	// Get folder to save file to
-	base, err := serv.GitRepo.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
-
-	// Save file
-	// TODO: find something more flexible than hard-coding main.qmd
-	path := filepath.Join(base, "main.qmd")
-	err = c.SaveUploadedFile(file, path)
-	if err != nil {
-		return err
-	}
-
-	// Commit
-	err = serv.GitRepo.Commit(article)
-	if err != nil {
-		return err
-	}
-
-	// Store the latest git commit ID of the version in the database entity
-	err = serv.UpdateLatestCommit(article, version)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// updateLatestCommit stores the latest git commit ID of the version in the database entity
-func (serv VersionService) UpdateLatestCommit(article int64, version int64) error {
-	// Get the latest commit ID from the git branch
-	commit, err := serv.GitRepo.GetLatestCommit(article, version)
-	if err != nil {
-		return err
-	}
 	// Store the commit id in the database
-	err = serv.VersionRepo.UpdateVersionLatestCommit(version, commit)
-	if err != nil {
-		return err
-	}
-	return nil
+	return serv.VersionRepo.UpdateVersionLatestCommit(version, commit)
 }
 
 func (serv VersionService) GetVersionFiles(article int64, version int64) (string, error) {
 
+	// Get information about the version from the database
 	versionEntity, err := serv.VersionRepo.GetVersion(version)
 	if err != nil {
 		return "", nil
 	}
+
+	// Get a path to the version file contents, zipped
 	versionName := versionEntity.Title
-
-	path, err := serv.Storer.GetVersionFiles(article, version, versionName)
-	if err != nil {
-		return "", nil
-	}
-
-	return path, nil
+	return serv.Storer.GetVersionZipped(article, version, versionName)
 }

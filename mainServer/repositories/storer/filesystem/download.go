@@ -10,10 +10,14 @@ import (
 	"path/filepath"
 )
 
-// MakeDownloadZip creates a
-func (fs FileSystem) MakeDownloadZip(filename string) (string, error) {
-	// TODO: check if this can lead to some sort of injection
-	path := filepath.Join(fs.path, "cache", "downloads", filename+".zip")
+const IllegalChars = "<>:\"/\\|?*"
+
+// MakeDownloadZip copies the all contents of the source directory to a .zip file with the specified
+func (fs FileSystem) MakeDownloadZip(filename string, sourceDir string) (string, error) {
+	path, err := fs.GetDownloadPath(filename)
+	if err != nil {
+		return "", err
+	}
 
 	// Create the (empty) zip file
 	versionZip, err := os.Create(path)
@@ -27,13 +31,16 @@ func (fs FileSystem) MakeDownloadZip(filename string) (string, error) {
 	zipWriter := zip.NewWriter(versionZip)
 	defer zipWriter.Close()
 
-	err = addFilesInDirToZip(zipWriter, path, "")
+	// write directory contents to the writer
+	err = addFilesInDirToZip(zipWriter, sourceDir, "")
 	if err != nil {
 		return "", err
 	}
 
+	return path, nil
 }
 
+// write files in dirPath to the location dirInZip in the zipWriter
 func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
@@ -42,7 +49,7 @@ func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) 
 
 	for _, file := range files {
 		// Wrapped in function to allow for "defer file.close()"
-		err := s.addFileInDirToZip(file, zipWriter, dirPath, dirInZip)
+		err := addFileInDirToZip(file, zipWriter, dirPath, dirInZip)
 		if err != nil {
 			return err
 		}
@@ -54,7 +61,7 @@ func addFileInDirToZip(file fs.FileInfo, zipWriter *zip.Writer, dirPath string, 
 	if file.IsDir() {
 		//Check if it is not the git folder
 		if file.Name() != ".git" {
-			err := s.addFilesInDirToZip(zipWriter, filepath.Join(dirPath, file.Name()), file.Name())
+			err := addFilesInDirToZip(zipWriter, filepath.Join(dirPath, file.Name()), file.Name())
 			if err != nil {
 				return err
 			}

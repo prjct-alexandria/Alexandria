@@ -30,5 +30,5 @@ func (m *MutexPool) Lock(index int64) {
 // Unlock releases the lock for the specified element index
 func (m *MutexPool) Unlock(index int64) {
 	i := index % m.n
-	m.pool[i].Lock()
+	m.pool[i].Unlock()
 }
