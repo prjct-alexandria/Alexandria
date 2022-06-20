@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import {Link, useParams, useSearchParams} from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import FileUpload from "./FileUpload";
 import CreateMR from "./CreateMR";
@@ -10,6 +10,7 @@ import FileDownload from "./FileDownload";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import InlineEditor from "./InlineEditor";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -32,7 +33,8 @@ export default function ArticleVersionPage() {
   let params = useParams();
 
   let url = //"/article_version1.json";
-  configData.back_end_url +"/articles/" +
+    configData.back_end_url +
+    "/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId;
@@ -105,16 +107,16 @@ export default function ArticleVersionPage() {
         <ul className="nav justify-content-end d-grid gap-2 d-md-flex justify-content-md-end">
           <li className="nav-item">
             <a className="nav-link">
-            <Link to={"/articles/" + params.articleId + "/versions"}>
-              <button
+              <Link to={"/articles/" + params.articleId + "/versions"}>
+                <button
                   type="button"
                   className="btn  btn-light"
                   data-bs-toggle="modal"
                   data-bs-target="#listVersions"
-              >
-                View list of versions
-              </button>
-            </Link>
+                >
+                  View list of versions
+                </button>
+              </Link>
             </a>
           </li>
           {!viewingOldVersion && isLoggedIn && (
@@ -181,20 +183,17 @@ export default function ArticleVersionPage() {
 
         <div className="row">
           <div className="row mb-2 mt-2">
-            <div className="col-8 articleContent">
-              <div style={{ whiteSpace: "pre-line" }}>
-                {versionData && versionData.content}
-              </div>
-            </div>
+            {versionData && <InlineEditor content={versionData.content} />}
             <div className="col-4">
-                {versionData && !viewingOldVersion && <ThreadList
+              {(versionData && !viewingOldVersion && (
+                <ThreadList
                   threadType={"commit"}
                   specificId={versionData && versionData.latestHistoryID}
                 />
-                || historyID && <ThreadList
-                        threadType={"commit"}
-                        specificId={historyID}
-                    />}
+              )) ||
+                (historyID && (
+                  <ThreadList threadType={"commit"} specificId={historyID} />
+                ))}
             </div>
           </div>
         </div>

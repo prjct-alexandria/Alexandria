@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import configData from "../../config.json"
+import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 
 export default function CreateArticle() {
@@ -9,6 +9,7 @@ export default function CreateArticle() {
   let [mainVersionTags, setMainVersionTags] = useState<string>("");
   let [error, setError] = useState<Error>();
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
+  let [isAddOnwersHidden, setOwnersHidden] = useState<boolean>(true);
 
   // Variable and references to it to be removed when adding tags
   let areTagsImplemented = false;
@@ -31,7 +32,7 @@ export default function CreateArticle() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url= configData.back_end_url +"/articles";
+    const url = configData.back_end_url + "/articles";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = mainVersionTags.split(",");
@@ -42,8 +43,8 @@ export default function CreateArticle() {
     ownerList = ownerList.map((owner) => owner.trim());
 
     // Remove empty elements
-    tagList = tagList.filter((tag) => tag != "");
-    ownerList = ownerList.filter((owner) => owner != "");
+    tagList = tagList.filter((tag) => tag !== "");
+    ownerList = ownerList.filter((owner) => owner !== "");
 
     let loggedUser = localStorage.getItem("loggedUserEmail");
     ownerList[ownerList.length] =
@@ -78,7 +79,8 @@ export default function CreateArticle() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              configData.front_end_url +"/articles/" +
+              configData.front_end_url +
+              "/articles/" +
               articleId +
               "/versions/" +
               versionId;
@@ -162,13 +164,20 @@ export default function CreateArticle() {
                 </div>
               )}
               <div>
-                <h5 className="form-label">Other owners (optional)</h5>
-                <span>Separate owner emails by ",".</span>
-                <input
-                  name="owners"
-                  className="create-article-input"
-                  onChange={onChangeOwners}
-                />
+                <span>By creating this article, you become its owner.</span>
+                <button onClick={() => setOwnersHidden(false)}>
+                  + Add owners
+                </button>
+                {!isAddOnwersHidden && (
+                  <div id="addOwners">
+                    <span>Separate owner emails by ",".</span>
+                    <input
+                      name="owners"
+                      className="create-article-input"
+                      onChange={onChangeOwners}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="modal-footer">

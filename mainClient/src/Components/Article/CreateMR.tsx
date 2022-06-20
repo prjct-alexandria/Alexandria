@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json"
-import { Request } from "./CompareView"
+import configData from "../../config.json";
+import { Request } from "./CompareView";
 
 type Version = {
   articleID: string;
@@ -26,7 +26,12 @@ export default function CreateMR() {
 
   const [selectedVersion, setSelectedVersion] = useState("");
 
-  const urlCurrentArticle = configData.back_end_url + "/articles/" + params.articleId + "/versions/" + params.versionId;
+  const urlCurrentArticle =
+    configData.back_end_url +
+    "/articles/" +
+    params.articleId +
+    "/versions/" +
+    params.versionId;
   // const urlCurrentArticle = "/article_version1.json";
   // retrieving the list of versions
   useEffect(() => {
@@ -62,7 +67,8 @@ export default function CreateMR() {
     );
   }, [urlCurrentArticle]);
 
-  const urlArticleVersions = configData.back_end_url + "/articles/" + params.articleId + "/versions";
+  const urlArticleVersions =
+    configData.back_end_url + "/articles/" + params.articleId + "/versions";
   //const urlArticleVersions = "/versionList.json";
   useEffect(() => {
     fetch(urlArticleVersions, {
@@ -103,7 +109,8 @@ export default function CreateMR() {
     setSelectedVersion(event.target.value);
   }
 
-  const urlSubmitMR = configData.back_end_url +"/articles/" + params.articleId + "/requests";
+  const urlSubmitMR =
+    configData.back_end_url + "/articles/" + params.articleId + "/requests";
   // post the new merge request
   const submitMR = () => {
     fetch(urlSubmitMR, {
@@ -129,10 +136,11 @@ export default function CreateMR() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-                configData.front_end_url +"/articles/" +
-                params.articleId +
-                "/requests/" +
-                request.requestID;
+              configData.front_end_url +
+              "/articles/" +
+              params.articleId +
+              "/requests/" +
+              request.requestID;
           }
 
           // After 3s, remove success from state to hide success alert
@@ -221,7 +229,7 @@ export default function CreateMR() {
                   type="button"
                   className="btn btn-primary"
                   onClick={submitMR}
-                  disabled={selectedVersion == ""}
+                  disabled={selectedVersion === ""}
                 >
                   Create request
                 </button>

@@ -29,7 +29,6 @@ export default function NavigationBar() {
           </Link>
           <button
             className="navbar-toggler"
-            type="button"
             data-toggle="collapse"
             data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent"
@@ -72,7 +71,6 @@ export default function NavigationBar() {
                     >
                       <li>
                         <button
-                          type="button"
                           role="button"
                           className="dropdown-item"
                           data-bs-toggle="modal"
@@ -83,7 +81,6 @@ export default function NavigationBar() {
                       </li>
                       <li>
                         <button
-                          type="button"
                           role="button"
                           className="dropdown-item"
                           data-bs-toggle="modal"
@@ -114,7 +111,6 @@ export default function NavigationBar() {
                     >
                       <li>
                         <button
-                          type="button"
                           role="button"
                           className="nav-link btn dropdown-item"
                           data-bs-toggle="modal"
