@@ -6,15 +6,14 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"mainServer/storer"
+	"mainServer/repositories/storer"
 	"mime/multipart"
 	"path/filepath"
 )
 
 type VersionService struct {
-	GitRepo        storer.GitStorer
-	VersionRepo    interfaces.VersionRepository
-	FilesystemRepo storer.FilesystemRepository
+	VersionRepo interfaces.VersionRepository
+	Storer      storer.Storer
 }
 
 func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
@@ -211,7 +210,7 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 	}
 	versionName := versionEntity.Title
 
-	path, err := serv.storer.GetVersionFiles(article, version, versionName)
+	path, err := serv.Storer.GetVersionFiles(article, version, versionName)
 	if err != nil {
 		return "", nil
 	}

@@ -1,4 +1,4 @@
-package storer
+package filesystem
 
 import (
 	"archive/zip"
@@ -6,30 +6,14 @@ import (
 	"io"
 	"io/fs"
 	"io/ioutil"
-	"mainServer/server/config"
 	"os"
 	"path/filepath"
 )
 
-type DownloadStorer struct {
-	Path string
-}
-
-func NewFilesystemRepository(cfg *config.FileSystemConfig) DownloadStorer {
-	path := filepath.Join(cfg.Path, "cache", "downloads")
-	repo := DownloadStorer{Path: path}
-
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	return repo
-}
-
-// MakeDownloadZip
-func (s DownloadStorer) MakeDownloadZip(filename string) (string, error) {
+// MakeDownloadZip creates a
+func (fs FileSystem) MakeDownloadZip(filename string) (string, error) {
 	// TODO: check if this can lead to some sort of injection
-	path := filepath.Join(s.Path, "cache", "downloads", filename+".zip")
+	path := filepath.Join(fs.path, "cache", "downloads", filename+".zip")
 
 	// Create the (empty) zip file
 	versionZip, err := os.Create(path)
@@ -43,14 +27,14 @@ func (s DownloadStorer) MakeDownloadZip(filename string) (string, error) {
 	zipWriter := zip.NewWriter(versionZip)
 	defer zipWriter.Close()
 
-	err = s.addFilesInDirToZip(zipWriter, path, "")
+	err = addFilesInDirToZip(zipWriter, path, "")
 	if err != nil {
 		return "", err
 	}
 
 }
 
-func (s DownloadStorer) addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
+func addFilesInDirToZip(zipWriter *zip.Writer, dirPath string, dirInZip string) error {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		return err
@@ -66,7 +50,7 @@ func (s DownloadStorer) addFilesInDirToZip(zipWriter *zip.Writer, dirPath string
 	return nil
 }
 
-func (s DownloadStorer) addFileInDirToZip(file fs.FileInfo, zipWriter *zip.Writer, dirPath string, dirInZip string) error {
+func addFileInDirToZip(file fs.FileInfo, zipWriter *zip.Writer, dirPath string, dirInZip string) error {
 	if file.IsDir() {
 		//Check if it is not the git folder
 		if file.Name() != ".git" {

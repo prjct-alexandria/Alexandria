@@ -1,4 +1,4 @@
-package storer
+package git
 
 import (
 	"context"
@@ -15,8 +15,6 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
 	"io/ioutil"
 	"mainServer/entities"
-	"mainServer/server/config"
-	"mainServer/utils/clock"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,33 +22,21 @@ import (
 	"strings"
 )
 
-type GitStorer struct {
-	Path  string
-	Clock clock.Clock
+type Repo struct {
+	path   string
+	runner types.Option
 }
 
-// NewGitStorer creates a new GitStorer class.
+// NewRepo creates a new GitRepo class. This references a git repository that represents an article.
+// This function does not actually initialize a repository.
 // This is NOT the function used to create a folder/git repository to store an article in.
-// See CreateRepo instead
-func NewGitStorer(cfg *config.FileSystemConfig) GitStorer {
-
-	// make folders for git files
-	err := os.MkdirAll(filepath.Join(cfg.Path, "persistent"), os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	return GitStorer{Path: cfg.Path, Clock: clock.RealClock{}}
+// See CreateRepo instead. It
+func NewRepo(path string) Repo {
+	return Repo{path: path, runner: runGitIn(path)}
 }
 
-// CreateRepo creates a new folder/git repository to store an article in, including main version branch.
-// This is NOT the function used to create the Go repository class,
-// see NewGitStorer instead,
-func (r GitStorer) CreateRepo(article int64, version int64) error {
-	path, err := r.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
+// Init initializes
+func (r Repo) Init(mainVersion int64) error {
 
 	// Check if folder with the same name already exists
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
@@ -70,7 +56,7 @@ func (r GitStorer) CreateRepo(article int64, version int64) error {
 	}
 
 	// Rename the branch to the main version ID
-	err = r.renameInitialBranch(article, version)
+	err = r.renameInitialBranch(mainVersion)
 	if err != nil {
 		return err
 	}
@@ -79,7 +65,7 @@ func (r GitStorer) CreateRepo(article int64, version int64) error {
 }
 
 // Commit commits all changes in the specified article
-func (r GitStorer) Commit(article int64) error {
+func (r Repo) Commit(article int64) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
@@ -104,7 +90,7 @@ func (r GitStorer) Commit(article int64) error {
 }
 
 // CheckoutCommit checks out the specified commit in the specified article repo
-func (r GitStorer) CheckoutCommit(article int64, commit [20]byte) error {
+func (r Repo) CheckoutCommit(article int64, commit [20]byte) error {
 	w, err := r.getWorktree(article)
 	if err != nil {
 		return err
@@ -119,11 +105,8 @@ func (r GitStorer) CheckoutCommit(article int64, commit [20]byte) error {
 }
 
 // CheckoutBranch checks out the specified version in the specified article repo
-func (r GitStorer) CheckoutBranch(article int64, version int64) error {
-	w, err := r.getWorktree(article)
-	if err != nil {
-		return err
-	}
+func (r Repo) CheckoutBranch(version int64) error {
+	w, err := r.getWorktree()
 
 	// checkout
 	branchName := strconv.FormatInt(version, 10)
@@ -135,7 +118,7 @@ func (r GitStorer) CheckoutBranch(article int64, version int64) error {
 }
 
 // CreateBranch creates a new branch based on the source one, named as target. Will automatically check out source branch.
-func (r GitStorer) CreateBranch(article int64, source int64, target int64) error {
+func (r Repo) CreateBranch(article int64, source int64, target int64) error {
 
 	// Open repository and get worktree
 	dir, err := r.GetArticlePath(article)
@@ -177,25 +160,9 @@ func (r GitStorer) CreateBranch(article int64, source int64, target int64) error
 	return nil
 }
 
-// GetArticlePath returns the path to an article git repository
-func (r GitStorer) GetArticlePath(article int64) (string, error) {
-	idString := strconv.FormatInt(article, 10)
-	path, err := filepath.Abs(filepath.Join(r.Path, "persistent", idString))
-	if err != nil {
-		return "", err
-	}
-	return filepath.Clean(path), err
-}
-
 // getWorktree returns the go-git worktree of an article git repository
-func (r GitStorer) getWorktree(article int64) (*git.Worktree, error) {
-	// Open  repository.
-	dir, err := r.GetArticlePath(article)
-	if err != nil {
-		return nil, err
-	}
-
-	repo, err := git.PlainOpen(dir)
+func (r Repo) getWorktree() (*git.Worktree, error) {
+	repo, err := git.PlainOpen(r.path)
 	if err != nil {
 		return nil, err
 	}
@@ -208,47 +175,12 @@ func (r GitStorer) getWorktree(article int64) (*git.Worktree, error) {
 	return w, nil
 }
 
-// renameInitialBranch manually renames the initial branch on a new repo.
-// Do not use on git repos that already have commits!
-// The main branch must have a database-usable version ID, not "master"
-// So, a file in .git is edited manually
-func (r GitStorer) renameInitialBranch(article int64, version int64) error {
-	path, err := r.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
-
-	headPath := filepath.Join(path, ".git", "HEAD")
-	f, err := os.Create(headPath)
-	if err != nil {
-		_ = f.Close()
-		return err
-	}
-
-	_, err = fmt.Fprintf(f, "ref: refs/heads/%d", version)
-	if err != nil {
-		_ = f.Close()
-		return err
-	}
-
-	err = f.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // GetLatestCommit returns the commit ID of the latest commit on the specified article version
-func (r GitStorer) GetLatestCommit(article int64, version int64) (string, error) {
-	path, err := r.GetArticlePath(article)
-	if err != nil {
-		return "", err
-	}
+func (r Repo) GetLatestCommit(version int64) (string, error) {
 	versionStr := strconv.FormatInt(version, 10)
 
 	// call the git command rev-parse, which returns a commit hash when given a branch name
-	output, err := git2.RevParse(revparse.Args(versionStr), runGitIn(path))
+	output, err := git2.RevParse(revparse.Args(versionStr), r.runner)
 	if err != nil {
 		return "", errors.New(output)
 	}
@@ -257,17 +189,12 @@ func (r GitStorer) GetLatestCommit(article int64, version int64) (string, error)
 }
 
 // Merge merges the source branch (version) into the target branch (version) of the specified repository (article)
-func (r GitStorer) Merge(article int64, source int64, target int64) error {
+func (r Repo) Merge(source int64, target int64) error {
 	sourceStr := strconv.FormatInt(source, 10)
 	targetStr := strconv.FormatInt(target, 10)
 
-	path, err := r.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
-
 	// checkout target
-	res, err := git2.Checkout(checkout.Branch(targetStr), runGitIn(path))
+	res, err := git2.Checkout(checkout.Branch(targetStr), runGitIn(r.path))
 	if err != nil {
 		return errors.New(res)
 	}
@@ -275,15 +202,15 @@ func (r GitStorer) Merge(article int64, source int64, target int64) error {
 	// revert any possible un-committed changes left over from previous failed executions
 	// without a clean worktree, aborting a failed merge might not be possible
 	// should be redundant, but the guarantee is good to have
-	res, err = git2.Reset(reset.Hard, runGitIn(path))
+	res, err = git2.Reset(reset.Hard, r.runner)
 	if err != nil {
 		return errors.New(res)
 	}
 
 	// merge source into target and commit immediately
-	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, runGitIn(path))
+	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, r.runner)
 	if err != nil {
-		res2, err := git2.Merge(merge.Abort, runGitIn(path))
+		res2, err := git2.Merge(merge.Abort, r.runner)
 		if err != nil {
 			return fmt.Errorf("failed aborting merge with message: %s, merge itself failed with error %s", res, res2)
 		}
@@ -297,7 +224,7 @@ func (r GitStorer) Merge(article int64, source int64, target int64) error {
 // Requires the commit/history ID's to be specified in the req struct
 // Might leave the repo behind with a detached HEAD
 // Returns whether there are conflicts
-func (r GitStorer) StoreRequestComparison(req entities.Request) (bool, error) {
+func (r Repo) StoreRequestComparison(req entities.Request) (bool, error) {
 	// get paths
 	repo, err := r.GetArticlePath(req.ArticleID)
 	if err != nil {
@@ -309,7 +236,7 @@ func (r GitStorer) StoreRequestComparison(req entities.Request) (bool, error) {
 	}
 
 	// checkout target commit, (possibly creating a detached head)
-	res, err := git2.Checkout(checkout.Branch(req.TargetHistoryID), runGitIn(repo))
+	res, err := git2.Checkout(checkout.Branch(req.TargetHistoryID), r.runner)
 	if err != nil {
 		return false, errors.New(res)
 	}
@@ -325,7 +252,7 @@ func (r GitStorer) StoreRequestComparison(req entities.Request) (bool, error) {
 	}
 
 	// merge source commit into target, without committing
-	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, merge.NoFf, runGitIn(repo))
+	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, merge.NoFf, r.runner)
 	conflicts := strings.Contains(mergeRes, "CONFLICT")
 	if err != nil && !conflicts { // if err is just that there are conflicts, the execution can continue as normal
 		return false, errors.New(mergeRes)
@@ -353,7 +280,7 @@ func (r GitStorer) StoreRequestComparison(req entities.Request) (bool, error) {
 
 // GetRequestComparison returns the before and after main article file of a request
 // requires the history ID's to be up-to-date in the req parameter
-func (r GitStorer) GetRequestComparison(article int64, request int64) (string, string, error) {
+func (r Repo) GetRequestComparison(article int64, request int64) (string, string, error) {
 	// get paths
 	path, err := r.GetRequestComparisonPath(article, request)
 	if err != nil {

@@ -8,10 +8,10 @@ import (
 )
 
 type Config struct {
-	Hosting  HostingConfig    `json:"hosting"`
-	Database DatabaseConfig   `json:"database"`
-	Auth     AuthConfig       `json:"auth"`
-	Fs       FileSystemConfig `json:"fs"`
+	Hosting  HostingConfig  `json:"hosting"`
+	Database DatabaseConfig `json:"database"`
+	Auth     AuthConfig     `json:"auth"`
+	Fs       StorerConfig   `json:"fs"`
 }
 
 type DatabaseConfig struct {
@@ -21,7 +21,7 @@ type DatabaseConfig struct {
 	DBName string    `json:"dbname"`
 }
 
-type FileSystemConfig struct {
+type StorerConfig struct {
 	Path       string `json:"path"`
 	MutexCount int    `json:"mutex-count"`
 }

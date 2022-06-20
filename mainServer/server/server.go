@@ -7,15 +7,14 @@ import (
 	"mainServer/db"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
+	"mainServer/repositories/storer"
 	"mainServer/server/config"
 	"mainServer/services"
 	servinterfaces "mainServer/services/interfaces"
-	"mainServer/storer"
 )
 
 type RepoEnv struct {
-	git           storer.GitStorer
-	filesystem    storer.FilesystemRepository
+	storer        storer.Storer
 	article       interfaces.ArticleRepository
 	user          interfaces.UserRepository
 	version       interfaces.VersionRepository
@@ -49,8 +48,7 @@ type ControllerEnv struct {
 
 func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 	return RepoEnv{
-		git:           storer.NewGitStorer(&cfg.Git),
-		filesystem:    storer.NewFilesystemRepository(&cfg.Git),
+		storer:        storer.NewStorer(&cfg.Fs),
 		article:       postgres.NewPgArticleRepository(database),
 		user:          postgres.NewPgUserRepository(database),
 		version:       postgres.NewPgVersionRepository(database),
