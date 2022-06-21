@@ -26,7 +26,6 @@ type ThreadController struct {
 // @Description  Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment
 // @Accept		 json
 // @Param		 thread 		body	models.Thread		true 	"Thread"
-// @Param			section		query	string	false	"section"
 // @Produce      json
 // @Success      200  {object} models.ReturnThreadIds
 // @Failure 	 400  {object} httperror.HTTPError
@@ -88,7 +87,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			return
 		}
 
-		section := c.Query("section")
+		section := thread.Selection
 		if len(section) > 255 || len(section) < 1 {
 			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid section length, got %d", len(section)))
 			return

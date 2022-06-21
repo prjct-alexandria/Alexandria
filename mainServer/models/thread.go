@@ -9,6 +9,7 @@ type Thread struct {
 	ArticleId  int64              `json:"articleId"       binding:"required"`
 	SpecificId string             `json:"specificId"`
 	Comments   []entities.Comment `json:"comments"         binding:"required"`
+	Selection  string             `json:"selection"`
 }
 
 type SectionThread struct {

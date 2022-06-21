@@ -40,10 +40,6 @@ export default function CreateComment(props: ThreadProps) {
         "/id/" +
         props.specificId;
 
-      if (props.threadType === "commitSection") {
-        urlCreateThread += "?section=" + props.selection
-      }
-
       const bodyThread = {
         articleId: parseInt(params.articleId as string),
         comments: [
@@ -56,6 +52,7 @@ export default function CreateComment(props: ThreadProps) {
           },
         ],
         specificId: props.specificId,
+        selection: props.selection
       };
 
       fetch(urlCreateThread, {
