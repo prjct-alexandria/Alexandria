@@ -18,7 +18,7 @@ export default function VersionListElement(props: VListProps) {
   return (
     <div className="row row-no-gutters col-md-12 text-wrap">
       <div className="col-md-1">
-        {props.version.versionID === props.mv && (
+        {props.version.versionID == props.mv && (
           <span className="badge bg-success">Main</span>
         )}
       </div>
