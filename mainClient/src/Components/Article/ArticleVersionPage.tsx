@@ -186,15 +186,15 @@ export default function ArticleVersionPage() {
                 {versionData && versionData.content}
               </div>
             </div>
-            <div className="col-3">
-              {versionData && !viewingOldVersion && <ThreadList
-                threadType={"commit"}
-                specificId={versionData && versionData.latestHistoryID}
-              />
-              || historyID && <ThreadList
-                      threadType={"commit"}
-                      specificId={historyID}
-                  />}
+            <div className="col-4">
+                {versionData && !viewingOldVersion && <ThreadList
+                  threadType={"commit"}
+                  specificId={versionData && versionData.latestHistoryID}
+                />
+                || historyID && <ThreadList
+                        threadType={"commit"}
+                        specificId={historyID}
+                    />}
             </div>
           </div>
         </div>
