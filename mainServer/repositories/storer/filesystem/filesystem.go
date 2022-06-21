@@ -12,11 +12,12 @@ import (
 )
 
 type FileSystem struct {
-	path string
+	path        string
+	defaultFile string
 }
 
 // NewFileSystem creates file system struct and creates folders
-func NewFileSystem(path string) *FileSystem {
+func NewFileSystem(path string, defaultFile string) *FileSystem {
 
 	// make folder for git repos
 	err := os.MkdirAll(filepath.Join(path, "persistent", "articles"), os.ModePerm)
@@ -36,7 +37,29 @@ func NewFileSystem(path string) *FileSystem {
 		panic(err)
 	}
 
-	return &FileSystem{path: path}
+	return &FileSystem{path: path, defaultFile: defaultFile}
+}
+
+// CreateArticlePath makes a new folder for an article git repository, returns the path.
+// Fails if the folder already exists. Does not initialize the repository.
+func (fs FileSystem) CreateArticlePath(article int64) (string, error) {
+	// Get path to where the directory will be added
+	path, err := fs.GetArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Check if dir already exists
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		return "", fmt.Errorf("trying to create an article repository folder that already exists with id=%d", article)
+	}
+
+	// Create directory
+	err = os.Mkdir(path, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+	return path, err
 }
 
 // GetArticlePath returns the path to an article git repository, does not check if it exists
@@ -78,4 +101,19 @@ func (fs FileSystem) ReadArticleFile(articlePath string) (string, error) {
 		return "", err
 	}
 	return string(fileContent), nil
+}
+
+// PlaceDefaultFile places the default article contents, as specified from the config,
+// in the specified path. Path should refer to a folder, the filename is added by the storer.
+func (fs FileSystem) PlaceDefaultFile(path string) error {
+
+	// Read the default file
+	input, err := ioutil.ReadFile(fs.defaultFile)
+	if err != nil {
+		return err
+	}
+
+	// Write contents to the main.qmd file in the repo
+	target := filepath.Join(path, "main.qmd")
+	return ioutil.WriteFile(target, input, 0644)
 }

@@ -22,8 +22,9 @@ type DatabaseConfig struct {
 }
 
 type StorerConfig struct {
-	Path       string `json:"path"`
-	MutexCount int    `json:"mutex-count"`
+	Path        string `json:"path"`
+	DefaultFile string `json:"default-file"`
+	MutexCount  int    `json:"mutex-count"`
 }
 
 type AuthConfig struct {

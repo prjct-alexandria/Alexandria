@@ -15,7 +15,6 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
 	"io/ioutil"
 	"mainServer/entities"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -33,30 +32,20 @@ func NewRepo(path string) Repo {
 	return Repo{path: path}
 }
 
-// Init initializes
+// Init initializes a repository with the specified id as main branch name
 func (r Repo) Init(mainVersion int64) error {
 
-	// Check if folder with the same name already exists
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return fmt.Errorf("trying to create a git repository that already exists with id=%d", article)
+	// Git init
+	output, err := git2.Init(runGitIn(r.path))
+	if err != nil {
+		return errors.New(output)
 	}
 
-	// Create directory
-	err = os.Mkdir(path, os.ModePerm)
+	// Checkout a new branch immediately before committing, this renames the main branch
+	branchName := strconv.FormatInt(mainVersion, 10)
+	output, err = git2.Checkout(checkout.Branch(branchName), runGitIn(r.path))
 	if err != nil {
-		return err
-	}
-
-	// Git init, Go-git automatically creates a branch called "master"
-	_, err = git.PlainInit(path, false)
-	if err != nil {
-		return err
-	}
-
-	// Rename the branch to the main version ID
-	err = r.renameInitialBranch(mainVersion)
-	if err != nil {
-		return err
+		return errors.New(output)
 	}
 
 	return nil
@@ -196,15 +185,15 @@ func (r Repo) Merge(source int64, target int64) error {
 	// revert any possible un-committed changes left over from previous failed executions
 	// without a clean worktree, aborting a failed merge might not be possible
 	// should be redundant, but the guarantee is good to have
-	res, err = git2.Reset(reset.Hard, r.runner)
+	res, err = git2.Reset(reset.Hard, runGitIn(r.path))
 	if err != nil {
 		return errors.New(res)
 	}
 
 	// merge source into target and commit immediately
-	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, r.runner)
+	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, runGitIn(r.path))
 	if err != nil {
-		res2, err := git2.Merge(merge.Abort, r.runner)
+		res2, err := git2.Merge(merge.Abort, runGitIn(r.path))
 		if err != nil {
 			return fmt.Errorf("failed aborting merge with message: %s, merge itself failed with error %s", res, res2)
 		}

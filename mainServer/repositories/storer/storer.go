@@ -19,7 +19,7 @@ type Storer struct {
 func NewStorer(cfg *config.StorerConfig) Storer {
 	return Storer{
 		pool:  locking.NewMutexPool(cfg.MutexCount),
-		fs:    filesystem.NewFileSystem(cfg.Path),
+		fs:    filesystem.NewFileSystem(cfg.Path, cfg.DefaultFile),
 		clock: clock.RealClock{},
 	}
 }

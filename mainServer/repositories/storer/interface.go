@@ -1,3 +1,3 @@
 package storer
 
-// TODO: add interface for storer
+// TODO: use interface for storer for testing

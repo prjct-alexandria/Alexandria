@@ -27,6 +27,7 @@
   },
   "fs": {
     "path": "../../gitfiles",
+    "default-file": "./resources/defaultArticle",
     "mutex-count": 12
   }
 }

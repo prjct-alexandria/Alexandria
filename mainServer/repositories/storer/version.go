@@ -139,3 +139,36 @@ func (s *Storer) CreateVersionFrom(article int64, source int64, target int64) (s
 	// Return the commit id of the created version
 	return repo.GetLatestCommit(target)
 }
+
+// InitMainVersion creates a new git repository for the article, with an initial branch named after the given version
+// Returns ID of the initial commit that added a default file.
+func (s *Storer) InitMainVersion(article int64, mainVersion int64) (string, error) {
+	s.pool.Lock(article)
+	defer s.pool.Unlock(article)
+
+	// Create article repository folder
+	path, err := s.fs.CreateArticlePath(article)
+	if err != nil {
+		return "", err
+	}
+
+	// Initialize git repository
+	repo := git.NewRepo(path)
+	err = repo.Init(mainVersion)
+	if err != nil {
+		return "", err
+	}
+
+	// Put the default file there and commit
+	err = s.fs.PlaceDefaultFile(path)
+	if err != nil {
+		return "", err
+	}
+	err = repo.Commit(s.clock.Now())
+	if err != nil {
+		return "", err
+	}
+
+	// Return the commit id of the created version
+	return repo.GetLatestCommit(mainVersion)
+}
