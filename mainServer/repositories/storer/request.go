@@ -2,6 +2,7 @@ package storer
 
 import (
 	"errors"
+	"fmt"
 	"mainServer/repositories/storer/git"
 )
 
@@ -89,7 +90,7 @@ func (s *Storer) Merge(article int64, source int64, target int64) (string, error
 	}
 
 	// Commit
-	err = repo.Commit(s.clock.Now())
+	err = repo.Commit(s.clock.Now(), fmt.Sprintf("Merge %v into %v", source, target))
 	if err != nil {
 		return "", err
 	}

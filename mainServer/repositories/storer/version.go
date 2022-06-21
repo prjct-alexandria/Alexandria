@@ -1,6 +1,7 @@
 package storer
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/repositories/storer/git"
 	"mime/multipart"
@@ -102,7 +103,7 @@ func (s *Storer) UpdateAndCommit(c *gin.Context, file *multipart.FileHeader, art
 	}
 
 	// Commit
-	err = repo.Commit(s.clock.Now())
+	err = repo.Commit(s.clock.Now(), fmt.Sprintf("Update version %v", version))
 	if err != nil {
 		return "", err
 	}
@@ -164,7 +165,7 @@ func (s *Storer) InitMainVersion(article int64, mainVersion int64) (string, erro
 	if err != nil {
 		return "", err
 	}
-	err = repo.Commit(s.clock.Now())
+	err = repo.Commit(s.clock.Now(), "Initial default file")
 	if err != nil {
 		return "", err
 	}

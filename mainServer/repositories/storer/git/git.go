@@ -46,8 +46,8 @@ func (r Repo) Init(mainVersion int64) error {
 	return nil
 }
 
-// Commit commits all changes in the specified article
-func (r Repo) Commit(timestamp time.Time) error {
+// Commit commits all changes in the specified article, with commit message
+func (r Repo) Commit(timestamp time.Time, msg string) error {
 	w, err := r.getWorktree()
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (r Repo) Commit(timestamp time.Time) error {
 	}
 
 	// commit
-	_, err = w.Commit("version update", &git.CommitOptions{
+	_, err = w.Commit(msg, &git.CommitOptions{
 		Author: &object.Signature{
 			// TODO: add actual user name?
 			Name:  "Alexandria Git Manager",
