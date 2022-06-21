@@ -98,6 +98,7 @@ export default function ThreadList(props: ThreadListProps) {
                 />
             )}
             <div id="accordionPanelsStayOpenExample">
+                <h5 className="mb-2">Comments</h5>
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
                         <Thread
