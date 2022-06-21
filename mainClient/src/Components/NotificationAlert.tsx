@@ -9,7 +9,9 @@ export default function NotificationAlert(props: alertProps) {
     <div
       id={props.errorType + "-alert"}
       className={
-        "alert alert-" + props.errorType + " alert-dismissible fade show"
+        "alert alert-" +
+        props.errorType +
+        " alert-dismissible notification-alert fade show "
       }
       role="alert"
     >

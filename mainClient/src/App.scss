@@ -1,5 +1,5 @@
 // Declare SASS variables
-$primary-color: #282c34;
+$primary-color: #0c2728;
 $primary-accent-color: cornflowerblue;
 $link-hover-color: #0a58ca;
 $added-color: green;
@@ -7,6 +7,7 @@ $added-background-color: #b5efdb;
 $removed-color:red;
 $removed-background-color: #fec4c0;
 $error-color: #c70000;
+$header-color: #174c4f;
 
 // article contents SASS
 $article-content-background-color: #f3f3f3;
@@ -37,13 +38,15 @@ $article-content-border-color: #ccc;
 }
 .inline-editor-article:hover, .inline-editor-textarea:hover, .inline-editor-textarea:focus {
   cursor: text !important;
+header {
+  background-color: $header-color;
 }
 body {
   // to prevent the browser from shaking when threads are opened
   overflow: scroll;
 }
 .App {
-  margin-top:100px;
+  margin-top: 100px;
 }
 .textarea {
   background-color: transparent;
@@ -51,7 +54,6 @@ body {
   padding: 8px;
   resize: none;
   width: 100%;
-  resize: none;
   overflow: auto;
   min-height: 300px;
 }
@@ -67,7 +69,7 @@ body {
   display: inline;
   padding-right: 10px;
 }
-NotificationAlert {
+.notification-alert {
   z-index:100;
 }
 .input-validation {
@@ -82,7 +84,9 @@ NotificationAlert {
 .header-image {
   background-image: url('../public/header-photo.png');
   background-size: cover;
-  width: 100%;
+  width: 800px;
+  margin: -45px auto 0;
+  height:250px;
 }
 .text-primary {
   color: $primary-accent-color;
@@ -178,4 +182,18 @@ a:hover {
 
 .commentHeader {
   background-color: transparent;
+}
+.header-buttons-wrapper {
+  position: relative;
+  top:-40px;
+  left:160px;
+}
+.header-browse-articles {
+  margin-right: 10px;
+}
+#btn-open-login-form {
+  margin-right: 2px;
+}
+.navbar {
+  background-color: $primary-color !important;
 }

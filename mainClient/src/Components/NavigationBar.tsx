@@ -22,7 +22,7 @@ export default function NavigationBar() {
 
   return (
     <div className="col-xs-12">
-      <nav className="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
         <div className="container-fluid">
           <Link to="/" className="navbar-brand">
             Project Alexandria

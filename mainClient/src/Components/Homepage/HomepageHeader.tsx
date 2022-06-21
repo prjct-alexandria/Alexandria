@@ -17,63 +17,54 @@ export default function HomepageHeader() {
     <header>
       <div id="intro-example" className="p-5 text-center bg-image header-image">
         <div className="mask">
-          <div className="d-flex justify-content-end align-items-end h-100">
-            <div>
-              <h1 className="mb-3">Alexandria</h1>
-              <h5 className="mb-4">
-                Collaborative and open-access scientific publishing.
-              </h5>
-              <a
-                className="btn btn-outline-dark btn-lg m-2"
-                href="/articles"
-                role="button"
-                rel="nofollow"
-              >
-                Browse articles
-              </a>
-              {isLoggedIn && (
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-outline-dark btn-lg m-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#publishArticle"
-                  >
-                    Publish article
-                  </button>
-                  <CreateArticle />
-                </div>
-              )}
-              {!isLoggedIn && (
-                <div>
-                  <div className="btn-group" role="group">
-                    <button
-                      type="button"
-                      className="btn btn-outline-dark btn-lg"
-                      data-bs-toggle="modal"
-                      data-bs-target="#login"
-                      id="btn-open-login-form"
-                    >
-                      Log in
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn btn-outline-dark btn-lg"
-                      data-bs-toggle="modal"
-                      data-bs-target="#signUp"
-                    >
-                      Sign up
-                    </button>
-                  </div>
-                  <Login />
-                  <Signup />
-                </div>
-              )}
-            </div>
-          </div>
+          <div className="d-flex justify-content-end align-items-end h-100"></div>
         </div>
       </div>
+      <div className="header-buttons-wrapper d-flex justify-content-center align-items-center">
+        <a
+          className="btn btn-light btn-lg header-browse-articles"
+          href="/articles"
+          role="button"
+          rel="nofollow"
+        >
+          Browse articles
+        </a>
+        {isLoggedIn && (
+          <button
+            type="button"
+            className="btn btn-light btn-lg"
+            data-bs-toggle="modal"
+            data-bs-target="#publishArticle"
+          >
+            Publish article
+          </button>
+        )}
+        {!isLoggedIn && (
+          <div className="btn-group" role="group">
+            <button
+              type="button"
+              className="btn btn-light btn-lg"
+              data-bs-toggle="modal"
+              data-bs-target="#login"
+              id="btn-open-login-form"
+            >
+              Log in
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-light btn-lg"
+              data-bs-toggle="modal"
+              data-bs-target="#signUp"
+            >
+              Sign up
+            </button>
+          </div>
+        )}
+      </div>
+      <Login />
+      <Signup />
+      <CreateArticle />
     </header>
   );
 }
