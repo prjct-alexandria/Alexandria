@@ -5,7 +5,6 @@ import * as React from "react";
 export default function NotificationAlert() {
     return (
         <div className="wrapper col-8 m-auto">
-            <div className={"accordion"}>
                 <p>This application is created by five second year Computer Science and Engineering students from TU Delft,
                 in the academic year 2021-2022:
                 </p>
@@ -16,7 +15,6 @@ export default function NotificationAlert() {
                     <li>Jos Sloof</li>
                     <li>Mattheo de Wit</li>
                 </ul>
-            </div>
         </div>
     );
 }
