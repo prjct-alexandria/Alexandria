@@ -11,7 +11,7 @@ type PgCommitSectionThreadRepository struct {
 	Db *sql.DB
 }
 
-func NewPgCommitSectionThreadRepository(db *sql.DB) PgCommitSectionThreadRepository {
+func NewPgCommitSelectionThreadRepository(db *sql.DB) PgCommitSectionThreadRepository {
 	repo := PgCommitSectionThreadRepository{db}
 	err := repo.createCommitSelectionThreadTable()
 	if err != nil {
