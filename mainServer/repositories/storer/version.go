@@ -70,7 +70,7 @@ func (s *Storer) GetVersionZipped(article int64, version int64, filename string)
 	}
 
 	// Add a .zip with the files to a cache folder and return the path
-	path, err = s.fs.MakeDownloadZip(filename, path)
+	path, err = s.fs.MakeDownloadZip(article, filename, path)
 	if err != nil {
 		return "", nil
 	}

@@ -80,15 +80,23 @@ func (fs FileSystem) GetArticlePath(article int64) (string, error) {
 }
 
 // GetDownloadPath returns the path that a (temporary) zip for downloading can be stored in
-func (fs FileSystem) GetDownloadPath(filename string) (string, error) {
+// creates a folder for the specific article if necessary
+func (fs FileSystem) GetDownloadPath(article int64, filename string) (string, error) {
 	// check that the filename does not contain illegal characters
-	if !strings.Contains(IllegalChars, filename) {
+	if strings.Contains(IllegalChars, filename) {
 		return "", fmt.Errorf("filename for zip contains illegal characters: %s", filename)
 	}
 
-	// create the filepath, absolute and cleaned
-	path := filepath.Join(fs.downloadPath, filename+".zip")
-	path, err := filepath.Abs(path)
+	// create the directory for the article (if necessary)
+	articleStr := strconv.FormatInt(article, 10)
+	err := os.MkdirAll(filepath.Join(fs.downloadPath, articleStr), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	// get the full path
+	path := filepath.Join(fs.downloadPath, articleStr, filename+".zip")
+	path, err = filepath.Abs(path)
 	if err != nil {
 		return "", err
 	}

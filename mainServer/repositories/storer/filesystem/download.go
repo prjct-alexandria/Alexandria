@@ -13,8 +13,8 @@ import (
 const IllegalChars = "<>:\"/\\|?*"
 
 // MakeDownloadZip copies the all contents of the source directory to a .zip file with the specified
-func (fs FileSystem) MakeDownloadZip(filename string, sourceDir string) (string, error) {
-	path, err := fs.GetDownloadPath(filename)
+func (fs FileSystem) MakeDownloadZip(article int64, filename string, sourceDir string) (string, error) {
+	path, err := fs.GetDownloadPath(article, filename)
 	if err != nil {
 		return "", err
 	}

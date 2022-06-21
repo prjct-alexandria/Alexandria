@@ -166,7 +166,7 @@ func (r Repo) Merge(source int64) (bool, error) {
 	sourceStr := strconv.FormatInt(source, 10)
 
 	// merge source into current branch
-	output, err := git2.Merge(merge.Commits(sourceStr), merge.NoCommit, runGitIn(r.path))
+	output, err := git2.Merge(merge.Commits(sourceStr), merge.NoCommit, merge.NoFf, runGitIn(r.path))
 	conflicts := strings.Contains(output, "CONFLICT")
 	if err != nil && !conflicts {
 		return false, nil
