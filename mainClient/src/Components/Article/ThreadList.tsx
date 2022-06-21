@@ -109,7 +109,7 @@ export default function ThreadList(props: ThreadListProps) {
           message={"Something went wrong. " + error}
         />
       )}
-      <div id="accordionPanelsStayOpenExample">
+      <div id="accordionPanelsStayOpenExample"><h5>Comments</h5>
         {threadListData != null &&
           threadListData.map((thread, i) => (
             <Thread
