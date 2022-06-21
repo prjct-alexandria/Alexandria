@@ -1,19 +1,13 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment";
-import configData from "../../config.json";
-import NotificationAlert from "../NotificationAlert";
-import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import moment from "moment";
 
-type SectionThreadProps = {
+type SelectionThreadProps = {
     "id": number,
     "specificId": string | undefined,
     "threadType": string,
     "comments": ThreadComment[],
-    "section": string
+    "selection": string
 };
 
 type ThreadComment = {
@@ -25,12 +19,12 @@ type ThreadComment = {
 }
 
 
-// A SectionThread is a thread (list of comments) that can be related to a specific section in the document
-export default function SectionThread(props: SectionThreadProps) {
+// A SelectionThread is a thread (list of comments) that can be related to a specific part of the file (selection).
+export default function SelectionThread(props: SelectionThreadProps) {
     return (
         <div>
             <div>
-                {"Related to text: \"" + props.section + '\"'}
+                {"Related to text: \"" + props.selection + '\"'}
             </div>
             {
                 <div className="accordion-item mb-3 text-break comment">

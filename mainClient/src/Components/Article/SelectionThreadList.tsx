@@ -2,12 +2,10 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import { useParams } from "react-router-dom";
-import Thread from "./Thread";
-import CreateThread from "./CreateThread";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
-import SectionThread from "./SectionThread";
+import SelectionThread from "./SelectionThread";
 
 type ThreadListProps = {
     "threadType": string
@@ -27,13 +25,12 @@ type ThreadEntity = {
     "comments": ThreadComment[]
     "id": number
     "specificId": string | undefined
-    "section": string
+    "selection": string
 }
 
 
-// A sectionThreadList is a list of threads that can be related to specific sections in the document.
-
-export default function SectionThreadList(props: ThreadListProps) {
+// A selectionThreadList is a list of threads that can be related to specific pieces of text (selections) in the document.
+export default function SelectionThreadList(props: ThreadListProps) {
     let baseUrl= configData.back_end_url;
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState<boolean>(false);
@@ -50,7 +47,7 @@ export default function SectionThreadList(props: ThreadListProps) {
 
     useEffect(() => {
         let urlThreadList = baseUrl + "/articles/" + params.articleId + "/versions/" + params.versionId +
-            "/history/" + props.specificId + "/sectionThreads";
+            "/history/" + props.specificId + "/selectionThreads";
 
         // get list of threads
         fetch(urlThreadList, {
@@ -98,16 +95,16 @@ export default function SectionThreadList(props: ThreadListProps) {
                 />
             )}
             <div id="accordionPanelsStayOpenExample">
-                <h5 className="mb-2">Comments on specific sections</h5>
+                <h5 className="mb-2">Comments on specific selections</h5>
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
-                        <SectionThread
+                        <SelectionThread
                             key={i}
                             id={thread.id}
                             specificId={props.specificId}
                             threadType={props.threadType}
                             comments={thread.comments}
-                            section={thread.section}
+                            selection={thread.selection}
                         />
                     ))}
             </div>

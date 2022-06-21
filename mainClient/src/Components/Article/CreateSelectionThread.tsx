@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import CreateComment from "./CreateComment";
 
-type SectionThreadProps = {
+type SelectionThreadProps = {
     "id": undefined | number,
     "specificId": string | undefined,
     "threadType": string
@@ -12,7 +12,7 @@ type SectionThreadProps = {
     "selection": string
 };
 
-export default function CreateSectionThread(props: SectionThreadProps) {
+export default function CreateSelectionThread(props: SelectionThreadProps) {
     let [key, setKey] = useState(1);
 
     let [newThreadList, setNewThreadList] = useState([
