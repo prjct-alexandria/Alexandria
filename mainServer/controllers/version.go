@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils"
 	"mainServer/utils/httperror"
 	"net/http"
 	"os"
@@ -51,14 +52,11 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	// get optional query parameter for specific history/commit ID
 	commitID := c.Request.URL.Query().Get("historyID")
 	usingCommit := commitID != ""
-	if usingCommit {
-		// ensure that the commitID has the right format
-		_, err := strconv.ParseUint(commitID, 16, 64)
-		if len(commitID) != 40 || err != nil {
-			fmt.Println(err)
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID))
-			return
-		}
+	if usingCommit && !utils.IsCommitHash(commitID) {
+		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	// Get either a specific version or just the latest

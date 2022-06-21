@@ -26,12 +26,13 @@ func (serv VersionService) ListVersions(article int64) ([]models.Version, error)
 	result := make([]models.Version, len(list))
 	for i, e := range list {
 		result[i] = models.Version{
-			ArticleID: article,
-			Id:        e.Id,
-			Title:     e.Title,
-			Owners:    e.Owners,
-			Content:   "",
-			Status:    e.Status,
+			ArticleID:      article,
+			Id:             e.Id,
+			Title:          e.Title,
+			Owners:         e.Owners,
+			Content:        "",
+			Status:         e.Status,
+			LatestCommitID: e.LatestCommitID,
 		}
 	}
 	return result, nil
@@ -54,12 +55,13 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 	}
 
 	fullVersion := models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   content,
-		Status:    entity.Status,
+		ArticleID:      entity.ArticleID,
+		Id:             entity.Id,
+		Title:          entity.Title,
+		Owners:         entity.Owners,
+		Content:        content,
+		Status:         entity.Status,
+		LatestCommitID: entity.LatestCommitID,
 	}
 	return fullVersion, nil
 }
@@ -82,12 +84,13 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 	}
 
 	fullVersion := models.Version{
-		ArticleID: entity.ArticleID,
-		Id:        entity.Id,
-		Title:     entity.Title,
-		Owners:    entity.Owners,
-		Content:   content,
-		Status:    entity.Status,
+		ArticleID:      entity.ArticleID,
+		Id:             entity.Id,
+		Title:          entity.Title,
+		Owners:         entity.Owners,
+		Content:        content,
+		Status:         entity.Status,
+		LatestCommitID: entity.LatestCommitID,
 	}
 	return fullVersion, nil
 }

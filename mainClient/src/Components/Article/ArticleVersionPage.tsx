@@ -15,6 +15,7 @@ type ArticleVersion = {
   owners: Array<string>;
   title: string;
   content: string;
+  latestHistoryID: string;
 };
 
 export default function ArticleVersionPage() {
@@ -22,6 +23,7 @@ export default function ArticleVersionPage() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+  let [isOutdated, setOutdated] = useState<boolean>();
 
   // Listen for userAccountEvent that fires when user in localstorage changes
   window.addEventListener("userAccountEvent", () => {
@@ -38,9 +40,8 @@ export default function ArticleVersionPage() {
 
   // get the optional specific history param
   const [searchParams] = useSearchParams(); // used for the source and target
-  let historyID = searchParams.get("history");
-  const viewingOldVersion = historyID != null;
-  if (viewingOldVersion) {
+  const historyID = searchParams.get("history");
+  if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
 
@@ -60,6 +61,7 @@ export default function ArticleVersionPage() {
           let VersionData: ArticleVersion = await response.json();
           setData(VersionData);
           setLoaded(true);
+          setOutdated(historyID != null && VersionData.latestHistoryID != historyID)
         } else {
           setLoaded(true);
           // Set error with message returned from the server
@@ -117,7 +119,7 @@ export default function ArticleVersionPage() {
             </Link>
             </a>
           </li>
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -137,7 +139,7 @@ export default function ArticleVersionPage() {
               <FileDownload />
             </a>
           </li>
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -152,7 +154,7 @@ export default function ArticleVersionPage() {
               </a>
             </li>
           )}
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -169,7 +171,7 @@ export default function ArticleVersionPage() {
           )}
         </ul>
 
-        {viewingOldVersion && (
+        {isOutdated && (
           <p>
             <em>
               {

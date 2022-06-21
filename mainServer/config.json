@@ -27,7 +27,7 @@
   },
   "fs": {
     "path": "../../gitfiles",
-    "default-file": "./resources/defaultArticle",
+    "default-file": "./resources/defaultArticle.qmd",
     "mutex-count": 12
   }
 }

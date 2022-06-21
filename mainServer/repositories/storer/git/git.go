@@ -38,7 +38,7 @@ func (r Repo) Init(mainVersion int64) error {
 
 	// Checkout a new branch immediately before committing, this renames the main branch
 	branchName := strconv.FormatInt(mainVersion, 10)
-	output, err = git2.Checkout(checkout.Branch(branchName), runGitIn(r.path))
+	output, err = git2.Checkout(checkout.NewBranch(branchName), runGitIn(r.path))
 	if err != nil {
 		return errors.New(output)
 	}
