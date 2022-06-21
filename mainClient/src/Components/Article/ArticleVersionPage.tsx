@@ -208,7 +208,8 @@ export default function ArticleVersionPage() {
         <div className="row">
           <div className="row mb-2 mt-2">
             <div className="col-8 articleContent">
-              <div style={{ whiteSpace: "pre-line" }} onMouseUp={(e) => showAddSectionComment(e)}>
+              <div style={{ whiteSpace: "pre-line" }} onMouseUp={(e) =>
+                  (isLoggedIn && showAddSectionComment(e))}>
                 {versionData && versionData.content}
               </div>
             </div>

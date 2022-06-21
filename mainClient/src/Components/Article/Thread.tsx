@@ -1,11 +1,5 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment";
-import configData from "../../config.json";
-import NotificationAlert from "../NotificationAlert";
-import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import moment from 'moment';
 
 type ThreadProps = {
@@ -14,13 +8,6 @@ type ThreadProps = {
     "threadType": string,
     "comments": ThreadComment[],
 };
-
-type ThreadEntity = {
-    "articleId": number,
-    "id": number,
-    "specificId": string | undefined,
-    "comment": ThreadComment[],
-}
 
 type ThreadComment = {
     "id": number,
@@ -80,7 +67,7 @@ export default function Thread(props: ThreadProps) {
                             </div>
                         </div>
                     ))}
-                    <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType}/>
+                    <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType} selection={undefined}/>
                 </div>
             </div>
             }
