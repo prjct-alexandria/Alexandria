@@ -15,6 +15,13 @@ type ThreadProps = {
     "comments": ThreadComment[],
 };
 
+type ThreadEntity = {
+    "articleId": number,
+    "id": number,
+    "specificId": string | undefined,
+    "comment": ThreadComment[],
+}
+
 type ThreadComment = {
     "id": number,
     "authorId": string,
@@ -24,12 +31,10 @@ type ThreadComment = {
 }
 
 export default function Thread(props: ThreadProps) {
-    const date = new Date(parseInt(props.comments[0].creationDate as string) * 1000);
-    console.log(date)
     return (
         <div>
             {
-                <div className="accordion-item mb-3 text-break" style={{border: '1px solid #e9ecef'}}>
+                <div className="accordion-item mb-3 text-break comment">
                     <button className="accordion-button collapsed"
                         type="button"
                         data-bs-toggle="collapse"
@@ -37,7 +42,7 @@ export default function Thread(props: ThreadProps) {
                         aria-expanded="false"
                         aria-controls={"panelsStayOpen-collapse" + props.id}>
                         <div className="row">
-                            <div className="toast-header mb-2" style={{backgroundColor: 'transparent'}}>
+                            <div className="toast-header mb-2 commentHeader">
                                 <strong className="me-auto p-1">
                                     {props.comments[0].authorId}
                                 </strong>
@@ -59,7 +64,7 @@ export default function Thread(props: ThreadProps) {
                 >
                     {props.comments.map((comment, i) => (
                         i !== 0 && // don't show first element in the list
-                        <div className="accordion-body" style={{border: '1px solid #e9ecef'}} key={i}>
+                        <div className="accordion-body comment" key={i}>
                             <div className="toast-header mb-2 p-0">
                                 <strong className="me-auto p-1">
                                     {comment.authorId}
@@ -75,8 +80,7 @@ export default function Thread(props: ThreadProps) {
                             </div>
                         </div>
                     ))}
-                    <CreateComment id={props.id} specificId={props.specificId}
-                                   threadType={props.threadType} selection={undefined}/>
+                    <CreateComment id={props.id} specificId={props.specificId} threadType={props.threadType}/>
                 </div>
             </div>
             }
