@@ -2,6 +2,7 @@ package services
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
@@ -17,6 +18,7 @@ import (
 type VersionService struct {
 	GitRepo        repositories.GitRepository
 	VersionRepo    interfaces.VersionRepository
+	UserRepo       interfaces.UserRepository
 	FilesystemRepo repositories.FilesystemRepository
 }
 
@@ -118,6 +120,13 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 
 // CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
 func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+	// Check if owners exist in database
+	for _, email := range owners {
+		exists, err := serv.UserRepo.CheckIfExists(email)
+		if err != nil || exists == false {
+			return models.Version{}, errors.New(fmt.Sprintf("Could not verify %s exists in the database", email))
+		}
+	}
 
 	// Create entity to store in db
 	version := entities.Version{
