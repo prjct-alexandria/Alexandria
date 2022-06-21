@@ -30,6 +30,9 @@ type ThreadEntity = {
     "section": string
 }
 
+
+// A sectionThreadList is a list of threads that can be related to specific sections in the document.
+
 export default function SectionThreadList(props: ThreadListProps) {
     let baseUrl= configData.back_end_url;
     let [threadListData, setData] = useState<ThreadEntity[]>();
@@ -95,6 +98,7 @@ export default function SectionThreadList(props: ThreadListProps) {
                 />
             )}
             <div id="accordionPanelsStayOpenExample">
+                <h5 className="mb-2">Comments on specific sections</h5>
                 {threadListData != null &&
                     threadListData.map((thread, i) => (
                         <SectionThread

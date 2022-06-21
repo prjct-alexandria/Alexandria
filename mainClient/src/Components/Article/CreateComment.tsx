@@ -40,7 +40,7 @@ export default function CreateComment(props: ThreadProps) {
         "/id/" +
         props.specificId;
 
-      if (props.threadType == "commitSection") {
+      if (props.threadType === "commitSection") {
         urlCreateThread += "?section=" + props.selection
       }
 

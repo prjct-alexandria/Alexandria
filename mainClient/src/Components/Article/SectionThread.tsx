@@ -23,11 +23,13 @@ type ThreadComment = {
     "creationDate": string,
 }
 
+
+// A SectionThread is a thread (list of comments) that can be related to a specific section in the document
 export default function SectionThread(props: SectionThreadProps) {
     return (
         <div>
             <div>
-                {"On \"" + props.section + '\"'}
+                {"Related to text: \"" + props.section + '\"'}
             </div>
             {
                 <div className="accordion-item mb-3" style={{border: '1px solid #e9ecef'}}>
