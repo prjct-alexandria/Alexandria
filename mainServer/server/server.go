@@ -88,11 +88,11 @@ func initControllerEnv(cfg *config.Config, servs ServiceEnv) ControllerEnv {
 		req:     controllers.RequestController{Serv: servs.req},
 		version: controllers.VersionController{Serv: servs.version},
 		thread: controllers.ThreadController{ThreadService: servs.thread,
-			CommitThreadService:        servs.commitThread,
-			CommitSectionThreadService: servs.commitSectionThread,
-			RequestThreadService:       servs.requestThread,
-			CommentService:             servs.comment,
-			ReviewThreadService:        servs.reviewThread},
+			CommitThreadService:          servs.commitThread,
+			CommitSelectionThreadService: servs.commitSectionThread,
+			RequestThreadService:         servs.requestThread,
+			CommentService:               servs.comment,
+			ReviewThreadService:          servs.reviewThread},
 	}
 }
 

@@ -129,7 +129,7 @@ definitions:
     - id
     - threadId
     type: object
-  models.SectionThread:
+  models.SelectionThread:
     properties:
       articleId:
         type: integer
@@ -139,14 +139,14 @@ definitions:
         type: array
       id:
         type: integer
-      section:
+      selection:
         type: string
       specificId:
         type: string
     required:
     - articleId
     - comments
-    - section
+    - selection
     type: object
   models.Thread:
     properties:
@@ -158,6 +158,8 @@ definitions:
         type: array
       id:
         type: integer
+      selection:
+        type: string
       specificId:
         type: string
     required:
@@ -307,10 +309,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.Thread'
-      - description: section
-        in: query
-        name: section
-        type: string
       produces:
       - application/json
       responses:
@@ -327,7 +325,7 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Creates thread entity
-  /articles/:articleID/versions/:versionID/history/:commitID/sectionThreads:
+  /articles/:articleID/versions/:versionID/history/:commitID/selectionThreads:
     get:
       description: Gets a list with all threads belonging to a specific commit of
         an article
@@ -349,7 +347,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.SectionThread'
+              $ref: '#/definitions/models.SelectionThread'
             type: array
         "400":
           description: Bad Request

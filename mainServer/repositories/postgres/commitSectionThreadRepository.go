@@ -13,15 +13,15 @@ type PgCommitSectionThreadRepository struct {
 
 func NewPgCommitSectionThreadRepository(db *sql.DB) PgCommitSectionThreadRepository {
 	repo := PgCommitSectionThreadRepository{db}
-	err := repo.createCommitSectionThreadTable()
+	err := repo.createCommitSelectionThreadTable()
 	if err != nil {
 		return PgCommitSectionThreadRepository{}
 	}
 	return repo
 }
 
-func (r PgCommitSectionThreadRepository) createCommitSectionThreadTable() error {
-	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitSectionThread (
+func (r PgCommitSectionThreadRepository) createCommitSelectionThreadTable() error {
+	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS commitselectionthread (
     	commitSectionThreadId SERIAL,
     	commitId NCHAR(40) NOT NULL,
         threadId BIGINT NOT NULL,
@@ -31,8 +31,8 @@ func (r PgCommitSectionThreadRepository) createCommitSectionThreadTable() error 
 	return err
 }
 
-func (r PgCommitSectionThreadRepository) CreateCommitSectionThread(cid string, tid int64, section string) (int64, error) {
-	stmt, err := r.Db.Prepare(`INSERT INTO commitsectionthread (commitsectionthreadid, commitid, threadid, section)
+func (r PgCommitSectionThreadRepository) CreateCommitSelectionThread(cid string, tid int64, section string) (int64, error) {
+	stmt, err := r.Db.Prepare(`INSERT INTO commitselectionthread (commitsectionthreadid, commitid, threadid, section)
 	VALUES (DEFAULT, $1, $2, $3) RETURNING commitsectionthreadid`)
 	if err != nil {
 		return -1, fmt.Errorf("CreateThread: %v", err)
@@ -48,10 +48,10 @@ func (r PgCommitSectionThreadRepository) CreateCommitSectionThread(cid string, t
 	return id, nil
 }
 
-func (r PgCommitSectionThreadRepository) GetCommitSectionThreads(aid int64, cid string) ([]models.SectionThread, error) {
+func (r PgCommitSectionThreadRepository) GetCommitSelectionThreads(aid int64, cid string) ([]models.SelectionThread, error) {
 	// construct list of threads
 	stmt, err := r.Db.Prepare(`SELECT t.threadid, articleid, commitid, commentid, authorid, creationdate, content, section
-	FROM commitsectionthread ct JOIN thread t on ct.threadid = t.threadid JOIN comment c on t.threadid = c.threadid
+	FROM commitselectionthread ct JOIN thread t on ct.threadid = t.threadid JOIN comment c on t.threadid = c.threadid
 	WHERE t.articleid = $1 AND ct.commitid = $2 ORDER BY creationdate`)
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (r PgCommitSectionThreadRepository) GetCommitSectionThreads(aid int64, cid 
 		return nil, fmt.Errorf("GetCommitThreads: %v", err)
 	}
 
-	var threads []models.SectionThread
+	var threads []models.SelectionThread
 	for rows.Next() {
 		// declare variables
 		var tid int64
@@ -101,12 +101,12 @@ func (r PgCommitSectionThreadRepository) GetCommitSectionThreads(aid int64, cid 
 		if index == -1 {
 			var comments []entities.Comment
 			comments = append(comments, comment)
-			threads = append(threads, models.SectionThread{
+			threads = append(threads, models.SelectionThread{
 				Id:         tid,
 				ArticleId:  aid,
 				SpecificId: cid,
 				Comments:   comments,
-				Section:    section,
+				Selection:  section,
 			})
 		} else {
 			threads[index].Comments = append(threads[index].Comments, comment)

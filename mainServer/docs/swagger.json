@@ -153,12 +153,6 @@
                         "schema": {
                             "$ref": "#/definitions/models.Thread"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "section",
-                        "name": "section",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -183,7 +177,7 @@
                 }
             }
         },
-        "/articles/:articleID/versions/:versionID/history/:commitID/sectionThreads": {
+        "/articles/:articleID/versions/:versionID/history/:commitID/selectionThreads": {
             "get": {
                 "description": "Gets a list with all threads belonging to a specific commit of an article",
                 "produces": [
@@ -212,7 +206,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.SectionThread"
+                                "$ref": "#/definitions/models.SelectionThread"
                             }
                         }
                     },
@@ -1083,12 +1077,12 @@
                 }
             }
         },
-        "models.SectionThread": {
+        "models.SelectionThread": {
             "type": "object",
             "required": [
                 "articleId",
                 "comments",
-                "section"
+                "selection"
             ],
             "properties": {
                 "articleId": {
@@ -1103,7 +1097,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "section": {
+                "selection": {
                     "type": "string"
                 },
                 "specificId": {
@@ -1129,6 +1123,9 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
                 },
                 "specificId": {
                     "type": "string"

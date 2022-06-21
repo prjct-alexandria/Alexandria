@@ -10,9 +10,9 @@ import FileDownload from "./FileDownload";
 import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
-import CreateSectionThread from "./CreateSectionThread";
+import CreateSelectionThread from "./CreateSelectionThread";
 import CreateThread from "./CreateThread";
-import SectionThreadList from "./SectionThreadList";
+import SelectionThreadList from "./SelectionThreadList";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -226,16 +226,16 @@ export default function ArticleVersionPage() {
           </div>
         </div>
         <div>
-          <CreateSectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
-                               threadType={"commitSection"} posX={xPosCommentButton} posY={yPosCommentButton}
-                               hidden={commentButtonHidden} selection={selection}/>
+          <CreateSelectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
+                                 threadType={"commitSelection"} posX={xPosCommentButton} posY={yPosCommentButton}
+                                 hidden={commentButtonHidden} selection={selection}/>
           <div>
-            {versionData && !viewingOldVersion && <SectionThreadList
+            {versionData && !viewingOldVersion && <SelectionThreadList
                     threadType={"commitSection"}
                     specificId={versionData && versionData.latestHistoryID}
                 />
-                || historyID && <SectionThreadList
-                    threadType={"commitSection"}
+                || historyID && <SelectionThreadList
+                    threadType={"commitSelection"}
                     specificId={historyID}
                 />}
           </div>

@@ -13,12 +13,12 @@ import (
 )
 
 type ThreadController struct {
-	ThreadService              interfaces.ThreadService
-	CommitThreadService        interfaces.CommitThreadService
-	CommitSectionThreadService interfaces.CommitSectionThreadService
-	RequestThreadService       interfaces.RequestThreadService
-	ReviewThreadService        interfaces.ReviewThreadService
-	CommentService             interfaces.CommentService
+	ThreadService                interfaces.ThreadService
+	CommitThreadService          interfaces.CommitThreadService
+	CommitSelectionThreadService interfaces.CommitSelectionThreadService
+	RequestThreadService         interfaces.RequestThreadService
+	ReviewThreadService          interfaces.ReviewThreadService
+	CommentService               interfaces.CommentService
 }
 
 // CreateThread godoc
@@ -79,7 +79,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			return
 		}
 		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
-	case "commitSection":
+	case "commitSelection":
 		// check if the specific thread ID string can actually be a commit ID
 		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
 		if len(sid) != 40 && err == nil {
@@ -87,13 +87,13 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			return
 		}
 
-		section := thread.Selection
-		if len(section) > 255 || len(section) < 1 {
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid section length, got %d", len(section)))
+		selection := thread.Selection
+		if len(selection) > 255 || len(selection) < 1 {
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid selection length, got %d", len(selection)))
 			return
 		}
 
-		id, err = contr.CommitSectionThreadService.StartCommitSectionThread(sid, tid, section)
+		id, err = contr.CommitSelectionThreadService.StartCommitSelectionThread(sid, tid, selection)
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
@@ -238,16 +238,16 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	c.JSON(http.StatusOK, threads)
 }
 
-// GetCommitSectionThreads godoc
+// GetCommitSelectionThreads godoc
 // @Summary      Get all section threads for a commit
 // @Description  Gets a list with all threads belonging to a specific commit of an article
 // @Param		 article ID 		path	int64		true 	"Article ID"
 // @Param		 commit ID 			path	int64		true 	"Commit ID"
 // @Produce      json
-// @Success      200  {object} []models.SectionThread
+// @Success      200  {object} []models.SelectionThread
 // @Failure      400  {object} httperror.HTTPError
-// @Router       /articles/:articleID/versions/:versionID/history/:commitID/sectionThreads [get]
-func (contr *ThreadController) GetCommitSectionThreads(c *gin.Context) {
+// @Router       /articles/:articleID/versions/:versionID/history/:commitID/selectionThreads [get]
+func (contr *ThreadController) GetCommitSelectionThreads(c *gin.Context) {
 	aid := c.Param("articleID")
 	cid := c.Param("commitID")
 
@@ -258,7 +258,7 @@ func (contr *ThreadController) GetCommitSectionThreads(c *gin.Context) {
 		return
 	}
 
-	threads, err := contr.CommitSectionThreadService.GetCommitSectionThreads(cid, intAid)
+	threads, err := contr.CommitSelectionThreadService.GetCommitSelectionThreads(cid, intAid)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))

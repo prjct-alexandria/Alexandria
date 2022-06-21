@@ -161,12 +161,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Thread"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "section",
-                        "name": "section",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -191,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/articles/:articleID/versions/:versionID/history/:commitID/sectionThreads": {
+        "/articles/:articleID/versions/:versionID/history/:commitID/selectionThreads": {
             "get": {
                 "description": "Gets a list with all threads belonging to a specific commit of an article",
                 "produces": [
@@ -220,7 +214,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.SectionThread"
+                                "$ref": "#/definitions/models.SelectionThread"
                             }
                         }
                     },
@@ -1091,12 +1085,12 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SectionThread": {
+        "models.SelectionThread": {
             "type": "object",
             "required": [
                 "articleId",
                 "comments",
-                "section"
+                "selection"
             ],
             "properties": {
                 "articleId": {
@@ -1111,7 +1105,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "section": {
+                "selection": {
                     "type": "string"
                 },
                 "specificId": {
@@ -1137,6 +1131,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
                 },
                 "specificId": {
                     "type": "string"
