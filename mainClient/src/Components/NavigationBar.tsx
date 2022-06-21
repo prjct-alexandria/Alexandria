@@ -54,7 +54,7 @@ export default function NavigationBar() {
               </div>
               <div className="d-flex">
                 {!isLoggedIn && (
-                  <li className="nav-item dropdown">
+                  <li className="nav-item dropdown navbar-user-buttons">
                     <a
                       className="nav-link dropdown-toggle"
                       id="navbarDropdown"
@@ -94,7 +94,7 @@ export default function NavigationBar() {
                 )}
 
                 {isLoggedIn && (
-                  <li className="nav-item dropdown">
+                  <li className="nav-item dropdown navbar-user-buttons">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -110,7 +110,7 @@ export default function NavigationBar() {
                       />
                     </svg>
                     <a
-                      className="nav-link dropdown-toggle inline-block"
+                      className="nav-link dropdown-toggle inline-block "
                       href="#"
                       id="navbarDropdown"
                       role="button"

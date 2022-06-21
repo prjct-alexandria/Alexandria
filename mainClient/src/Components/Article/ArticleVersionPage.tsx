@@ -25,6 +25,7 @@ export default function ArticleVersionPage() {
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
   let [isUserAnOwner, setIsOwner] = useState<boolean>(false);
+  let [editorContent, setContent] = useState<string>("");
 
   function isLoggedInUserTheOwner() {
     return versionData && versionData.owners.includes(getLoggedInEmail() || "");
@@ -33,6 +34,13 @@ export default function ArticleVersionPage() {
   // Listen for userAccountEvent that fires when user in localstorage changes
   window.addEventListener("userAccountEvent", () => {
     setLoggedIn(isUserLoggedIn());
+  });
+
+  window.addEventListener("changesSavedEvent", () => {
+    // This is where you would do setData({content:editorContent})
+    // if(versionData) setData((versionData =>{...versionData, "content":editorContent}));
+    // Reloading the page isn't great for a single page app
+    window.location.reload();
   });
 
   let params = useParams();
@@ -323,7 +331,12 @@ export default function ArticleVersionPage() {
                 aria-labelledby="edit-tab"
                 tabIndex={0}
               >
-                {versionData && <InlineEditor content={versionData.content} />}
+                {versionData && (
+                  <InlineEditor
+                    content={versionData.content}
+                    setContent={setContent}
+                  />
+                )}
               </div>
             </div>
           </div>

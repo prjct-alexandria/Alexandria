@@ -11,7 +11,9 @@ $error-color: #c70000;
 // article contents SASS
 $article-content-background-color: #f3f3f3;
 $article-content-border-color: #ccc;
-
+.navbar-user-buttons {
+  margin-right: 100px;
+}
 .inline-block {
   display: inline-block;
 }
@@ -32,6 +34,9 @@ $article-content-border-color: #ccc;
   border:1px solid $article-content-border-color;
   background-color:$article-content-background-color;
   padding:10px;
+}
+.inline-editor-article:hover, .inline-editor-textarea:hover, .inline-editor-textarea:focus {
+  cursor: text !important;
 }
 body {
   // to prevent the browser from shaking when threads are opened

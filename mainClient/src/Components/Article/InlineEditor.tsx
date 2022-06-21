@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, useState } from "react";
 import { useParams } from "react-router-dom";
 import * as React from "react";
 import FileUpload from "./FileUpload";
@@ -6,6 +6,7 @@ import NotificationAlert from "../NotificationAlert";
 
 type EditorProps = {
   content: string;
+  setContent: Dispatch<React.SetStateAction<string>>;
 };
 
 export default function InlineEditor(props: EditorProps) {
@@ -31,26 +32,37 @@ export default function InlineEditor(props: EditorProps) {
       mode: "cors",
       credentials: "include",
       body: formData,
-    }).then(
-      async (response) => {
-        if (response.ok) {
-          // props.content = editorData;
-          setSaveSuccess(true);
-          setTimeout(() => setSaveSuccess(false), 3000);
-        } else {
-          // Set error with message returned from the server
-          let responseJSON: {
-            message: string;
-          } = await response.json();
+    })
+      .then(
+        async (response) => {
+          if (response.ok) {
+            // props.content = editorData;
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+            // dispatch
+            props.setContent(editorData);
+            return true;
+          } else {
+            // Set error with message returned from the server
+            let responseJSON: {
+              message: string;
+            } = await response.json();
 
-          let serverMessage: string = responseJSON.message;
-          setEditError(new Error(serverMessage));
+            let serverMessage: string = responseJSON.message;
+            setEditError(new Error(serverMessage));
+            return false;
+          }
+        },
+        (error) => {
+          setEditError(error);
+          return false;
         }
-      },
-      (error) => {
-        setEditError(error);
-      }
-    );
+      )
+      .then((wasSuccessful) => {
+        if (wasSuccessful) {
+          window.dispatchEvent(new Event("changesSavedEvent"));
+        }
+      });
   };
 
   const discardChanges = () => {
@@ -76,7 +88,7 @@ export default function InlineEditor(props: EditorProps) {
       )}
       <div className="inline-editor-article">
         <textarea
-          className="col-xs-12 textarea"
+          className="col-xs-12 textarea inline-editor-textarea"
           value={editorData}
           onChange={(e) => {
             setEditorData(e.target.value);
