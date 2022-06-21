@@ -85,7 +85,7 @@ export default function ArticleVersionPage() {
         setError(error);
       }
     );
-  });
+  }, []);
 
   return (
     <div className={"row justify-content-center wrapper"}>
@@ -329,17 +329,15 @@ export default function ArticleVersionPage() {
           </div>
 
           <div className="col-3">
-            <div className="col-3">
-              {(versionData && !viewingOldVersion && (
-                <ThreadList
-                  threadType={"commit"}
-                  specificId={versionData && versionData.latestHistoryID}
-                />
-              )) ||
-                (historyID && (
-                  <ThreadList threadType={"commit"} specificId={historyID} />
-                ))}
-            </div>
+            {(versionData && !viewingOldVersion && (
+              <ThreadList
+                threadType={"commit"}
+                specificId={versionData && versionData.latestHistoryID}
+              />
+            )) ||
+              (historyID && (
+                <ThreadList threadType={"commit"} specificId={historyID} />
+              ))}
           </div>
         </div>
       </div>

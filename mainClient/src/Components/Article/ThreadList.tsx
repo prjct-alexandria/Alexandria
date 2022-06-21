@@ -97,7 +97,7 @@ export default function ThreadList(props: ThreadListProps) {
         setError(error);
       }
     );
-  });
+  }, []);
 
   return (
     <div>
