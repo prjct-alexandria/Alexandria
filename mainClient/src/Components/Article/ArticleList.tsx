@@ -65,10 +65,10 @@ export default function ArticleList() {
           <NotificationAlert
             errorType="danger"
             title={"Error: "}
-            message={"Something went wrong. " + error}
+            message={"Something went wrong when getting the articles. " + error}
           />
         )}
-        {articleList != null &&
+        {articleList &&
           articleList.map((article, i) => (
             <ArticleListElement key={i} article={article} />
           ))}

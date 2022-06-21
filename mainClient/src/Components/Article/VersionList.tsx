@@ -55,7 +55,7 @@ export default function VersionList() {
         setErrorVersions(error);
       }
     );
-  }, [urlVersions]);
+  }, []);
 
   // const urlMain = "/mainVersion.json"; // Placeholder
   const urlMain =
@@ -95,7 +95,7 @@ export default function VersionList() {
         setErrorMain(error);
       }
     );
-  }, [urlVersions]);
+  }, []);
 
   return (
     <div className="wrapper col-8 m-auto">

@@ -1,11 +1,5 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment";
-import configData from "../../config.json";
-import NotificationAlert from "../NotificationAlert";
-import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import moment from "moment";
 
 type ThreadProps = {
@@ -13,13 +7,6 @@ type ThreadProps = {
   specificId: string | undefined;
   threadType: string;
   comments: ThreadComment[];
-};
-
-type ThreadEntity = {
-  articleId: number;
-  id: number;
-  specificId: string | undefined;
-  comment: ThreadComment[];
 };
 
 type ThreadComment = {
