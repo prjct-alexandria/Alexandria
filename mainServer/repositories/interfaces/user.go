@@ -9,4 +9,5 @@ type UserRepository interface {
 	GetFullUserByEmail(email string) (entities.User, error)
 	UpdateUser(email string, user entities.User) error
 	DeleteUser(email string) error
+	CheckIfExists(email string) (bool, error)
 }
