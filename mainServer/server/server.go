@@ -65,10 +65,11 @@ func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 
 func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
-		article:       services.NewArticleService(repos.article, repos.version, repos.git),
-		user:          services.UserService{UserRepository: repos.user},
-		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
-		version:       services.VersionService{GitRepo: repos.git, VersionRepo: repos.version, FilesystemRepo: repos.filesystem},
+		article: services.NewArticleService(repos.article, repos.version, repos.user, repos.git),
+		user:    services.UserService{UserRepository: repos.user},
+		req:     services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
+		version: services.VersionService{GitRepo: repos.git, VersionRepo: repos.version,
+			UserRepo: repos.user, FilesystemRepo: repos.filesystem},
 		thread:        services.ThreadService{ThreadRepository: repos.thread},
 		comment:       services.CommentService{CommentRepository: repos.comment},
 		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
