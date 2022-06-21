@@ -64,7 +64,7 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 	return fullVersion, nil
 }
 
-func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
+func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit string) (models.Version, error) {
 
 	// TODO: check if the commit is actually part of the specified version,
 	// can be done once the version-commit table exists

@@ -29,7 +29,7 @@ func (s *Storer) GetVersion(article int64, version int64) (string, error) {
 }
 
 // GetVersionByCommit returns the contents of the specified article at the specified commit
-func (s *Storer) GetVersionByCommit(article int64, commit [20]byte) (string, error) {
+func (s *Storer) GetVersionByCommit(article int64, commit string) (string, error) {
 	s.pool.Lock(article)
 	defer s.pool.Unlock(article)
 

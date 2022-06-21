@@ -3,20 +3,15 @@ package git
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/ldez/go-git-cmd-wrapper/v2/checkout"
 	git2 "github.com/ldez/go-git-cmd-wrapper/v2/git"
 	"github.com/ldez/go-git-cmd-wrapper/v2/merge"
-	"github.com/ldez/go-git-cmd-wrapper/v2/reset"
 	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
-	"io/ioutil"
-	"mainServer/entities"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -76,22 +71,16 @@ func (r Repo) Commit(timestamp time.Time) error {
 	return nil
 }
 
-// CheckoutCommit checks out the specified commit in the specified article repo
-func (r Repo) CheckoutCommit(commit [20]byte) error {
-	w, err := r.getWorktree()
+// CheckoutCommit checks out the specified commit
+func (r Repo) CheckoutCommit(commit string) error {
+	output, err := git2.Checkout(checkout.Branch(commit), runGitIn(r.path))
 	if err != nil {
-		return err
+		return errors.New(output)
 	}
-
-	// checkout
-	err = w.Checkout(&git.CheckoutOptions{
-		Hash: commit,
-	})
-
-	return err
+	return nil
 }
 
-// CheckoutBranch checks out the specified version in the specified article repo
+// CheckoutBranch checks out the specified version
 func (r Repo) CheckoutBranch(version int64) error {
 	w, err := r.getWorktree()
 
@@ -171,116 +160,27 @@ func (r Repo) GetLatestCommit(version int64) (string, error) {
 	return output, nil
 }
 
-// Merge merges the source branch (version) into the target branch (version) of the specified repository (article)
-func (r Repo) Merge(source int64, target int64) error {
+// Merge merges the source branch (version) into the currently checked out branch without committing
+// returns whether there are conflicts, no error is returned if there are conflicts
+func (r Repo) Merge(source int64) (bool, error) {
 	sourceStr := strconv.FormatInt(source, 10)
-	targetStr := strconv.FormatInt(target, 10)
 
-	// checkout target
-	res, err := git2.Checkout(checkout.Branch(targetStr), runGitIn(r.path))
-	if err != nil {
-		return errors.New(res)
-	}
-
-	// revert any possible un-committed changes left over from previous failed executions
-	// without a clean worktree, aborting a failed merge might not be possible
-	// should be redundant, but the guarantee is good to have
-	res, err = git2.Reset(reset.Hard, runGitIn(r.path))
-	if err != nil {
-		return errors.New(res)
-	}
-
-	// merge source into target and commit immediately
-	res, err = git2.Merge(merge.Commits(sourceStr), merge.Commit, runGitIn(r.path))
-	if err != nil {
-		res2, err := git2.Merge(merge.Abort, runGitIn(r.path))
-		if err != nil {
-			return fmt.Errorf("failed aborting merge with message: %s, merge itself failed with error %s", res, res2)
-		}
-		return errors.New(res)
-	}
-	return nil
-}
-
-// StoreRequestComparison performs a merge without committing.
-// Stores the before-and-after in a cache folder
-// Requires the commit/history ID's to be specified in the req struct
-// Might leave the repo behind with a detached HEAD
-// Returns whether there are conflicts
-func (r Repo) StoreRequestComparison(req entities.Request) (bool, error) {
-	// get paths
-	repo, err := r.GetArticlePath(req.ArticleID)
-	if err != nil {
-		return false, err
-	}
-	comparison, err := r.GetRequestComparisonPath(req.ArticleID, req.RequestID)
-	if err != nil {
-		return false, err
-	}
-
-	// checkout target commit, (possibly creating a detached head)
-	res, err := git2.Checkout(checkout.Branch(req.TargetHistoryID), r.runner)
-	if err != nil {
-		return false, errors.New(res)
-	}
-
-	// copy files to "old" cache
-	input, err := ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
-	if err != nil {
-		return false, err
-	}
-	err = ioutil.WriteFile(filepath.Join(comparison, "old", "main.qmd"), input, 0644)
-	if err != nil {
-		return false, err
-	}
-
-	// merge source commit into target, without committing
-	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, merge.NoFf, r.runner)
-	conflicts := strings.Contains(mergeRes, "CONFLICT")
-	if err != nil && !conflicts { // if err is just that there are conflicts, the execution can continue as normal
-		return false, errors.New(mergeRes)
-	}
-
-	// copy merged files to "new" cache (possibly with conflicts)
-	input, err = ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
-	if err != nil {
-		return false, err
-	}
-	err = ioutil.WriteFile(filepath.Join(comparison, "new", "main.qmd"), input, 0644)
-	if err != nil {
-		return false, err
-	}
-
-	// abort merge / revert
-	if mergeRes != "Already up to date." {
-		res, err = git2.Merge(merge.Abort, runGitIn(repo))
-		if err != nil {
-			return false, errors.New(res)
-		}
+	// merge source into current branch
+	output, err := git2.Merge(merge.Commits(sourceStr), merge.NoCommit, runGitIn(r.path))
+	conflicts := strings.Contains(output, "CONFLICT")
+	if err != nil && !conflicts {
+		return false, nil
 	}
 	return conflicts, nil
 }
 
-// GetRequestComparison returns the before and after main article file of a request
-// requires the history ID's to be up-to-date in the req parameter
-func (r Repo) GetRequestComparison(article int64, request int64) (string, string, error) {
-	// get paths
-	path, err := r.GetRequestComparisonPath(article, request)
+// Abort aborts an ongoing merge, does not verify if a merge is actually going on
+func (r Repo) Abort() error {
+	output, err := git2.Merge(merge.Abort, runGitIn(r.path))
 	if err != nil {
-		return "", "", err
+		return errors.New(output)
 	}
-
-	// read both old and new file from the cache
-	oldFile, err := ioutil.ReadFile(filepath.Join(path, "old", "main.qmd"))
-	if err != nil {
-		return "", "", err
-	}
-	newFile, err := ioutil.ReadFile(filepath.Join(path, "new", "main.qmd"))
-	if err != nil {
-		return "", "", err
-	}
-
-	return string(oldFile), string(newFile), nil
+	return nil
 }
 
 // custom option made for use with the go-git-cmd-wrapper library,

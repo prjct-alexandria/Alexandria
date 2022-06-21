@@ -88,6 +88,30 @@ func (fs FileSystem) GetDownloadPath(filename string) (string, error) {
 	return filepath.Clean(path), err
 }
 
+// GetRequestPath returns the path to a folder for this request, with /old and /new folders
+// creates the folder if it doesn't exist yet
+func (fs FileSystem) GetRequestPath(article int64, request int64) (string, error) {
+
+	// get the path by generating a unique cache id
+	id := fmt.Sprintf("%d-%d", article, request)
+	path, err := filepath.Abs(filepath.Join(fs.path, "requests", id))
+	if err != nil {
+		return "", err
+	}
+
+	// create nested folders
+	err = os.MkdirAll(filepath.Join(path, "old"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+	err = os.MkdirAll(filepath.Join(path, "new"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Clean(path), nil
+}
+
 // SaveArticleFile saves the file from the multipart file header as the main contents of an article
 func (fs FileSystem) SaveArticleFile(c *gin.Context, file *multipart.FileHeader, articlePath string) error {
 	filePath := filepath.Join(articlePath, "main.qmd")
