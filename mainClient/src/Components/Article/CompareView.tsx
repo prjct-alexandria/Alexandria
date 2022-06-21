@@ -273,9 +273,9 @@ export default function CompareView() {
           </h1>
 
             {comparisonData !== undefined && comparisonData.request.conflicted &&
-                <div className={'alert alert-danger'} style={{whiteSpace:'pre-line'}}>
-                    <p>{"Warning: There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview below between each set of  '<<<<', '====', and '>>>>' markers."}</p>
-                </div>
+                <NotificationAlert errorType="warning" title={"Warning: Conflicting Changes!"} message=
+                    {"There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview between each set of  '<<<<', '====', and '>>>>' markers."}
+                />
             }
 
           <div className="row justify-content-center">
