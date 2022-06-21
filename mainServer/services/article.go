@@ -33,9 +33,11 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 	// Check if owners exist in database
 	for _, email := range owners {
 		exists, err := serv.userrepo.CheckIfExists(email)
-		fmt.Println(exists)
-		if err != nil || exists == false {
-			return models.Version{}, errors.New(fmt.Sprintf("Could not verify %s exists in the database", email))
+		if err != nil {
+			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database", email))
+		}
+		if !exists {
+			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
 		}
 	}
 

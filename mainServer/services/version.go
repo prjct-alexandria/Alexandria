@@ -123,8 +123,11 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 	// Check if owners exist in database
 	for _, email := range owners {
 		exists, err := serv.UserRepo.CheckIfExists(email)
-		if err != nil || exists == false {
-			return models.Version{}, errors.New(fmt.Sprintf("Could not verify %s exists in the database", email))
+		if err != nil {
+			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database", email))
+		}
+		if !exists {
+			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
 		}
 	}
 
