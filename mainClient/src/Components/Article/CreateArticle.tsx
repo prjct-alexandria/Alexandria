@@ -9,7 +9,7 @@ export default function CreateArticle() {
   let [mainVersionTags, setMainVersionTags] = useState<string>("");
   let [error, setError] = useState<Error>();
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
-  let [isAddOnwersHidden, setOwnersHidden] = useState<boolean>(true);
+  let [isAddOwnersHidden, setOwnersHidden] = useState<boolean>(true);
 
   // Variable and references to it to be removed when adding tags
   let areTagsImplemented = false;
@@ -115,7 +115,7 @@ export default function CreateArticle() {
         <NotificationAlert
           errorType="danger"
           title={"Error: "}
-          message={"Something went wrong. " + error}
+          message={"Something went wrong. " + error.message}
         />
       )}
       <div className="modal-dialog">
@@ -165,10 +165,16 @@ export default function CreateArticle() {
               )}
               <div>
                 <span>By creating this article, you become its owner.</span>
-                <button onClick={() => setOwnersHidden(false)}>
-                  + Add owners
+                <button
+                  role={"button"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOwnersHidden(!isAddOwnersHidden);
+                  }}
+                >
+                  + Add other owners
                 </button>
-                {!isAddOnwersHidden && (
+                {!isAddOwnersHidden && (
                   <div id="addOwners">
                     <span>Separate owner emails by ",".</span>
                     <input
