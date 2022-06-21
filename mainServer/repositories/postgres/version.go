@@ -44,7 +44,6 @@ func NewPgVersionRepository(db *sql.DB) PgVersionRepository {
 }
 
 func (r PgVersionRepository) CreateVersion(version entities.Version) (entities.Version, error) {
-
 	// add entry in version table
 	id, err := r.createVersion(version.ArticleID, version.Title)
 	if err != nil {
