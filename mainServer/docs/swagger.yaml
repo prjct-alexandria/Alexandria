@@ -78,13 +78,15 @@ definitions:
     properties:
       articleID:
         type: integer
+      conflicted:
+        type: boolean
       requestID:
         type: integer
       sourceHistoryID:
         type: string
       sourceVersionID:
         type: integer
-      state:
+      status:
         type: string
       targetHistoryID:
         type: string
@@ -100,6 +102,19 @@ definitions:
     required:
     - sourceVersionID
     - targetVersionID
+    type: object
+  models.RequestWithComparison:
+    properties:
+      after:
+        type: string
+      before:
+        type: string
+      request:
+        $ref: '#/definitions/models.Request'
+      source:
+        $ref: '#/definitions/models.Version'
+      target:
+        $ref: '#/definitions/models.Version'
     type: object
   models.ReturnThreadIds:
     properties:
@@ -124,18 +139,17 @@ definitions:
         type: array
       id:
         type: integer
-      specificId:
-        type: integer
     required:
     - articleId
     - comment
-    - specificId
     type: object
   models.Version:
     properties:
       articleID:
         type: integer
       content:
+        type: string
+      latestHistoryID:
         type: string
       owners:
         items:
@@ -230,6 +244,33 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Get main version id of article
+  /articles/:articleID/requests/:requestID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific request of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Request ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Thread'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a request
   /articles/:articleID/thread/:threadType/id/:specificID/:
     post:
       consumes:
@@ -259,7 +300,68 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Creates thread entity
+  /articles/:articleID/versions/:versionID/history/:commitID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific commit of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Commit ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Thread'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a commit
   /articles/{articleID}/requests:
+    get:
+      description: Gets a list of merge requests (with possible filtering conditions)
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Source version
+        in: query
+        name: sourceID
+        type: string
+      - description: Target version
+        in: query
+        name: targetID
+        type: string
+      - description: Source or Target version
+        in: query
+        name: relatedID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Request'
+            type: array
+        "400":
+          description: Invalid article ID provided
+        "404":
+          description: Could not find merge requests for this article
+      summary: Get a list of merge requests
     post:
       consumes:
       - application/json
@@ -288,6 +390,42 @@ paths:
         "500":
           description: Error creating request on server
       summary: Create request
+  /articles/{articleID}/requests/{requestID}:
+    get:
+      consumes:
+      - text/plain
+      description: Returns the information of a given request, including the information
+        of both versions. Note that comparing target and source versions directly,
+        isn't reliable as before-and-after comparison. That's why, instead of filling
+        in the contents of the version fields, a before and after string is included
+        in the response.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RequestWithComparison'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get Request
   /articles/{articleID}/requests/{requestID}/accept:
     put:
       consumes:
@@ -474,6 +612,31 @@ paths:
           schema:
             $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
+  /articles/{articleID}/versions/{versionID}/files:
+    get:
+      description: Get all the files of an article version as a zip, should be accessible
+        without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/x-zip-compressed
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all the files of a version as a zip
   /comments/thread/:threadID:
     post:
       consumes:
@@ -546,6 +709,26 @@ paths:
         "500":
           description: Could not create token
       summary: Endpoint for user logging in
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Sets an expired cookie with an empty email and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginForm'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "500":
+          description: Could not update token
+      summary: Endpoint for user logging out
   /users:
     post:
       consumes:

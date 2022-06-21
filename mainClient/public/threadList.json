@@ -1,12 +1,58 @@
 [
   {
     "articleId": 1,
-    "id": 3,
-    "specificId": 1
+    "id": 2,
+    "specificId": 1,
+    "comment": [
+      {
+        "authorId": "myauthorid1",
+        "content": "mycontent1",
+        "creationDate": "mycreationdate1",
+        "id": 1,
+        "threadId": 2
+      },
+      {
+        "authorId": "myauthorid2",
+        "content": "mycontent2",
+        "creationDate": "mycreationdate2",
+        "id": 3,
+        "threadId": 2
+      },
+      {
+        "authorId": "myauthorid3",
+        "content": "mycontent3",
+        "creationDate": "mycreationdate3",
+        "id": 5,
+        "threadId": 2
+      }
+    ]
   },
   {
-    "articleId": 10,
-    "id": 20,
-    "specificId": 40
+    "articleId": 1,
+    "id": 3,
+    "specificId": 1,
+    "comment": [
+      {
+        "authorId": "myauthorid1",
+        "content": "mycontent1",
+        "creationDate": "mycreationdate1",
+        "id": 1,
+        "threadId": 3
+      },
+      {
+        "authorId": "myauthorid2",
+        "content": "mycontent2",
+        "creationDate": "mycreationdate2",
+        "id": 3,
+        "threadId": 3
+      },
+      {
+        "authorId": "myauthorid3",
+        "content": "mycontent3",
+        "creationDate": "mycreationdate3",
+        "id": 5,
+        "threadId": 3
+      }
+    ]
   }
 ]

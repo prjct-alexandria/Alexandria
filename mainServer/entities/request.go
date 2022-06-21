@@ -7,7 +7,8 @@ type Request struct {
 	SourceHistoryID string
 	TargetVersionID int64
 	TargetHistoryID string
-	State           string
+	Status          string
+	Conflicted      bool
 }
 
 const (

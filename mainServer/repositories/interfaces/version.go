@@ -17,4 +17,7 @@ type VersionRepository interface {
 
 	// CheckIfOwner returns directly with a query whether the specified user owns an article version
 	CheckIfOwner(version int64, email string) (bool, error)
+
+	// UpdateVersionLatestCommit updates the latest commit of the specified version
+	UpdateVersionLatestCommit(version int64, commit string) error
 }

@@ -22,4 +22,7 @@ type VersionService interface {
 
 	// ListVersions returns a list of models for all versions of the specified article
 	ListVersions(article int64) ([]models.Version, error)
+
+	// GetVersionFiles returns the path to a zip with all files of a version (except for the .git folder)
+	GetVersionFiles(aid int64, vid int64) (string, error)
 }

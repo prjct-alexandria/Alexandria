@@ -21,12 +21,13 @@ func (s RequestService) CreateRequest(article int64, sourceVersion int64, target
 		TargetVersionID: targetVersion,
 	}
 
+	// create the request entity in the db
 	req, err := s.Repo.CreateRequest(req)
 	if err != nil {
 		return models.Request{}, err
 	}
 
-	//  directly converts the entity to the model, because they have the exact same fiels
+	//  directly converts the entity to the model, because they have the exact same fields
 	return models.Request(req), nil
 }
 
@@ -77,6 +78,9 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	if err != nil {
 		return err
 	}
+	if req.Conflicted {
+		return fmt.Errorf("request %d cannot be accepted, because there would be merge conflicts", request)
+	}
 
 	// check if logged-in user owns this version
 	target := req.TargetVersionID
@@ -108,6 +112,104 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 		return err
 	}
 
+	// get the latest commit from the git branch after merging
+	commit, err := s.Gitrepo.GetLatestCommit(req.ArticleID, req.TargetVersionID)
+	if err != nil {
+		return err
+	}
+
+	// update the commit id of the version in the database
+	err = s.Versionrepo.UpdateVersionLatestCommit(req.TargetVersionID, commit)
+	if err != nil {
+		return err
+	}
+
 	// accept the request
 	return s.Repo.SetStatus(request, entities.RequestAccepted)
+}
+
+// GetRequest returns a request, including the before and after versions
+func (s RequestService) GetRequest(request int64) (models.RequestWithComparison, error) {
+	// get request info
+	req, err := s.Repo.GetRequest(request)
+	if err != nil {
+		return models.RequestWithComparison{}, err
+	}
+
+	// get source and target version info
+	source, err := s.Versionrepo.GetVersion(req.SourceVersionID)
+	if err != nil {
+		return models.RequestWithComparison{}, err
+	}
+	target, err := s.Versionrepo.GetVersion(req.TargetVersionID)
+	if err != nil {
+		return models.RequestWithComparison{}, err
+	}
+
+	// ensure that the before-and-after comparison is up to date
+	err = s.UpdateRequestComparison(req, source, target)
+	if err != nil {
+		return models.RequestWithComparison{}, err
+	}
+
+	// Get the request preview
+	before, after, err := s.Gitrepo.GetRequestComparison(req.ArticleID, req.RequestID)
+	if err != nil {
+		return models.RequestWithComparison{}, err
+	}
+
+	// insert before and after contents in the version models
+	return models.RequestWithComparison{
+		Request: models.Request(req),
+		Source: models.Version{
+			ArticleID: source.ArticleID,
+			Id:        source.Id,
+			Title:     source.Title,
+			Owners:    source.Owners,
+			Status:    source.Status,
+		},
+		Target: models.Version{
+			ArticleID: target.ArticleID,
+			Id:        target.Id,
+			Title:     target.Title,
+			Owners:    target.Owners,
+			Status:    target.Status,
+		},
+		Before: before,
+		After:  after,
+	}, nil
+}
+
+// UpdateRequestComparison stores the before and after of the request, if it isn't up-to-date yet
+func (s RequestService) UpdateRequestComparison(req entities.Request, source entities.Version, target entities.Version) error {
+	if req.Status != "pending" {
+		// if not pending anymore, the comparison should not be updated
+		return nil
+	}
+
+	if req.SourceHistoryID == source.LatestCommitID && req.TargetHistoryID == target.LatestCommitID {
+		// if the commits that the request compares are up-to-date, the current comparison can be used
+		return nil
+	}
+	req.SourceHistoryID = source.LatestCommitID
+	req.TargetHistoryID = target.LatestCommitID
+
+	// store the preview using git merging and check if there will be conflicts
+	conflicted, err := s.Gitrepo.StoreRequestComparison(req)
+	if err != nil {
+		return err
+	}
+	req.Conflicted = conflicted
+
+	// now that the comparison has successfully been updated, store the correct commit IDs in the db
+	err = s.Repo.UpdateRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s RequestService) GetRequestList(articleId int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+	return s.Repo.GetRequestList(articleId, sourceId, targetId, relatedId)
 }

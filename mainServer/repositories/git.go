@@ -13,6 +13,9 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/reset"
 	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
 	"github.com/ldez/go-git-cmd-wrapper/v2/types"
+	"io/ioutil"
+	"mainServer/entities"
+	"mainServer/server/config"
 	"mainServer/utils/clock"
 	"os"
 	"os/exec"
@@ -29,15 +32,19 @@ type GitRepository struct {
 // NewGitRepository creates a new GitRepository class.
 // This is NOT the function used to create a folder/git repository to store an article in.
 // See CreateRepo instead
-func NewGitRepository(path string) (GitRepository, error) {
+func NewGitRepository(cfg *config.GitConfig) GitRepository {
 
-	// make folder for git files
-	err := os.MkdirAll(path, os.ModePerm)
+	// make folders for git files
+	err := os.MkdirAll(filepath.Join(cfg.Path, "persistent"), os.ModePerm)
 	if err != nil {
-		return GitRepository{}, err
+		panic(err)
+	}
+	err = os.MkdirAll(filepath.Join(cfg.Path, "requests"), os.ModePerm)
+	if err != nil {
+		panic(err)
 	}
 
-	return GitRepository{Path: path, Clock: clock.RealClock{}}, nil
+	return GitRepository{Path: cfg.Path, Clock: clock.RealClock{}}
 }
 
 // CreateRepo creates a new folder/git repository to store an article in, including main version branch.
@@ -177,11 +184,35 @@ func (r GitRepository) CreateBranch(article int64, source int64, target int64) e
 // GetArticlePath returns the path to an article git repository
 func (r GitRepository) GetArticlePath(article int64) (string, error) {
 	idString := strconv.FormatInt(article, 10)
-	path, err := filepath.Abs(filepath.Join(r.Path, idString))
+	path, err := filepath.Abs(filepath.Join(r.Path, "persistent", idString))
 	if err != nil {
 		return "", err
 	}
 	return filepath.Clean(path), err
+}
+
+// GetRequestComparisonPath returns the path to a with /old and /new folders,
+// for viewing what a request did or will do when accepted
+func (r GitRepository) GetRequestComparisonPath(article int64, request int64) (string, error) {
+
+	// get the path by generating a unique cache id
+	id := fmt.Sprintf("%d-%d", article, request)
+	path, err := filepath.Abs(filepath.Join(r.Path, "requests", id))
+	if err != nil {
+		return "", err
+	}
+
+	// create nested folders
+	err = os.MkdirAll(filepath.Join(path, "old"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+	err = os.MkdirAll(filepath.Join(path, "new"), os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Clean(path), nil
 }
 
 // getWorktree returns the go-git worktree of an article git repository
@@ -287,6 +318,87 @@ func (r GitRepository) Merge(article int64, source int64, target int64) error {
 		return errors.New(res)
 	}
 	return nil
+}
+
+// StoreRequestComparison performs a merge without committing.
+// Stores the before-and-after in a cache folder
+// Requires the commit/history ID's to be specified in the req struct
+// Might leave the repo behind with a detached HEAD
+// Returns whether there are conflicts
+func (r GitRepository) StoreRequestComparison(req entities.Request) (bool, error) {
+	// get paths
+	repo, err := r.GetArticlePath(req.ArticleID)
+	if err != nil {
+		return false, err
+	}
+	comparison, err := r.GetRequestComparisonPath(req.ArticleID, req.RequestID)
+	if err != nil {
+		return false, err
+	}
+
+	// checkout target commit, (possibly creating a detached head)
+	res, err := git2.Checkout(checkout.Branch(req.TargetHistoryID), runGitIn(repo))
+	if err != nil {
+		return false, errors.New(res)
+	}
+
+	// copy files to "old" cache
+	input, err := ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
+	if err != nil {
+		return false, err
+	}
+	err = ioutil.WriteFile(filepath.Join(comparison, "old", "main.qmd"), input, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	// merge source commit into target, without committing
+	mergeRes, err := git2.Merge(merge.Commits(req.SourceHistoryID), merge.NoCommit, merge.NoFf, runGitIn(repo))
+	conflicts := strings.Contains(mergeRes, "CONFLICT")
+	if err != nil && !conflicts { // if err is just that there are conflicts, the execution can continue as normal
+		return false, errors.New(mergeRes)
+	}
+
+	// copy merged files to "new" cache (possibly with conflicts)
+	input, err = ioutil.ReadFile(filepath.Join(repo, "main.qmd"))
+	if err != nil {
+		return false, err
+	}
+	err = ioutil.WriteFile(filepath.Join(comparison, "new", "main.qmd"), input, 0644)
+	if err != nil {
+		return false, err
+	}
+
+	// abort merge / revert
+	if mergeRes != "Already up to date." {
+		res, err = git2.Merge(merge.Abort, runGitIn(repo))
+		if err != nil {
+			return false, errors.New(res)
+		}
+	}
+	return conflicts, nil
+}
+
+// GetRequestComparison returns the before and after main article file of a request
+// requires the history ID's to be up-to-date in the req parameter
+func (r GitRepository) GetRequestComparison(article int64, request int64) (string, string, error) {
+	// get paths
+	path, err := r.GetRequestComparisonPath(article, request)
+	if err != nil {
+		return "", "", err
+	}
+
+	// read both old and new file from the cache
+	oldFile, err := ioutil.ReadFile(filepath.Join(path, "old", "main.qmd"))
+	if err != nil {
+		return "", "", err
+	}
+	newFile, err := ioutil.ReadFile(filepath.Join(path, "new", "main.qmd"))
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(oldFile), string(newFile), nil
 }
 
 // custom option made for use with the go-git-cmd-wrapper library,

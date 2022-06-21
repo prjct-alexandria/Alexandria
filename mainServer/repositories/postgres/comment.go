@@ -12,8 +12,8 @@ type PgCommentRepository struct {
 	Clock clock.Clock
 }
 
-func NewPgCommentRepository(db *sql.DB, clock clock.Clock) PgCommentRepository {
-	repo := PgCommentRepository{db, clock}
+func NewPgCommentRepository(db *sql.DB) PgCommentRepository {
+	repo := PgCommentRepository{Db: db, Clock: clock.RealClock{}}
 	err := repo.createCommentTable()
 	if err != nil {
 		fmt.Println(err)
@@ -26,7 +26,7 @@ func (r PgCommentRepository) createCommentTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS comment (
     	commentId SERIAL,
     	authorId varchar(64) NOT NULL,
-    	content varchar(64) NOT NULL,
+    	content varchar NOT NULL,
         threadId BIGINT NOT NULL,
         creationDate BIGINT NOT NULL,
     	PRIMARY KEY (commentId)
