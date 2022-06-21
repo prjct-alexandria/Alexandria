@@ -31,7 +31,7 @@ func (r PgUserRepository) CreateUser(user entities.User) error {
 
 func (r PgUserRepository) GetFullUserByEmail(email string) (entities.User, error) {
 	var user entities.User
-	stmt, err := r.Db.Prepare("SELECT * FROM users WHERE Email = $1")
+	stmt, err := r.Db.Prepare("SELECT * FROM users WHERE email = $1")
 
 	if err != nil {
 		return user, err
@@ -55,6 +55,22 @@ func (r PgUserRepository) UpdateUser(email string, user entities.User) error {
 func (r PgUserRepository) DeleteUser(email string) error {
 	//To be implemented
 	return nil
+}
+
+func (r PgUserRepository) CheckIfExists(email string) (bool, error) {
+	stmt, err := r.Db.Prepare(`SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)`)
+	if err != nil {
+		return false, fmt.Errorf("CheckIfExists: %v", err)
+	}
+	row := stmt.QueryRow(stmt, email)
+
+	var exists bool
+	err = row.Scan(&exists)
+	if err != nil {
+		return exists, fmt.Errorf("CheckIfExists: %v", err)
+	}
+	return exists, nil
+
 }
 
 func (r PgUserRepository) createUserTable() error {
