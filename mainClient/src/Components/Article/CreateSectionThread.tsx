@@ -35,7 +35,7 @@ export default function CreateSectionThread(props: SectionThreadProps) {
             <button className="btn btn-primary m-2" type="submit" onClick={addThread}
             style={{'position':"absolute", 'top':props.posY+'px', 'left':props.posX+'px'}}
                     hidden={props.hidden}
-            >Add comment</button>
+            >+ Add comment</button>
         </div>
     );
 }
