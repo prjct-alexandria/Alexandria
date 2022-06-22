@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services"
+	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
@@ -27,7 +28,9 @@ type RequestController struct {
 // @Failure     500 "Error creating request on server"
 // @Router      /articles/{articleID}/requests [post]
 func (contr RequestController) CreateRequest(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
 
 	// read path parameter
 	aid := c.Param("articleID")
@@ -55,6 +58,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, req)
 }
 
@@ -71,6 +75,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 // @Failure     500 {object} httperror.HTTPError
 // @Router      /articles/{articleID}/requests/{requestID}/reject [put]
 func (contr RequestController) RejectRequest(c *gin.Context) {
+	//TODO auth owner check (in service??)
 	c.Header("Content-Type", "application/json")
 
 	// extract article id, had it in the path for consistency in endpoints, but actually ignores it
@@ -124,6 +129,8 @@ func (contr RequestController) RejectRequest(c *gin.Context) {
 // @Failure     500 {object} httperror.HTTPError
 // @Router      /articles/{articleID}/requests/{requestID}/accept [put]
 func (contr RequestController) AcceptRequest(c *gin.Context) {
+	//TODO auth owner check (in service?)
+
 	c.Header("Content-Type", "application/json")
 
 	// extract article id, had it in the path for consistency in endpoints, but actually ignores it

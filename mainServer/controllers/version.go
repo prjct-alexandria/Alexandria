@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
 	"os"
@@ -125,6 +126,10 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 // @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
+	//TODO change to owner check
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
 
 	// get file from form data
 	file, err := c.FormFile("file")
@@ -173,6 +178,9 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 // @Failure      500  {object} httperror.HTTPError
 // @Router       /articles/{articleID}/versions [post]
 func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
 
 	// Extract article id
 	aid := c.Param("articleID")

@@ -22,6 +22,11 @@ type VersionService struct {
 	FilesystemRepo repositories.FilesystemRepository
 }
 
+func (serv VersionService) IsVersionOwner(article int64, version int64, email string) bool {
+	//return serv.VersionRepo.CheckIfOwner()
+	return false
+}
+
 func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
 
 	// Get file contents from Git
@@ -168,8 +173,6 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 
 // UpdateVersion overwrites file of specified article version and commits
 func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
-	// TODO: check if user of authenticated session is version owner
-
 	// Checkout
 	err := serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {

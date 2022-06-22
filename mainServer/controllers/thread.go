@@ -7,6 +7,7 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
@@ -31,6 +32,10 @@ type ThreadController struct {
 // @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
 func (contr *ThreadController) CreateThread(c *gin.Context) {
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
+
 	var thread models.Thread
 	err := c.BindJSON(&thread)
 	if err != nil {
@@ -79,6 +84,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		}
 		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "request":
+		//TODO auth check for source or target owner
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
 			fmt.Println(err)
@@ -126,6 +132,10 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 // @Failure     500 "failed saving comment"
 // @Router      /comments/thread/:threadID [post]
 func (contr *ThreadController) SaveComment(c *gin.Context) {
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
+
 	var comment entities.Comment
 	err := c.BindJSON(&comment)
 	if err != nil {
