@@ -48,7 +48,7 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 	// Get file contents from the (git) file system
 	content, err := serv.Storer.GetVersion(article, version)
 	if err != nil {
-		return models.Version{}, nil
+		return models.Version{}, err
 	}
 
 	// Get other version info from database

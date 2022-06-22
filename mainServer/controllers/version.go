@@ -71,7 +71,6 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
-	fmt.Println(res.LatestCommitID)
 	c.IndentedJSON(http.StatusOK, res)
 }
 
