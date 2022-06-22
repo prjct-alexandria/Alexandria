@@ -1,6 +1,7 @@
 package services
 
 import (
+	"mainServer/models"
 	"mainServer/repositories/interfaces"
 )
 
@@ -17,4 +18,14 @@ func (serv CommitThreadService) StartCommitThread(cid string, tid int64) (int64,
 	}
 
 	return id, err
+}
+
+// GetCommitThreads  gets the commit comment threads from the database, using the article id (aid) and commit id (cid)
+func (serv CommitThreadService) GetCommitThreads(aid int64, cid string) ([]models.Thread, error) {
+	threads, err := serv.CommitThreadRepository.GetCommitThreads(aid, cid)
+	if err != nil {
+		return nil, err
+	}
+
+	return threads, err
 }

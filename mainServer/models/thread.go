@@ -5,9 +5,10 @@ import (
 )
 
 type Thread struct {
-	Id        int64              `json:"id"`
-	ArticleId int64              `json:"articleId"       binding:"required"`
-	Comment   []entities.Comment `json:"comment"         binding:"required"`
+	Id         int64              `json:"id"`
+	ArticleId  int64              `json:"articleId"       binding:"required"`
+	SpecificId string             `json:"specificId"`
+	Comments   []entities.Comment `json:"comments"         binding:"required"`
 }
 
 type ReturnThreadIds struct {

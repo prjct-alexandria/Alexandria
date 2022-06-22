@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
@@ -10,19 +12,32 @@ import (
 type ArticleService struct {
 	articlerepo interfaces.ArticleRepository
 	versionrepo interfaces.VersionRepository
+	userrepo    interfaces.UserRepository
 	storer      storer.Storer
 }
 
-func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, storer storer.Storer) ArticleService {
+func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, userrepo interfaces.UserRepository, storer storer.Storer) ArticleService {
 	return ArticleService{
 		articlerepo: articlerepo,
 		versionrepo: versionrepo,
+		userrepo:    userrepo,
 		storer:      storer}
 }
 
 // CreateArticle creates a new article repo and main article version, returns main version
 func (serv ArticleService) CreateArticle(title string, owners []string) (models.Version, error) {
 	// TODO: ensure authenticated user is among owners
+
+	// Verify that all owners exist in database
+	for _, email := range owners {
+		exists, err := serv.userrepo.CheckIfExists(email)
+		if err != nil {
+			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database: %s", email, err.Error()))
+		}
+		if !exists {
+			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
+		}
+	}
 
 	// Create article in database, this generates article ID
 	article, err := serv.articlerepo.CreateArticle()

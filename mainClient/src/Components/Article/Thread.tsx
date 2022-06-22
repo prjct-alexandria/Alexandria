@@ -1,115 +1,27 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import LoadingSpinner from "../LoadingSpinner";
 import CreateComment from "./CreateComment";
-import configData from "../../config.json";
-import NotificationAlert from "../NotificationAlert";
-import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import moment from "moment";
 
 type ThreadProps = {
   id: number;
-  specificId: number;
+  specificId: string | undefined;
   threadType: string;
+  comments: ThreadComment[];
 };
 
 type ThreadComment = {
+  id: number;
   authorId: string;
+  threadId: number;
   content: string;
   creationDate: string;
-  commentId: number;
-  threadId: number;
 };
 
 export default function Thread(props: ThreadProps) {
-  let baseUrl = configData.back_end_url;
-  let [commentData, setData] = useState<ThreadComment[]>();
-  let [isLoaded, setLoaded] = useState<boolean>(false);
-  let [error, setError] = useState<Error>();
-
-  let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
-
-  // Listen for userAccountEvent that fires when user in localstorage changes
-  window.addEventListener("userAccountEvent", () => {
-    setLoggedIn(isUserLoggedIn());
-  });
-
-  const params = useParams();
-
-  useEffect(() => {
-    let urlCommentList = "";
-    if (props.threadType === "commit") {
-      urlCommentList =
-        baseUrl +
-        "/articles/" +
-        params.articleId +
-        "/versions/" +
-        params.versionId +
-        "/history/" +
-        params.historyId +
-        "/thread/" +
-        props.id +
-        "/comments";
-    } else if (props.threadType === "request") {
-      urlCommentList =
-        baseUrl +
-        "/articles/" +
-        params.articleId +
-        "/requests/" +
-        params.requestId +
-        "/thread/" +
-        props.id +
-        "/comments";
-    }
-    urlCommentList = "/commentList1.json"; // Placeholder
-
-    // get comments of specific thread
-    fetch(urlCommentList, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      credentials: "include",
-    }).then(
-      async (response) => {
-        if (response.ok) {
-          let data: ThreadComment[] = await response.json();
-          setData(data);
-        } else {
-          // Set error with message returned from the server
-          let responseJSON: {
-            message: string;
-          } = await response.json();
-
-          let serverMessage: string = responseJSON.message;
-          setError(new Error(serverMessage));
-        }
-        setLoaded(true);
-      },
-      (error) => {
-        setLoaded(true);
-        setError(error);
-      }
-    );
-  }, []);
-
   return (
     <div>
-      {!isLoaded && <LoadingSpinner />}
-      {error && (
-        <NotificationAlert
-          errorType="danger"
-          title={"Error: "}
-          message={"Something went wrong. " + error}
-        />
-      )}
-      {commentData != null && (
-        <div
-          className="accordion-item mb-3"
-          style={{ border: "1px solid #e9ecef" }}
-        >
+      {
+        <div className="accordion-item mb-3 text-break comment">
           <button
             className="accordion-button collapsed"
             type="button"
@@ -118,35 +30,55 @@ export default function Thread(props: ThreadProps) {
             aria-expanded="false"
             aria-controls={"panelsStayOpen-collapse" + props.id}
           >
-            {commentData[0].content}
+            <div className="row">
+              <div className="toast-header mb-2 commentHeader">
+                <strong className="me-auto p-1">
+                  {props.comments[0].authorId}
+                </strong>
+                <small className="text-muted">
+                  {moment(
+                    new Date(
+                      parseInt(props.comments[0].creationDate as string) * 1000
+                    )
+                  ).format("DD-MM-YYYY HH:mm")}
+                </small>
+              </div>
+              <div>{props.comments[0].content}</div>
+            </div>
           </button>
           <div
             id={"panelsStayOpen-collapse" + props.id}
             className="accordion-collapse collapse"
             aria-labelledby={"panelsStayOpen-heading" + props.id}
           >
-            {commentData.map(
+            {props.comments.map(
               (comment, i) =>
                 i !== 0 && ( // don't show first element in the list
-                  <div
-                    className="accordion-body"
-                    style={{ border: "1px solid #e9ecef" }}
-                    key={i}
-                  >
-                    {comment.content}
+                  <div className="accordion-body comment" key={i}>
+                    <div className="toast-header mb-2 p-0">
+                      <strong className="me-auto p-1">
+                        {comment.authorId}
+                      </strong>
+                      <small className="text-muted float-end">
+                        {moment(
+                          new Date(
+                            parseInt(comment.creationDate as string) * 1000
+                          )
+                        ).format("DD-MM-YYYY HH:mm")}
+                      </small>
+                    </div>
+                    <div>{comment.content}</div>
                   </div>
                 )
             )}
-            {isLoggedIn && (
-              <CreateComment
-                id={props.id}
-                specificId={props.specificId}
-                threadType={props.threadType}
-              />
-            )}
+            <CreateComment
+              id={props.id}
+              specificId={props.specificId}
+              threadType={props.threadType}
+            />
           </div>
         </div>
-      )}
+      }
     </div>
   );
 }

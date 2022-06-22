@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/entities"
 	"mainServer/models"
@@ -12,6 +14,7 @@ import (
 type VersionService struct {
 	VersionRepo interfaces.VersionRepository
 	Storer      storer.Storer
+	UserRepo    interfaces.UserRepository
 }
 
 func (serv VersionService) ListVersions(article int64) ([]models.Version, error) {
@@ -97,6 +100,16 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 
 // CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
 func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+	// Check if owners exist in database
+	for _, email := range owners {
+		exists, err := serv.UserRepo.CheckIfExists(email)
+		if err != nil {
+			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database: %s", email, err.Error()))
+		}
+		if !exists {
+			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
+		}
+	}
 
 	// Create entity to store in db
 	version := entities.Version{
