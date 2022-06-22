@@ -28,9 +28,11 @@ type RequestController struct {
 // @Failure     500 "Error creating request on server"
 // @Router      /articles/{articleID}/requests [post]
 func (contr RequestController) CreateRequest(c *gin.Context) {
+	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// read path parameter
 	aid := c.Param("articleID")
@@ -51,7 +53,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 	}
 
 	// create request with service
-	req, err := contr.Serv.CreateRequest(article, form.SourceVersionID, form.TargetVersionID)
+	req, err := contr.Serv.CreateRequest(article, form.SourceVersionID, form.TargetVersionID, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed accepting request on server"))
@@ -75,8 +77,11 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 // @Failure     500 {object} httperror.HTTPError
 // @Router      /articles/{articleID}/requests/{requestID}/reject [put]
 func (contr RequestController) RejectRequest(c *gin.Context) {
-	//TODO auth owner check (in service??)
-	c.Header("Content-Type", "application/json")
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// extract article id, had it in the path for consistency in endpoints, but actually ignores it
 	aid := c.Param("articleID")
@@ -96,17 +101,8 @@ func (contr RequestController) RejectRequest(c *gin.Context) {
 		return
 	}
 
-	// get the current logged-in user
-	val, exists := c.Get("Email")
-	email := fmt.Sprintf("%v", val) // convert email interface{} type to string
-	if !exists {
-		fmt.Println(err)
-		httperror.NewError(c, http.StatusUnauthorized, fmt.Errorf("you have to be logged-in to reject a request"))
-		return
-	}
-
 	// reject request with service
-	err = contr.Serv.RejectRequest(request, email)
+	err = contr.Serv.RejectRequest(request, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed rejecting request on server"))
@@ -129,9 +125,11 @@ func (contr RequestController) RejectRequest(c *gin.Context) {
 // @Failure     500 {object} httperror.HTTPError
 // @Router      /articles/{articleID}/requests/{requestID}/accept [put]
 func (contr RequestController) AcceptRequest(c *gin.Context) {
-	//TODO auth owner check (in service?)
-
-	c.Header("Content-Type", "application/json")
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// extract article id, had it in the path for consistency in endpoints, but actually ignores it
 	aid := c.Param("articleID")
@@ -150,18 +148,8 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("Invalid version ID, cannot interpret as integer, id=%s ", aid))
 		return
 	}
-
-	// get the current logged-in user
-	val, exists := c.Get("Email")
-	if val == nil || exists == false {
-		fmt.Println(err)
-		httperror.NewError(c, http.StatusUnauthorized, fmt.Errorf("you have to be logged-in to accept a request"))
-		return
-	}
-	email := fmt.Sprintf("%v", val) // convert email interface{} type to string
-
 	// accept request with service
-	err = contr.Serv.AcceptRequest(request, email)
+	err = contr.Serv.AcceptRequest(request, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed accepting request on server"))
