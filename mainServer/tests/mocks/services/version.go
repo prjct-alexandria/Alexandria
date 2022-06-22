@@ -39,7 +39,7 @@ func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title
 	panic("implement me")
 }
 
-func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, error) {
+func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, func(), error) {
 	//TODO implement me
 	panic("implement me")
 }
