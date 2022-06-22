@@ -68,7 +68,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// save first comment in the db
-	coid, err := contr.CommentService.SaveComment(thread.Comments[0], tid)
+	coid, err := contr.CommentService.SaveComment(thread.Comments[0], tid, loggedInAs)
 
 	if err != nil {
 		fmt.Println(err)
@@ -155,6 +155,7 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 		return
 	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	var comment entities.Comment
 	err := c.BindJSON(&comment)
@@ -172,7 +173,7 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 		return
 	}
 
-	id, err := contr.CommentService.SaveComment(comment, intTid)
+	id, err := contr.CommentService.SaveComment(comment, intTid, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed saving comment"))
