@@ -73,12 +73,14 @@ func initServiceEnv(repos RepoEnv) ServiceEnv {
 		req:     services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
 		version: services.VersionService{GitRepo: repos.git, VersionRepo: repos.version,
 			UserRepo: repos.user, FilesystemRepo: repos.filesystem},
-		thread:        services.ThreadService{ThreadRepository: repos.thread},
-		comment:       services.CommentService{CommentRepository: repos.comment},
-		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
+		thread:                services.ThreadService{ThreadRepository: repos.thread},
+		comment:               services.CommentService{CommentRepository: repos.comment},
+		commitThread:          services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 		commitSelectionThread: services.CommitSelectionThreadService{CommitSelectionThreadRepository: repos.commitSelectionThread},
-		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread},
-		reviewThread:  services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
+		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread,
+			VersionRepository: repos.version,
+			RequestRepository: repos.req},
+		reviewThread: services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
 	}
 }
 

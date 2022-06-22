@@ -22,11 +22,6 @@ type VersionService struct {
 	FilesystemRepo repositories.FilesystemRepository
 }
 
-func (serv VersionService) IsVersionOwner(article int64, version int64, email string) bool {
-	//return serv.VersionRepo.CheckIfOwner()
-	return false
-}
-
 func (serv VersionService) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
 
 	// Get file contents from Git
