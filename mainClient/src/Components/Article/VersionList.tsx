@@ -16,11 +16,10 @@ type Version = {
 };
 
 export default function VersionList() {
-  let [error, setError] = useState<Error>();
   let params = useParams();
   // const urlVersions = "/versionList.json"; // Placeholder
-  const urlVersions = configData.back_end_url +"/articles/" + params.articleId + "/versions";
-
+  const urlVersions =
+    configData.back_end_url + "/articles/" + params.articleId + "/versions";
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
   let [isLoadedVersions, setLoadedVersions] = useState<boolean>(false);
@@ -56,10 +55,11 @@ export default function VersionList() {
         setErrorVersions(error);
       }
     );
-  }, [urlVersions]);
+  }, []);
 
   // const urlMain = "/mainVersion.json"; // Placeholder
-  const urlMain = configData.back_end_url +"/articles/" + params.articleId + "/mainVersion";
+  const urlMain =
+    configData.back_end_url + "/articles/" + params.articleId + "/mainVersion";
 
   let [dataMain, setDataMain] = useState<string>();
   let [isLoadedMain, setLoadedMain] = useState<boolean>(false);
@@ -95,17 +95,10 @@ export default function VersionList() {
         setErrorMain(error);
       }
     );
-  }, [urlVersions]);
+  }, []);
 
   return (
     <div className="wrapper col-8 m-auto">
-      {error && (
-        <NotificationAlert
-          errorType="danger"
-          title={"Error: "}
-          message={"Something went wrong. " + error.message}
-        />
-      )}
       <div>
         {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
         {(errorVersions || errorMain) && (

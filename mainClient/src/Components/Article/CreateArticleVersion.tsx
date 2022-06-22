@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json"
+import configData from "../../config.json";
 
 export default function CreateArticleVersion() {
   let [newVersionTitle, setNewVersionTitle] = useState<string>("");
@@ -10,6 +10,7 @@ export default function CreateArticleVersion() {
   let [newVersionTags, setNewVersionTags] = useState<string>("");
   let [error, setError] = useState<Error>();
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
+  let [isAddOwnersHidden, setOwnersHidden] = useState<boolean>(true);
 
   let params = useParams();
 
@@ -166,13 +167,29 @@ export default function CreateArticleVersion() {
                 </div>
               )}
               <div>
-                <h5 className="form-label">Other owners (optional)</h5>
-                <span>Separate owner emails by ",".</span>
-                <input
-                  name="owners"
-                  className="create-article-input"
-                  onChange={onChangeOwners}
-                />
+                <span>
+                  By cloning this article, you become the new version's owner.
+                </span>
+                <button
+                  role={"button"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOwnersHidden(!isAddOwnersHidden);
+                  }}
+                >
+                  + Add other owners
+                </button>
+                {!isAddOwnersHidden && (
+                  <div id="addOwners">
+                    <h5 className="form-label">Other owners (optional)</h5>
+                    <span>Separate owner emails by ",".</span>
+                    <input
+                      name="owners"
+                      className="create-article-input"
+                      onChange={onChangeOwners}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="modal-footer">
