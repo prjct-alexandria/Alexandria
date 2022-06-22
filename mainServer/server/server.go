@@ -63,7 +63,7 @@ func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 
 func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
-		article:       services.NewArticleService(repos.article, repos.version, repos.storer),
+		article:       services.NewArticleService(repos.article, repos.version, repos.user, repos.storer),
 		user:          services.UserService{UserRepository: repos.user},
 		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Storer: repos.storer},
 		version:       services.VersionService{VersionRepo: repos.version, Storer: repos.storer, UserRepo: repos.user},

@@ -83,6 +83,9 @@ func (r Repo) CheckoutCommit(commit string) error {
 // CheckoutBranch checks out the specified version
 func (r Repo) CheckoutBranch(version int64) error {
 	w, err := r.getWorktree()
+	if err != nil {
+		return err
+	}
 
 	// checkout
 	branchName := strconv.FormatInt(version, 10)
