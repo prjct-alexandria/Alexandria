@@ -24,5 +24,6 @@ type VersionService interface {
 	ListVersions(article int64) ([]models.Version, error)
 
 	// GetVersionFiles returns the path to a zip with all files of a version (except for the .git folder)
-	GetVersionFiles(aid int64, vid int64) (string, error)
+	// Includes cleanup function to delete temporary files when done
+	GetVersionFiles(aid int64, vid int64) (string, func(), error)
 }

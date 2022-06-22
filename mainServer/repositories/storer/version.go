@@ -52,29 +52,30 @@ func (s *Storer) GetVersionByCommit(article int64, commit string) (string, error
 }
 
 // GetVersionZipped creates a .zip, with specified name, with all files of an article version at the returned path
-func (s *Storer) GetVersionZipped(article int64, version int64, filename string) (string, error) {
+// includes function that can be used to delete the zip after it's not needed anymore
+func (s *Storer) GetVersionZipped(article int64, version int64, filename string) (string, func(), error) {
 	s.pool.Lock(article)
 	defer s.pool.Unlock(article)
 
 	// Get the path to the article repository
 	path, err := s.fs.GetArticlePath(article)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Checkout version
 	repo := git.NewRepo(path)
 	err = repo.CheckoutBranch(version)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Add a .zip with the files to a cache folder and return the path
-	path, err = s.fs.MakeDownloadZip(article, filename, path)
+	path, cleanup, err := s.fs.MakeDownloadZip(article, filename, path)
 	if err != nil {
-		return "", nil
+		return "", nil, nil
 	}
-	return path, nil
+	return path, cleanup, nil
 }
 
 // UpdateAndCommit overwrites the file content of the specified article version and committing changes.

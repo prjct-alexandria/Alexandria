@@ -160,12 +160,12 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	return serv.VersionRepo.UpdateVersionLatestCommit(version, commit)
 }
 
-func (serv VersionService) GetVersionFiles(article int64, version int64) (string, error) {
+func (serv VersionService) GetVersionFiles(article int64, version int64) (string, func(), error) {
 
 	// Get information about the version from the database
 	versionEntity, err := serv.VersionRepo.GetVersion(version)
 	if err != nil {
-		return "", nil
+		return "", nil, nil
 	}
 
 	// Get a path to the version file contents, zipped

@@ -13,10 +13,10 @@ import (
 const IllegalChars = "<>:\"/\\|?*"
 
 // MakeDownloadZip copies the all contents of the source directory to a .zip file with the specified
-func (fs FileSystem) MakeDownloadZip(article int64, filename string, sourceDir string) (string, error) {
+func (fs FileSystem) MakeDownloadZip(article int64, filename string, sourceDir string) (string, func(), error) {
 	path, err := fs.GetDownloadPath(article, filename)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Create the (empty) zip file
@@ -24,7 +24,7 @@ func (fs FileSystem) MakeDownloadZip(article int64, filename string, sourceDir s
 	defer versionZip.Close()
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return "", nil, err
 	}
 
 	// Create a writer for the file, with the zip library
@@ -34,10 +34,11 @@ func (fs FileSystem) MakeDownloadZip(article int64, filename string, sourceDir s
 	// write directory contents to the writer
 	err = addFilesInDirToZip(zipWriter, sourceDir, "")
 	if err != nil {
-		return "", err
+		cleanUp(path)() // cleanup immediately
+		return "", nil, err
 	}
 
-	return path, nil
+	return path, cleanUp(path), nil
 }
 
 // write files in dirPath to the location dirInZip in the zipWriter

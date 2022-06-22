@@ -47,6 +47,17 @@ func NewFileSystem(path string, defaultFile string) *FileSystem {
 	return fs
 }
 
+// cleanUp creates a function that higher-level modules can use,
+// to delete a file in the filesystem after they're done with it
+func cleanUp(path string) func() {
+	return func() {
+		err := os.Remove(path)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
 // CreateArticlePath makes a new folder for an article git repository, returns the path.
 // Fails if the folder already exists. Does not initialize the repository.
 func (fs FileSystem) CreateArticlePath(article int64) (string, error) {

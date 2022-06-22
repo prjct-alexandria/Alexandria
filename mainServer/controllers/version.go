@@ -9,7 +9,6 @@ import (
 	"mainServer/utils"
 	"mainServer/utils/httperror"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -220,21 +219,14 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 		return
 	}
 
-	path, err := contr.Serv.GetVersionFiles(article, version)
+	path, cleanup, err := contr.Serv.GetVersionFiles(article, version)
 	if err != nil {
 		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
 		return
 	}
-
-	//GetVersionFiles creates a temporary zip file, which needs to be removed after this method is finished
-
-	defer func(name string) {
-		err := os.Remove(name)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(path)
+	// delete temporary files when done
+	defer cleanup()
 
 	//Return files
 	c.Header("Access-Control-Expose-Headers", "content-disposition")
