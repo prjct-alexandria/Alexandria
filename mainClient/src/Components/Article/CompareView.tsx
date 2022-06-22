@@ -105,7 +105,7 @@ export default function CompareView() {
     return (
       <button
         className={className}
-        disabled={disableButton()}
+        disabled={disableButton() || (comparisonData !== undefined && comparisonData.request.conflicted)}
         onClick={handleAcceptClick}
       >
         Accept
@@ -280,6 +280,12 @@ export default function CompareView() {
                 </Link>
             </h1>
         }
+            {comparisonData !== undefined && comparisonData.request.conflicted &&
+                <NotificationAlert errorType="warning" title={"Warning: Conflicting Changes!"} message=
+                    {"There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview between each set of  '<<<<', '====', and '>>>>' markers."}
+                />
+            }
+
           <div className="row justify-content-center">
               <div className='row col-8 mb-2'>
                   <div className='col-6'>
@@ -324,7 +330,7 @@ export default function CompareView() {
                   </div>
               </div>
               <div className="wrapper col-3">
-                  <ThreadList threadType={"request"} specificId={parseInt(params.requestId as string)}/>
+                  <ThreadList threadType={"request"} specificId={params.requestId as string}/>
               </div>
           </div>
         </div>

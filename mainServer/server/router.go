@@ -43,6 +43,9 @@ func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	//Example of how to make an endpoint use the authentication
 	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
+	router.GET("/articles/:articleID/versions/:versionID/history/:commitID/threads",
+		contrs.thread.GetCommitThreads)
+	router.GET("/articles/:articleID/requests/:requestID/threads", contrs.thread.GetRequestThreads)
 	router.POST("/articles/:articleID/thread/:threadType/id/:specificID", contrs.thread.CreateThread)
 	router.POST("/comments/thread/:threadID", contrs.thread.SaveComment)
 

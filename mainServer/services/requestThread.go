@@ -1,6 +1,7 @@
 package services
 
 import (
+	"mainServer/models"
 	"mainServer/repositories/interfaces"
 )
 
@@ -16,4 +17,14 @@ func (serv RequestThreadService) StartRequestThread(rid int64, tid int64) (int64
 	}
 
 	return id, err
+}
+
+//GetRequestThreads gets the request comment threads from the database, using the article id (aid) and request id (rid)
+func (serv RequestThreadService) GetRequestThreads(aid int64, rid int64) ([]models.Thread, error) {
+	threads, err := serv.RequestThreadRepository.GetRequestThreads(aid, rid)
+	if err != nil {
+		return nil, err
+	}
+
+	return threads, err
 }

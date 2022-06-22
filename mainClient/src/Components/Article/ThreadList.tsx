@@ -10,17 +10,26 @@ import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 
 type ThreadListProps = {
   threadType: string;
-  specificId: number;
+  specificId: string | undefined;
+};
+
+type ThreadComment = {
+  id: number;
+  authorId: string;
+  threadId: number;
+  content: string;
+  creationDate: string;
 };
 
 type ThreadEntity = {
   articleId: number;
+  comments: ThreadComment[];
   id: number;
-  specificId: number;
+  specificId: string | undefined;
 };
 
 export default function ThreadList(props: ThreadListProps) {
-  let baseUrl= configData.back_end_url;
+  let baseUrl = configData.back_end_url;
   let [threadListData, setData] = useState<ThreadEntity[]>();
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
@@ -44,18 +53,19 @@ export default function ThreadList(props: ThreadListProps) {
         "/versions/" +
         params.versionId +
         "/history/" +
-        params.historyId +
+        props.specificId +
         "/threads";
+      // "/history/" + 1 + "/threads";
     } else if (props.threadType === "request") {
       urlThreadList =
         baseUrl +
         "/articles/" +
         params.articleId +
-        "/request/" +
+        "/requests/" +
         params.requestId +
         "/threads";
     }
-    urlThreadList = "/threadList.json"; // Placeholder
+    // urlThreadList = "/threadList.json" // Placeholder
 
     // get list of threads
     fetch(urlThreadList, {
@@ -99,7 +109,7 @@ export default function ThreadList(props: ThreadListProps) {
           message={"Something went wrong. " + error}
         />
       )}
-      <div id="accordionPanelsStayOpenExample">
+      <div id="accordionPanelsStayOpenExample"><h5>Comments</h5>
         {threadListData != null &&
           threadListData.map((thread, i) => (
             <Thread
@@ -107,6 +117,7 @@ export default function ThreadList(props: ThreadListProps) {
               id={thread.id}
               specificId={props.specificId}
               threadType={props.threadType}
+              comments={thread.comments}
             />
           ))}
       </div>
