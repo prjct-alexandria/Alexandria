@@ -75,7 +75,7 @@ export default function Thread(props: ThreadProps) {
               id={props.id}
               specificId={props.specificId}
               threadType={props.threadType}
-            />
+              selection={undefined}/>
           </div>
         </div>
       }

@@ -339,7 +339,8 @@ export default function ArticleVersionPage() {
                 aria-labelledby="raw-tab"
                 tabIndex={0}
               >
-                <div className="raw-article">
+                <div className="raw-article" onMouseUp={(e) =>
+                    (isLoggedIn && showAddSectionComment(e))}>
                   {versionData && versionData.content}
                 </div>
               </div>
@@ -369,7 +370,7 @@ export default function ArticleVersionPage() {
             </div>
           </div>
 
-          <div className="col-3">
+          <div className="col-3" style={{alignContent: 'center'}}>
             {(versionData && !viewingOldVersion && (
               <ThreadList
                 threadType={"commit"}
@@ -380,6 +381,21 @@ export default function ArticleVersionPage() {
                 <ThreadList threadType={"commit"} specificId={historyID} />
               ))}
           </div>
+        </div>
+      </div>
+      <div className={"col-10"}>
+        <CreateSelectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
+                               threadType={"commitSelection"} posX={xPosCommentButton} posY={yPosCommentButton}
+                               hidden={commentButtonHidden} selection={selection}/>
+        <div>
+          {versionData && !viewingOldVersion && <SelectionThreadList
+                  threadType={"commitSection"}
+                  specificId={versionData && versionData.latestHistoryID}
+              />
+              || historyID && <SelectionThreadList
+                  threadType={"commitSelection"}
+                  specificId={historyID}
+              />}
         </div>
       </div>
     </div>
