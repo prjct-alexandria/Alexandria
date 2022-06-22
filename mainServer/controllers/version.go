@@ -30,8 +30,6 @@ type VersionController struct {
 // @Failure 	400 {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -81,8 +79,9 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
-	fmt.Println(res.LatestCommitID)
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // ListVersions 	godoc
@@ -95,8 +94,6 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Failure 	500  {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions [get]
 func (contr VersionController) ListVersions(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -113,7 +110,9 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get versions of aid=%d", article))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // UpdateVersion godoc
@@ -126,10 +125,11 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 // @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
-	//TODO change to owner check
+	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// get file from form data
 	file, err := c.FormFile("file")
@@ -158,7 +158,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	}
 
 	// update version data
-	if err := contr.Serv.UpdateVersion(c, file, article, version); err != nil {
+	if err := contr.Serv.UpdateVersion(c, file, article, version, loggedInAs); err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
 		return
@@ -178,6 +178,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 // @Failure      500  {object} httperror.HTTPError
 // @Router       /articles/{articleID}/versions [post]
 func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+	// Check if logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 	}

@@ -171,8 +171,6 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 // @Failure     500 {object} httperror.HTTPError
 // @Router      /articles/{articleID}/requests/{requestID} [get]
 func (contr RequestController) GetRequest(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id, had it in the path for consistency in endpoints, but actually ignores it
 	aid := c.Param("articleID")
 	_, err := strconv.ParseInt(aid, 10, 64)
@@ -199,6 +197,7 @@ func (contr RequestController) GetRequest(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, req)
 }
 

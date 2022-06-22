@@ -172,7 +172,9 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 }
 
 // UpdateVersion overwrites file of specified article version and commits
-func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
+func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
+	// Check if owner of version
+
 	// Checkout
 	err := serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {
@@ -208,7 +210,7 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	return nil
 }
 
-// updateLatestCommit stores the latest git commit ID of the version in the database entity
+// UpdateLatestCommit stores the latest git commit ID of the version in the database entity
 func (serv VersionService) UpdateLatestCommit(article int64, version int64) error {
 	// Get the latest commit ID from the git branch
 	commit, err := serv.GitRepo.GetLatestCommit(article, version)

@@ -32,9 +32,11 @@ type ThreadController struct {
 // @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
 func (contr *ThreadController) CreateThread(c *gin.Context) {
+	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	var thread models.Thread
 	err := c.BindJSON(&thread)
@@ -84,14 +86,13 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		}
 		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "request":
-		//TODO auth check for source or target owner
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
 			fmt.Println(err)
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		id, err = contr.RequestThreadService.StartRequestThread(intSid, tid)
+		id, err = contr.RequestThreadService.StartRequestThread(intSid, tid, loggedInAs)
 	case "review":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
@@ -118,7 +119,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.IndentedJSON(http.StatusOK, ids)
+	c.JSON(http.StatusOK, ids)
 }
 
 // SaveComment godoc
@@ -132,6 +133,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 // @Failure     500 "failed saving comment"
 // @Router      /comments/thread/:threadID [post]
 func (contr *ThreadController) SaveComment(c *gin.Context) {
+	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 	}
