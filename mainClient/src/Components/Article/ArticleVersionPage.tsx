@@ -15,13 +15,12 @@ type ArticleVersion = {
   owners: Array<string>;
   title: string;
   content: string;
-  latestHistoryID: string;
+  latestCommitID: string;
 };
 
 export default function ArticleVersionPage() {
   let [versionData, setData] = useState<ArticleVersion>();
   let [isLoaded, setLoaded] = useState<boolean>(false);
-  let [isOldVersion, setOldVersion] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
 
@@ -44,6 +43,7 @@ export default function ArticleVersionPage() {
   if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
+  let viewingOldVersion = false;
 
   useEffect(() => {
     fetch(url, {
@@ -59,7 +59,7 @@ export default function ArticleVersionPage() {
         if (response.ok) {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
-          setOldVersion(historyID != null && VersionData.latestHistoryID != historyID)
+          viewingOldVersion = VersionData.latestCommitID != historyID
           setData(VersionData);
           setLoaded(true);
         } else {
@@ -119,7 +119,7 @@ export default function ArticleVersionPage() {
             </Link>
             </a>
           </li>
-          {!isOldVersion && isLoggedIn && (
+          {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -139,7 +139,7 @@ export default function ArticleVersionPage() {
               <FileDownload />
             </a>
           </li>
-          {!isOldVersion && isLoggedIn && (
+          {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -154,7 +154,7 @@ export default function ArticleVersionPage() {
               </a>
             </li>
           )}
-          {!isOldVersion && isLoggedIn && (
+          {!viewingOldVersion && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -171,7 +171,7 @@ export default function ArticleVersionPage() {
           )}
         </ul>
 
-        {isOldVersion && (
+        {viewingOldVersion && (
           <p>
             <em>
               {
