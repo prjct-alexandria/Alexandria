@@ -31,6 +31,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 	loggedInAs := auth.GetLoggedInEmail(c)
 
@@ -80,6 +81,7 @@ func (contr RequestController) RejectRequest(c *gin.Context) {
 	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 	loggedInAs := auth.GetLoggedInEmail(c)
 
@@ -128,6 +130,7 @@ func (contr RequestController) AcceptRequest(c *gin.Context) {
 	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 	loggedInAs := auth.GetLoggedInEmail(c)
 

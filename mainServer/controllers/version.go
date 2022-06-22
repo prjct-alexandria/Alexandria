@@ -128,6 +128,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	// Check if user is logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 	loggedInAs := auth.GetLoggedInEmail(c)
 
@@ -181,6 +182,7 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	// Check if logged in
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 
 	// Extract article id

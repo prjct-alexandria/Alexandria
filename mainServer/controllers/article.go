@@ -33,6 +33,7 @@ func NewArticleController(serv services.ArticleService) ArticleController {
 func (contr ArticleController) CreateArticle(c *gin.Context) {
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
 	}
 	loggedInAs := auth.GetLoggedInEmail(c)
 
