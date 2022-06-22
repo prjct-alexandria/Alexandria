@@ -58,19 +58,21 @@ func (r PgUserRepository) DeleteUser(email string) error {
 }
 
 func (r PgUserRepository) CheckIfExists(email string) (bool, error) {
-	stmt, err := r.Db.Prepare(`SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)`)
-	if err != nil {
-		return false, fmt.Errorf("CheckIfExists: %v", err)
-	}
-	row := stmt.QueryRow(stmt, email)
+	stmt, err := r.Db.Prepare("SELECT 1 FROM users WHERE email = $1")
 
-	var exists bool
-	err = row.Scan(&exists)
 	if err != nil {
-		return exists, fmt.Errorf("CheckIfExists: %v", err)
+		return false, err
 	}
-	return exists, nil
 
+	var temp int
+	row := stmt.QueryRow(email)
+	if err := row.Scan(&temp); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, fmt.Errorf("CheckIfExists %s: %v", email, err)
+	}
+	return true, nil
 }
 
 func (r PgUserRepository) createUserTable() error {
