@@ -5,10 +5,10 @@ import MRListElement from "./MRListElement";
 import { useParams, useSearchParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
 import configData from "../../config.json";
-import {Request} from "./CompareView";
+import { Request } from "./CompareView";
 
 type MR = {
-  request: Request
+  request: Request;
   sourceTitle: string;
   targetTitle: string;
 };
@@ -21,7 +21,8 @@ export default function MRList() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
 
-  const baseUrl = configData.back_end_url +"/articles/" + params.articleId + "/requests";
+  const baseUrl =
+    configData.back_end_url + "/articles/" + params.articleId + "/requests";
 
   let appendUrl = "?" + searchParams.toString();
   const url = baseUrl + appendUrl;
@@ -56,7 +57,7 @@ export default function MRList() {
         setError(error);
       }
     );
-  }, []);
+  });
 
   const mrListMap = () => {
     return (
