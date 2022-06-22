@@ -1,6 +1,6 @@
 import * as React from "react";
 import CreateComment from "./CreateComment";
-import moment from "moment";
+import moment from 'moment';
 
 type ThreadProps = {
   id: number;
@@ -75,7 +75,7 @@ export default function Thread(props: ThreadProps) {
               id={props.id}
               specificId={props.specificId}
               threadType={props.threadType}
-            />
+              selection={undefined}/>
           </div>
         </div>
       }
