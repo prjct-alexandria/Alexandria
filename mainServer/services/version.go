@@ -10,6 +10,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/utils/arrays"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -119,8 +120,13 @@ func (serv VersionService) GetVersion(article int64, version int64) (models.Vers
 }
 
 // CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
-func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
+	// Remove possible duplicates in owners array
+	owners = arrays.RemoveDuplicateStr(owners)
+
 	// Check if owners exist in database
+	// Also checks if the authenticated user is in this list
+	authenticatedUserPresent := false
 	for _, email := range owners {
 		exists, err := serv.UserRepo.CheckIfExists(email)
 		if err != nil {
@@ -129,6 +135,13 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 		if !exists {
 			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
 		}
+		if loggedInAs == email {
+			authenticatedUserPresent = true
+		}
+	}
+	// TODO Make this lead to a 403 Forbidden
+	if !authenticatedUserPresent {
+		return models.Version{}, errors.New("authenticated user is not present in list of owners")
 	}
 
 	// Create entity to store in db
@@ -168,10 +181,17 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 
 // UpdateVersion overwrites file of specified article version and commits
 func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
-	// Check if owner of version
+	//Check if user is the owner
+	isOwner, err := serv.VersionRepo.CheckIfOwner(version, loggedInAs)
+	if err != nil {
+		return errors.New("could not verify version ownership")
+	}
+	if !isOwner {
+		return errors.New(fmt.Sprintf("updateVersion: %v is not an owner", loggedInAs))
+	}
 
 	// Checkout
-	err := serv.GitRepo.CheckoutBranch(article, version)
+	err = serv.GitRepo.CheckoutBranch(article, version)
 	if err != nil {
 		return err
 	}

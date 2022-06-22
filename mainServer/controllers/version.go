@@ -184,6 +184,7 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 		return
 	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// Extract article id
 	aid := c.Param("articleID")
@@ -204,7 +205,7 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	}
 
 	// Create version
-	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
+	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create new version on server"))

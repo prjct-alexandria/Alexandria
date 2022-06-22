@@ -34,7 +34,7 @@ func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, c
 	panic("implement me")
 }
 
-func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
 	//TODO implement me
 	panic("implement me")
 }
