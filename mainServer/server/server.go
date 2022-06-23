@@ -1,40 +1,43 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"mainServer/controllers"
 	"mainServer/db"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
+	"mainServer/repositories/storer"
+	"mainServer/server/config"
 	"mainServer/services"
 	servinterfaces "mainServer/services/interfaces"
-	"mainServer/utils/clock"
 )
 
 type RepoEnv struct {
-	git           repositories.GitRepository
-	article       interfaces.ArticleRepository
-	user          interfaces.UserRepository
-	version       interfaces.VersionRepository
-	req           interfaces.RequestRepository
-	thread        interfaces.ThreadRepository
-	comment       interfaces.CommentRepository
-	commitThread  interfaces.CommitThreadRepository
-	requestThread interfaces.RequestThreadRepository
-	reviewThread  interfaces.ReviewThreadRepository
+	storer                storer.Storer
+	article               interfaces.ArticleRepository
+	user                  interfaces.UserRepository
+	version               interfaces.VersionRepository
+	req                   interfaces.RequestRepository
+	thread                interfaces.ThreadRepository
+	comment               interfaces.CommentRepository
+	commitThread          interfaces.CommitThreadRepository
+	requestThread         interfaces.RequestThreadRepository
+	reviewThread          interfaces.ReviewThreadRepository
+	commitSelectionThread interfaces.CommitSelectionThreadRepository
 }
 
 type ServiceEnv struct {
-	version       servinterfaces.VersionService
-	article       servinterfaces.ArticleService
-	user          services.UserService
-	req           services.RequestService
-	thread        services.ThreadService
-	comment       services.CommentService
-	commitThread  services.CommitThreadService
-	requestThread services.RequestThreadService
-	reviewThread  services.ReviewThreadService
+	version               servinterfaces.VersionService
+	article               servinterfaces.ArticleService
+	user                  services.UserService
+	req                   services.RequestService
+	thread                services.ThreadService
+	comment               services.CommentService
+	commitThread          services.CommitThreadService
+	commitSelectionThread services.CommitSelectionThreadService
+	requestThread         services.RequestThreadService
+	reviewThread          services.ReviewThreadService
 }
 
 type ControllerEnv struct {
@@ -45,81 +48,67 @@ type ControllerEnv struct {
 	thread  controllers.ThreadController
 }
 
-func initRepoEnv() (RepoEnv, error) {
-	// TODO: gitfiles path in config file
-	gitpath := "../../gitfiles"
-
-	gitrepo, err := repositories.NewGitRepository(gitpath)
-	if err != nil {
-		return RepoEnv{}, err
-	}
-
-	database := db.Connect()
-	clock := clock.RealClock{}
-
+func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 	return RepoEnv{
-		git:           gitrepo,
-		article:       postgres.NewPgArticleRepository(database),
-		user:          postgres.NewPgUserRepository(database),
-		version:       postgres.NewPgVersionRepository(database),
-		req:           postgres.NewPgRequestRepository(database),
-		thread:        postgres.NewPgThreadRepository(database),
-		comment:       postgres.NewPgCommentRepository(database, clock),
-		commitThread:  postgres.NewPgCommitThreadRepository(database),
-		requestThread: postgres.NewPgRequestThreadRepository(database),
-		reviewThread:  postgres.NewPgReviewThreadRepository(database),
-	}, nil
+		storer:                storer.NewStorer(&cfg.Fs),
+		article:               postgres.NewPgArticleRepository(database),
+		user:                  postgres.NewPgUserRepository(database),
+		version:               postgres.NewPgVersionRepository(database),
+		req:                   postgres.NewPgRequestRepository(database),
+		thread:                postgres.NewPgThreadRepository(database),
+		comment:               postgres.NewPgCommentRepository(database),
+		commitThread:          postgres.NewPgCommitThreadRepository(database),
+		commitSelectionThread: postgres.NewPgCommitSelectionThreadRepository(database),
+		requestThread:         postgres.NewPgRequestThreadRepository(database),
+		reviewThread:          postgres.NewPgReviewThreadRepository(database),
+	}
 }
 
-func initServiceEnv() (ServiceEnv, error) {
-	repos, err := initRepoEnv()
-	if err != nil {
-		return ServiceEnv{}, err
-	}
-
+func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
-		article:       services.NewArticleService(repos.article, repos.version, repos.git),
-		user:          services.UserService{UserRepository: repos.user},
-		req:           services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
-		version:       services.VersionService{Gitrepo: repos.git, Versionrepo: repos.version},
-		thread:        services.ThreadService{ThreadRepository: repos.thread},
-		comment:       services.CommentService{CommentRepository: repos.comment},
-		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
-		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread},
-		reviewThread:  services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
-	}, nil
+		article:               services.NewArticleService(repos.article, repos.version, repos.user, repos.storer),
+		user:                  services.UserService{UserRepository: repos.user},
+		req:                   services.RequestService{Repo: repos.req, Versionrepo: repos.version, Storer: repos.storer},
+		version:               services.VersionService{VersionRepo: repos.version, Storer: repos.storer, UserRepo: repos.user},
+		thread:                services.ThreadService{ThreadRepository: repos.thread},
+		comment:               services.CommentService{CommentRepository: repos.comment},
+		commitThread:          services.CommitThreadService{CommitThreadRepository: repos.commitThread},
+		commitSelectionThread: services.CommitSelectionThreadService{CommitSelectionThreadRepository: repos.commitSelectionThread},
+		requestThread:         services.RequestThreadService{RequestThreadRepository: repos.requestThread},
+		reviewThread:          services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
+	}
 }
 
-func initControllerEnv() (ControllerEnv, error) {
-	servs, err := initServiceEnv()
-	if err != nil {
-		return ControllerEnv{}, err
-	}
-
+func initControllerEnv(cfg *config.Config, servs ServiceEnv) ControllerEnv {
 	return ControllerEnv{
 		article: controllers.NewArticleController(servs.article),
-		user:    controllers.UserController{UserService: servs.user},
+		user:    controllers.UserController{UserService: servs.user, Cfg: cfg},
 		req:     controllers.RequestController{Serv: servs.req},
 		version: controllers.VersionController{Serv: servs.version},
 		thread: controllers.ThreadController{ThreadService: servs.thread,
-			CommitThreadService:  servs.commitThread,
-			RequestThreadService: servs.requestThread,
-			ReviewThreadService:  servs.reviewThread,
-			CommentService:       servs.comment},
-	}, nil
+			CommitThreadService:          servs.commitThread,
+			CommitSelectionThreadService: servs.commitSelectionThread,
+			RequestThreadService:         servs.requestThread,
+			CommentService:               servs.comment,
+			ReviewThreadService:          servs.reviewThread},
+	}
 }
 
 func Init() {
-	env, err := initControllerEnv()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// read config file
+	cfg := config.ReadConfig("./config.json")
 
-	router := SetUpRouter(env)
-	err = router.Run("localhost:8080")
+	database := db.Connect(&cfg.Database)
+
+	// create environments in order
+	repoEnv := initRepoEnv(&cfg, database)
+	serviceEnv := initServiceEnv(repoEnv)
+	controllerEnv := initControllerEnv(&cfg, serviceEnv)
+
+	// set up routing for the endpoint URLsS
+	router := SetUpRouter(&cfg, controllerEnv)
+	err := router.Run(fmt.Sprintf("%s:%d", cfg.Hosting.Backend.Host, cfg.Hosting.Backend.Port))
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 }

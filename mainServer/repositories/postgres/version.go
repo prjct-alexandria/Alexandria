@@ -44,7 +44,6 @@ func NewPgVersionRepository(db *sql.DB) PgVersionRepository {
 }
 
 func (r PgVersionRepository) CreateVersion(version entities.Version) (entities.Version, error) {
-
 	// add entry in version table
 	id, err := r.createVersion(version.ArticleID, version.Title)
 	if err != nil {
@@ -59,6 +58,22 @@ func (r PgVersionRepository) CreateVersion(version entities.Version) (entities.V
 
 	version.Id = id
 	return version, nil
+}
+
+// UpdateVersionLatestCommit updates the latest commit of the specified version
+func (r PgVersionRepository) UpdateVersionLatestCommit(version int64, commit string) error {
+
+	// update field
+	stmt, err := r.Db.Prepare("UPDATE version SET latestCommit=$2 where id=$1")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(version, commit)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // createVersion adds a single row to the version table, returns generated id.
@@ -116,6 +131,7 @@ func (r PgVersionRepository) createVersionTable() error {
     			articleID int NOT NULL,
     			title VARCHAR(255) NOT NULL,
     			status VARCHAR(16) NOT NULL DEFAULT 'draft',
+    			latestCommit CHAR(40),
     			FOREIGN KEY (articleID) REFERENCES article(id)    			
     )`)
 	return err
@@ -134,7 +150,7 @@ func (r PgVersionRepository) createVersionOwnersTable() error {
 // getVersion gets the version entity from the database, but doesn't link the owners
 func (r PgVersionRepository) getVersion(version int64) (entities.Version, error) {
 	// Prepare and execute query
-	stmt, err := r.Db.Prepare("SELECT articleid, id, title, status FROM version WHERE id=$1")
+	stmt, err := r.Db.Prepare("SELECT articleid, id, title, status, latestCommit FROM version WHERE id=$1")
 
 	if err != nil {
 		return entities.Version{}, err
@@ -143,7 +159,7 @@ func (r PgVersionRepository) getVersion(version int64) (entities.Version, error)
 
 	// Extract results
 	var entity entities.Version
-	err = row.Scan(&entity.ArticleID, &entity.Id, &entity.Title, &entity.Status)
+	err = row.Scan(&entity.ArticleID, &entity.Id, &entity.Title, &entity.Status, &entity.LatestCommitID)
 	if err != nil {
 		return entities.Version{}, err
 	}
@@ -155,7 +171,7 @@ func (r PgVersionRepository) getVersion(version int64) (entities.Version, error)
 func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Version, error) {
 
 	// Prepare and execute query
-	stmt, err := r.Db.Prepare(`SELECT id, title, status, versionowners.email
+	stmt, err := r.Db.Prepare(`SELECT id, title, status, versionowners.email, latestCommit
 		FROM version INNER JOIN versionowners ON version.id = versionowners.versionid
 		WHERE articleid=$1`)
 	if err != nil {
@@ -173,7 +189,7 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 		// Read the current row
 		row := entities.Version{}
 		var email string
-		if err := rows.Scan(&row.Id, &row.Title, &row.Status, &email); err != nil {
+		if err := rows.Scan(&row.Id, &row.Title, &row.Status, &email, &row.LatestCommitID); err != nil {
 			return nil, err
 		}
 

@@ -1,30 +1,43 @@
 package services
 
 import (
-	"io/ioutil"
+	"errors"
+	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
-	"path/filepath"
+	"mainServer/repositories/storer"
 )
 
 type ArticleService struct {
 	articlerepo interfaces.ArticleRepository
 	versionrepo interfaces.VersionRepository
-	gitrepo     repositories.GitRepository
+	userrepo    interfaces.UserRepository
+	storer      storer.Storer
 }
 
-func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, gitrepo repositories.GitRepository) ArticleService {
+func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, userrepo interfaces.UserRepository, storer storer.Storer) ArticleService {
 	return ArticleService{
 		articlerepo: articlerepo,
 		versionrepo: versionrepo,
-		gitrepo:     gitrepo}
+		userrepo:    userrepo,
+		storer:      storer}
 }
 
 // CreateArticle creates a new article repo and main article version, returns main version
 func (serv ArticleService) CreateArticle(title string, owners []string) (models.Version, error) {
 	// TODO: ensure authenticated user is among owners
+
+	// Verify that all owners exist in database
+	for _, email := range owners {
+		exists, err := serv.userrepo.CheckIfExists(email)
+		if err != nil {
+			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database: %s", email, err.Error()))
+		}
+		if !exists {
+			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
+		}
+	}
 
 	// Create article in database, this generates article ID
 	article, err := serv.articlerepo.CreateArticle()
@@ -45,14 +58,14 @@ func (serv ArticleService) CreateArticle(title string, owners []string) (models.
 		return models.Version{}, err
 	}
 
-	// Create article git repo
-	err = serv.gitrepo.CreateRepo(article.Id, version.Id)
+	// Initialize the repository with the specified main version and default article
+	commit, err := serv.storer.InitMainVersion(article.Id, version.Id)
 	if err != nil {
 		return models.Version{}, err
 	}
 
-	// Place a default file and create the initial commit
-	err = serv.commitDefaultFile(article.Id)
+	// Store the commit id in the database
+	err = serv.versionrepo.UpdateVersionLatestCommit(version.Id, commit)
 	if err != nil {
 		return models.Version{}, err
 	}
@@ -74,41 +87,6 @@ func (serv ArticleService) GetMainVersion(article int64) (int64, error) {
 		return 0, err
 	}
 	return mv, nil
-}
-
-// commitDefaultFile copies the template file from the resource folder to the given article
-// intended for article creation. does not check out any branch.
-func (serv ArticleService) commitDefaultFile(article int64) error {
-
-	// Get the path to the repo
-	repo, err := serv.gitrepo.GetArticlePath(article)
-	if err != nil {
-		return err
-	}
-
-	// Read the template file
-	source, err := filepath.Abs("./resources/defaultArticle.qmd")
-	if err != nil {
-		return err
-	}
-	input, err := ioutil.ReadFile(source)
-	if err != nil {
-		return err
-	}
-
-	// Write contents to the main.qmd file in the repo
-	target := filepath.Join(repo, "main.qmd")
-	err = ioutil.WriteFile(target, input, 0644)
-	if err != nil {
-		return err
-	}
-
-	// Commit the file to the currently checked out branch
-	err = serv.gitrepo.Commit(article)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (serv ArticleService) GetArticleList() ([]models.ArticleListElement, error) {

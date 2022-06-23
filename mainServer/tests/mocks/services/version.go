@@ -33,13 +33,18 @@ func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Ver
 	panic("implement me")
 }
 
-func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, commit [20]byte) (models.Version, error) {
+func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, commit string) (models.Version, error) {
 	// added to solve merge conflicts after the testing issue was finished
 	// TODO: implement for future testing
 	panic("implement me")
 }
 
 func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, func(), error) {
 	//TODO implement me
 	panic("implement me")
 }

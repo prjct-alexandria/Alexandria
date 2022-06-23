@@ -1,12 +1,15 @@
 import * as React from "react";
 import { useState } from "react";
+import configData from "../../config.json";
+import NotificationAlert from "../NotificationAlert";
 
 export default function CreateArticle() {
   let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
   let [mainVersionOwners, setMainVersionOwners] = useState<string>("");
   let [mainVersionTags, setMainVersionTags] = useState<string>("");
-  let [error, setError] = useState(null);
+  let [error, setError] = useState<Error>();
   let [isTitleChanged, setIsTitleChanged] = useState<boolean>(false);
+  let [isAddOwnersHidden, setOwnersHidden] = useState<boolean>(true);
 
   // Variable and references to it to be removed when adding tags
   let areTagsImplemented = false;
@@ -29,7 +32,7 @@ export default function CreateArticle() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = "http://localhost:8080/articles";
+    const url = configData.back_end_url + "/articles";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = mainVersionTags.split(",");
@@ -40,8 +43,8 @@ export default function CreateArticle() {
     ownerList = ownerList.map((owner) => owner.trim());
 
     // Remove empty elements
-    tagList = tagList.filter((tag) => tag!= '')
-    ownerList = ownerList.filter((owner) => owner!= '')
+    tagList = tagList.filter((tag) => tag !== "");
+    ownerList = ownerList.filter((owner) => owner !== "");
 
     let loggedUser = localStorage.getItem("loggedUserEmail");
     ownerList[ownerList.length] =
@@ -61,13 +64,11 @@ export default function CreateArticle() {
       headers: { "Content-Type": "application/json" },
       mode: "cors",
       body: JSON.stringify(body),
-      credentials: "include"
+      credentials: "include",
     }).then(
-      // Success
       async (response) => {
-        console.log("Success:", response);
-
         if (response.ok) {
+          setError(undefined);
           let responseJSON: {
             articleID: string;
             versionID: string;
@@ -78,16 +79,24 @@ export default function CreateArticle() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              "http://localhost:3000/articles/" +
+              configData.front_end_url +
+              "/articles/" +
               articleId +
               "/versions/" +
               versionId;
           }
+        } else {
+          // Set error with message returned from the server
+          let responseJSON: {
+            message: string;
+          } = await response.json();
+
+          let serverMessage: string = responseJSON.message;
+          setError(new Error(serverMessage));
         }
       },
       (error) => {
         // Request returns an error
-        console.error("Error:", error);
         setError(error);
       }
     );
@@ -102,7 +111,13 @@ export default function CreateArticle() {
       aria-labelledby="publishArticleLabel"
       aria-hidden="true"
     >
-      {error != null && <span>{error}</span>}
+      {error && (
+        <NotificationAlert
+          errorType="danger"
+          title={"Error: "}
+          message={"Something went wrong. " + error.message}
+        />
+      )}
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -149,13 +164,26 @@ export default function CreateArticle() {
                 </div>
               )}
               <div>
-                <h5 className="form-label">Other owners (optional)</h5>
-                <span>Separate owner emails by ",".</span>
-                <input
-                  name="owners"
-                  className="create-article-input"
-                  onChange={onChangeOwners}
-                />
+                <span>By creating this article, you become its owner.</span>
+                <button
+                  role={"button"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOwnersHidden(!isAddOwnersHidden);
+                  }}
+                >
+                  + Add other owners
+                </button>
+                {!isAddOwnersHidden && (
+                  <div id="addOwners">
+                    <span>Separate owner emails by ",".</span>
+                    <input
+                      name="owners"
+                      className="create-article-input"
+                      onChange={onChangeOwners}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="modal-footer">

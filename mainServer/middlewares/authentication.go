@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"mainServer/server/config"
 	"mainServer/utils/clock"
 	"time"
 )
@@ -15,7 +16,7 @@ import (
 // If the token cannot be validated, the context-email is set to nil
 // If the token has expired, the context-email is set to nil
 // If there is a valid token, the context-email is set to the email of the logged-in user and the cookie is refreshed
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader, err := c.Request.Cookie("Authorization")
 		if err != nil {
@@ -25,7 +26,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenString := authHeader.Value[len("Bearer."):]
 
-		token, err := validateToken(tokenString)
+		token, err := validateToken(tokenString, []byte(cfg.Auth.JwtSecret))
 		if err != nil {
 			c.Set("Email", nil)
 			return
@@ -46,7 +47,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Set("Email", claims["email"].(string))
 
 			//Refresh token
-			err := UpdateJwtCookie(c, claims["email"].(string))
+			err := UpdateJwtCookie(c, claims["email"].(string), cfg)
 
 			if err != nil {
 				return
@@ -57,26 +58,45 @@ func AuthMiddleware() gin.HandlerFunc {
 
 // Function for validating JWT token
 // Code from https://medium.com/wesionary-team/jwt-authentication-in-golang-with-gin-63dbc0816d55
-func validateToken(encodedToken string) (*jwt.Token, error) {
+func validateToken(encodedToken string, secret []byte) (*jwt.Token, error) {
 	return jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
-		if _, isvalid := token.Method.(*jwt.SigningMethodHMAC); !isvalid {
+		if _, isValid := token.Method.(*jwt.SigningMethodHMAC); !isValid {
 			return nil, fmt.Errorf("Invalid token")
 		}
-		return []byte("temporaryVerySecretThisShouldBeInAConfigFile"), nil
+		return secret, nil
 	})
 }
 
 // UpdateJwtCookie Function for creating and updating the JWT token
-func UpdateJwtCookie(c *gin.Context, email string) error {
-	//TODO: Put this in a config file
-	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
-
+func UpdateJwtCookie(c *gin.Context, email string, cfg *config.Config) error {
 	cl := clock.RealClock{}
 
-	//TODO add token expire time to config file
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":     email,
-		"expiresAt": cl.Now().Add(time.Minute * 15).Unix(),
+		"expiresAt": cl.Now().Add(time.Minute * time.Duration(cfg.Auth.TokenExpireMinutes)).Unix(),
+		"issuedAt":  cl.Now().Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(cfg.Auth.JwtSecret))
+
+	if err != nil {
+		return err
+	}
+
+	//TODO: Make secure once HTTPS connection is established
+	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", cfg.Hosting.Backend.Host, false, true)
+
+	return nil
+}
+
+// ExpireJwtCookie Function for expiring the JWT token for logging out
+func ExpireJwtCookie(c *gin.Context) error {
+	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
+	cl := clock.RealClock{}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":     "",
+		"expiresAt": cl.Now().Add(time.Hour * -3600).Unix(),
 		"issuedAt":  cl.Now().Unix(),
 	})
 
@@ -88,7 +108,8 @@ func UpdateJwtCookie(c *gin.Context, email string) error {
 
 	//TODO: Add domain when necessary
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", "localhost", false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", "localhost", false, true)
 
 	return nil
+
 }

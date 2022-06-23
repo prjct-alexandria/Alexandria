@@ -9,14 +9,67 @@ $removed-background-color: #fec4c0;
 $error-color: #c70000;
 
 // article contents SASS
-$article-content-background-color:#eee;
+$article-content-background-color: #f3f3f3;
 $article-content-border-color: #ccc;
-
+.navbar-user-buttons {
+  margin-right: 100px;
+}
+.inline-block {
+  display: inline-block;
+}
+.bi {
+  margin-right: 5px;
+}
+.navbar-nav {
+  width: 100%;
+}
+.raw-article {
+  white-space: pre-line;
+  border:1px solid $article-content-border-color;
+  background-color:$article-content-background-color;
+  padding:50px;
+}
+.inline-editor-article {
+  white-space: pre-line;
+  border:1px solid $article-content-border-color;
+  background-color:$article-content-background-color;
+  padding:10px;
+}
+.inline-editor-article:hover, .inline-editor-textarea:hover, .inline-editor-textarea:focus {
+  cursor: text !important;
+}
 body {
   // to prevent the browser from shaking when threads are opened
   overflow: scroll;
 }
-
+.App {
+  margin-top:100px;
+}
+.textarea {
+  background-color: transparent;
+  border: 0;
+  padding: 8px;
+  resize: none;
+  width: 100%;
+  resize: none;
+  overflow: auto;
+  min-height: 300px;
+}
+.textarea:hover {
+  background-color: #d3d3d3;
+  cursor: pointer;
+}
+.article {
+  margin-top:15px;
+  border-bottom: 1px solid #bbbbbb;
+}
+.ownersLi {
+  display: inline;
+  padding-right: 10px;
+}
+NotificationAlert {
+  z-index:100;
+}
 .input-validation {
   color: $error-color;
 }
@@ -117,4 +170,12 @@ a:hover {
   width: 75%;
   left: 50%;
   transform: translate(-50%)
+}
+
+.comment {
+  border: 1px solid #e9ecef;
+}
+
+.commentHeader {
+  background-color: transparent;
 }
