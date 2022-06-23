@@ -58,7 +58,7 @@ func (r Repo) Commit(timestamp time.Time, msg string) error {
 	unixTimeStr := strconv.FormatInt(timestamp.Unix(), 10)
 	output, err = git.Commit(
 		commit.Message(msg),
-		commit.Author("Alexandria Git Manager"),
+		commit.Author("Alexandria Git Manager <>"),
 		commit.Date(unixTimeStr),
 		runGitIn(r.path))
 	if err != nil {

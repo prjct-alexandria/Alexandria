@@ -101,7 +101,7 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	}
 
 	// Merge
-	commit, err := s.Storer.Merge(req.ArticleID, source.Id, target.ArticleID)
+	commit, err := s.Storer.Merge(req.ArticleID, source.Id, target.Id)
 	if err != nil {
 		return err
 	}
