@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  front-end:
+    container_name: client_container
+    image: node:18
+    command: sh -c "npm install && npm start"
+    restart: always
+    ports:
+      - '3000:3000'
+    working_dir: /mainClient
+  back-end:
+    container_name: server_container
+    image: alexandria/go_server
+    restart: always
+    ports:
+      - '8000:8000'
+#    Persistent git files
+  database:
+    container_name: pg_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: AlexandriaPG
+    ports:
+      - '5432:5432'
