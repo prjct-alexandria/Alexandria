@@ -126,7 +126,7 @@ export default function NavigationBar() {
                       <li>
                         <button
                           role="button"
-                          className="nav-link btn dropdown-item"
+                          className="dropdown-item"
                           data-bs-toggle="modal"
                           data-bs-target="#publishArticle"
                         >
