@@ -22,7 +22,7 @@ export default function NavigationBar() {
 
   return (
     <div className="col-xs-12">
-      <nav className="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
         <div className="container-fluid">
           <Link to="/" className="navbar-brand">
             Project Alexandria
@@ -99,7 +99,7 @@ export default function NavigationBar() {
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
                       height="16"
-                      fill="currentColor"
+                      fill="white"
                       className="inline-block bi bi-person-circle"
                       viewBox="0 0 16 16"
                     >
@@ -126,7 +126,7 @@ export default function NavigationBar() {
                       <li>
                         <button
                           role="button"
-                          className="nav-link btn dropdown-item"
+                          className="dropdown-item"
                           data-bs-toggle="modal"
                           data-bs-target="#publishArticle"
                         >

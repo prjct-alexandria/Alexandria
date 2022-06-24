@@ -7,7 +7,7 @@ export default function Homepage() {
       <HomepageHeader />
       <div className="container px-4 py-5" id="hanging-icons">
         <h2 className="pb-2 border-bottom">
-          Scientific publishing, but make it...
+          Scientific publishing, and make it...
         </h2>
         <div className="row g-4 py-5 row-cols-1 row-cols-lg-3">
           <div className="col d-flex align-items-start">

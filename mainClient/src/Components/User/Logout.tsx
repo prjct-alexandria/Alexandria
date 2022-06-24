@@ -64,7 +64,7 @@ export default function Logout() {
       <button
         role="button"
         type="button"
-        className="nav-link btn dropdown-item"
+        className="dropdown-item"
         onClick={LogoutHandler}
       >
         Log out
