@@ -37,7 +37,7 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			exp := time.Unix(int64(claims["expiresAt"].(float64)), 0)
 			if (clock.RealClock{}.Now().After(exp)) {
 				//TODO: Notify user on frontend that sesssion has timed out?
-				ExpireJwtCookie(c)
+				ExpireJwtCookie(c, cfg)
 				return
 			}
 
