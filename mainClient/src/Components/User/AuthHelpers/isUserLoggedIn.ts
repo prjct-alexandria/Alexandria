@@ -1,12 +1,12 @@
 import removeUserFromLocalStorage from "./removeUserFromLocalStorage";
 
 // Source: https://stackoverflow.com/a/52406518/14209629
-function getCookie(name: string) {
+export function getCookie(name: string) {
   let match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
   return match ? match[1] : null;
 }
 
-function authCookiePresent(): boolean {
+export function authCookieCheck(): boolean {
   let present = getCookie("isAuthorized")
   if (present == null) {
     if (localStorage.getItem("isLoggedIn") === "true") {
@@ -20,5 +20,5 @@ function authCookiePresent(): boolean {
 }
 
 export default function isUserLoggedIn(): boolean {
-  return authCookiePresent() && localStorage.getItem("isLoggedIn") === "true";
+  return authCookieCheck() && localStorage.getItem("isLoggedIn") === "true";
 }
