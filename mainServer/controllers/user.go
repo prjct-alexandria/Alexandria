@@ -100,7 +100,7 @@ func (u *UserController) Login(c *gin.Context) {
 // @Failure		500 "Could not update token"
 // @Router		/logout	[post]
 func (u *UserController) Logout(c *gin.Context) {
-	err := middlewares.ExpireJwtCookie(c)
+	err := middlewares.ExpireJwtCookie(c, u.Cfg)
 
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not delete token to logout user"))
