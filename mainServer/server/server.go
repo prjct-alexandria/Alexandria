@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"mainServer/controllers"
 	"mainServer/db"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/postgres"
+	"mainServer/repositories/storer"
 	"mainServer/server/config"
 	"mainServer/services"
 	servinterfaces "mainServer/services/interfaces"
 )
 
 type RepoEnv struct {
-	git                   repositories.GitRepository
-	filesystem            repositories.FilesystemRepository
+	storer                storer.Storer
 	article               interfaces.ArticleRepository
 	user                  interfaces.UserRepository
 	version               interfaces.VersionRepository
@@ -23,9 +22,9 @@ type RepoEnv struct {
 	thread                interfaces.ThreadRepository
 	comment               interfaces.CommentRepository
 	commitThread          interfaces.CommitThreadRepository
-	commitSelectionThread interfaces.CommitSelectionThreadRepository
 	requestThread         interfaces.RequestThreadRepository
 	reviewThread          interfaces.ReviewThreadRepository
+	commitSelectionThread interfaces.CommitSelectionThreadRepository
 }
 
 type ServiceEnv struct {
@@ -51,8 +50,7 @@ type ControllerEnv struct {
 
 func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 	return RepoEnv{
-		git:                   repositories.NewGitRepository(&cfg.Git),
-		filesystem:            repositories.NewFilesystemRepository(&cfg.Git),
+		storer:                storer.NewStorer(&cfg.Fs),
 		article:               postgres.NewPgArticleRepository(database),
 		user:                  postgres.NewPgUserRepository(database),
 		version:               postgres.NewPgVersionRepository(database),
@@ -68,17 +66,16 @@ func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 
 func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
-		article: services.NewArticleService(repos.article, repos.version, repos.user, repos.git),
-		user:    services.UserService{UserRepository: repos.user},
-		req:     services.RequestService{Repo: repos.req, Versionrepo: repos.version, Gitrepo: repos.git},
-		version: services.VersionService{GitRepo: repos.git, VersionRepo: repos.version,
-			UserRepo: repos.user, FilesystemRepo: repos.filesystem},
-		thread:        services.ThreadService{ThreadRepository: repos.thread},
-		comment:       services.CommentService{CommentRepository: repos.comment},
-		commitThread:  services.CommitThreadService{CommitThreadRepository: repos.commitThread},
+		article:               services.NewArticleService(repos.article, repos.version, repos.user, repos.storer),
+		user:                  services.UserService{UserRepository: repos.user},
+		req:                   services.RequestService{Repo: repos.req, Versionrepo: repos.version, Storer: repos.storer},
+		version:               services.VersionService{VersionRepo: repos.version, Storer: repos.storer, UserRepo: repos.user},
+		thread:                services.ThreadService{ThreadRepository: repos.thread},
+		comment:               services.CommentService{CommentRepository: repos.comment},
+		commitThread:          services.CommitThreadService{CommitThreadRepository: repos.commitThread},
 		commitSelectionThread: services.CommitSelectionThreadService{CommitSelectionThreadRepository: repos.commitSelectionThread},
-		requestThread: services.RequestThreadService{RequestThreadRepository: repos.requestThread},
-		reviewThread:  services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
+		requestThread:         services.RequestThreadService{RequestThreadRepository: repos.requestThread},
+		reviewThread:          services.ReviewThreadService{ReviewThreadRepository: repos.reviewThread},
 	}
 }
 

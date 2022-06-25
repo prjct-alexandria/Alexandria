@@ -57,7 +57,7 @@ export default function MRList() {
         setError(error);
       }
     );
-  });
+  },[]);
 
   const mrListMap = () => {
     return (
