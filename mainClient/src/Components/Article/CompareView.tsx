@@ -285,31 +285,35 @@ export default function CompareView() {
                     {"There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview between each set of  '<<<<', '====', and '>>>>' markers."}
                 />
             }
-
-          <div className="row justify-content-center">
-              <div className='row col-8 mb-2'>
-                  <div className='col-6'>
-                      <h5>Changes</h5>
-                  </div>
-                  <div className='col-6'>
-                      <h5>Result</h5>
-                  </div>
-              </div>
-
-              {/*Accept, reject and delete button*/}
-              <div className='col-1' id='AcceptButton'>
-                  {acceptButton()}
-              </div>
-              <div className='col-1'>
-                  {rejectButton()}
-              </div>
-              {/*TODO: un hide when delete implemented on backend*/}
-              {/*<div className='col-1'>*/}
-              {/*    {deleteButton()}*/}
-              {/*</div>*/}
-
-          </div>
-
+            <div className="row justify-content-center mb-2">
+                {/*Content of versions*/}
+                <div className={"wrapper col-8"}>
+                    <div className='row'>
+                        {/*Differences between before and after*/}
+                        <div className='col-6'>
+                            <h5>Changes</h5>
+                        </div>
+                        <div className='col-6'>
+                            <h5>Result</h5>
+                        </div>
+                    </div>
+                </div>
+                <div className="wrapper col-3">
+                    <div className="row justify-content-evenly">
+                        {/*Accept, reject and delete button*/}
+                        <div className='col-1' id='AcceptButton'>
+                            {acceptButton()}
+                        </div>
+                        <div className='col-1'>
+                            {rejectButton()}
+                        </div>
+                        {/*TODO: un hide when delete implemented on backend*/}
+                        {/*<div className='col-1'>*/}
+                        {/*    {deleteButton()}*/}
+                        {/*</div>*/}
+                    </div>
+                </div>
+            </div>
           <div className="row justify-content-center">
               {/*Content of versions*/}
               <div className={"wrapper col-8"}>
