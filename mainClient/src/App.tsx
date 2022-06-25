@@ -16,8 +16,14 @@ import VersionList from "./Components/Article/VersionList";
 import CompareView from "./Components/Article/CompareView";
 import MRList from "./Components/Article/MRList";
 import About from "./Components/About"
+import {authCookieCheck} from "./Components/User/AuthHelpers/isUserLoggedIn";
 
 function App() {
+  //This callback syncs localStorage with a possible present authenticationCookie
+  setInterval(() => {
+    authCookieCheck()
+  }, 1000)
+
   return (
     <>
       <Router>

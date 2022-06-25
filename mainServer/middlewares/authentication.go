@@ -84,13 +84,14 @@ func UpdateJwtCookie(c *gin.Context, email string, cfg *config.Config) error {
 	}
 
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, 60*cfg.Auth.TokenExpireMinutes, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("isAuthorized", "true", 60*cfg.Auth.TokenExpireMinutes, "/", cfg.Hosting.Backend.Host, false, false)
 
 	return nil
 }
 
 // ExpireJwtCookie Function for expiring the JWT token for logging out
-func ExpireJwtCookie(c *gin.Context) error {
+func ExpireJwtCookie(c *gin.Context, cfg *config.Config) error {
 	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
 	cl := clock.RealClock{}
 
@@ -108,7 +109,8 @@ func ExpireJwtCookie(c *gin.Context) error {
 
 	//TODO: Add domain when necessary
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", "localhost", false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("isAuthorized", "false", -1, "/", cfg.Hosting.Backend.Host, false, false)
 
 	return nil
 
