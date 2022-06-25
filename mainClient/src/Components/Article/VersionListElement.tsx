@@ -30,6 +30,7 @@ export default function VersionListElement(props: VListProps) {
             "/versions/" +
             props.version.versionID
           }
+          data-testid={"title" + props.version.versionID}
         >
           {props.version.title}
         </Link>
@@ -50,8 +51,8 @@ export default function VersionListElement(props: VListProps) {
         </Link>
       </div>
 
-      <div className="col-md-2">{props.version.owners.join(", ")}</div>
-      <div className="col-md-1">{props.version.status}</div>
+      <div className="col-md-2" data-testid={"owners" + props.version.versionID}>{props.version.owners.join(", ")}</div>
+      <div className="col-md-1" data-testid={"status" + props.version.versionID}>{props.version.status}</div>
     </div>
   );
 }

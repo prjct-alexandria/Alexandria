@@ -26,11 +26,11 @@ export default function MRListElement(props: MRListProps) {
           className="row row-no-gutters col-md-12 m-1"
           style={{ textAlign: "left" }}
         >
-          <div className="col-md-4">{props.MR.sourceTitle}</div>
+          <div className="col-md-4" data-testid={"sourceTitle" + props.MR.request.requestID}>{props.MR.sourceTitle}</div>
           {/*<div className="col-md-2">{props.MR.sourceHistoryID}</div>*/}
-          <div className="col-md-4">{props.MR.targetTitle}</div>
+          <div className="col-md-4" data-testid={"targetTitle" + props.MR.request.requestID}>{props.MR.targetTitle}</div>
           {/*<div className="col-md-2">{props.MR.targetHistoryID}</div>*/}
-          <div className="col-md-4">{props.MR.request.status}</div>
+          <div className="col-md-4" data-testid={"status" + props.MR.request.requestID}>{props.MR.request.status}</div>
         </button>
       </Link>
     </div>
