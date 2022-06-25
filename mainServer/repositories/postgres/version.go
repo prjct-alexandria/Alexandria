@@ -190,7 +190,8 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 		row := entities.Version{}
 		var email string
 		if err := rows.Scan(&row.Id, &row.Title, &row.Status, &email, &row.LatestCommitID); err != nil {
-			return nil, err
+			fmt.Printf("GetVersionsByArticle: %v\n", err.Error())
+			continue
 		}
 
 		// Insert new version into map, or append email to existing

@@ -42,7 +42,8 @@ func (r PgRequestThreadRepository) GetRequestThreads(aid int64, rid int64) ([]mo
 		var cd string
 		var c string
 		if err := rows.Scan(&tid, &aid, &rid, &coid, &auid, &cd, &c); err != nil {
-			return threads, fmt.Errorf("GetRequestThreads: %v", err)
+			fmt.Printf("GetRequestThreads: %v\n", err.Error())
+			continue
 		}
 		// find index of tid in the threads list
 		index := -1
