@@ -33,6 +33,8 @@ func globalSetup() {
 
 	// route
 	r.POST("/articles/:articleID/versions/:versionID", func(c *gin.Context) {
+		//TODO: Remove this hardcoded email to an Auth mock (or similar) once implemented)
+		c.Set("Email", "testUser@gmail.com")
 		contr.UpdateVersion(c)
 	})
 }

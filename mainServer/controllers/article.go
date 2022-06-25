@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
@@ -30,6 +31,11 @@ func NewArticleController(serv interfaces.ArticleService) ArticleController {
 // @Failure      500  {object} httperror.HTTPError
 // @Router       /articles [post]
 func (contr ArticleController) CreateArticle(c *gin.Context) {
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// Read article creation JSON
 	article := models.ArticleCreationForm{}
@@ -41,7 +47,7 @@ func (contr ArticleController) CreateArticle(c *gin.Context) {
 	}
 
 	// Create article in service
-	version, err := contr.serv.CreateArticle(article.Title, article.Owners)
+	version, err := contr.serv.CreateArticle(article.Title, article.Owners, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed creating article on server"))

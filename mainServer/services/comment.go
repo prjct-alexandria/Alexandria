@@ -12,8 +12,11 @@ type CommentService struct {
 
 // SaveComment saves list of comments to the db
 // returns the id's of the saved comments
-func (serv CommentService) SaveComment(comment entities.Comment, tid int64) (int64, error) {
-	// TODO: check if user is authenticated
+func (serv CommentService) SaveComment(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+	if loggedInAs != comment.AuthorId {
+		return int64(-1),
+			fmt.Errorf("provided author %v does not match logged-in author %v", comment.AuthorId, loggedInAs)
+	}
 
 	var err error
 	id, err := serv.CommentRepository.SaveComment(
@@ -24,8 +27,7 @@ func (serv CommentService) SaveComment(comment entities.Comment, tid int64) (int
 			CreationDate: comment.CreationDate,
 		})
 	if err != nil {
-		fmt.Println(err)
-		return int64(0), err
+		return int64(-1), err
 	}
 	return id, err
 }

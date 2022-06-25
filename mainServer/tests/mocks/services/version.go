@@ -39,7 +39,7 @@ func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, c
 	panic("implement me")
 }
 
-func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -51,7 +51,7 @@ func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, func(
 
 // UpdateVersion implements the corresponding version from the VersionService interface.
 // Stores in the mock that it was called, including the arguments, and executes the custom UpdateVersionMock function
-func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
+func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
 	m.Mock.CallFunc("UpdateVersion", &map[string]interface{}{
 		"article": article,
 		"version": version,

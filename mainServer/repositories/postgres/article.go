@@ -59,10 +59,17 @@ func (r PgArticleRepository) GetAllArticles() ([]entities.Article, error) {
 
 	var list []entities.Article
 	rows, err := stmt.Query()
+	if err != nil {
+		return list, err
+	}
 
 	for rows.Next() {
 		var entity entities.Article
-		err = rows.Scan(&entity.Id, &entity.MainVersionID)
+		err := rows.Scan(&entity.Id, &entity.MainVersionID)
+		if err != nil {
+			fmt.Printf("GetAllArticles: %v\n", err.Error())
+			continue
+		}
 		list = append(list, entity)
 	}
 

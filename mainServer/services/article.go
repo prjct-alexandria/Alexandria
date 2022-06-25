@@ -7,6 +7,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
+	"mainServer/utils/arrays"
 )
 
 type ArticleService struct {
@@ -25,18 +26,28 @@ func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo int
 }
 
 // CreateArticle creates a new article repo and main article version, returns main version
-func (serv ArticleService) CreateArticle(title string, owners []string) (models.Version, error) {
-	// TODO: ensure authenticated user is among owners
+func (serv ArticleService) CreateArticle(title string, owners []string, loggedInAs string) (models.Version, error) {
+	// Remove possible duplicates in owners array
+	owners = arrays.RemoveDuplicateStr(owners)
 
-	// Verify that all owners exist in database
+	// Check if owners exist in database
+	// Also checks if the authenticated user is in this list
+	authenticatedUserPresent := false
 	for _, email := range owners {
 		exists, err := serv.userrepo.CheckIfExists(email)
 		if err != nil {
-			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database: %s", email, err.Error()))
+			return models.Version{}, fmt.Errorf("could not check if %s exists in the database: %s", email, err.Error())
 		}
 		if !exists {
-			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
+			return models.Version{}, fmt.Errorf("%s is not a registered email address", email)
 		}
+		if loggedInAs == email {
+			authenticatedUserPresent = true
+		}
+	}
+	// TODO Make this lead to a 403 Forbidden
+	if !authenticatedUserPresent {
+		return models.Version{}, errors.New("authenticated user is not present in list of owners")
 	}
 
 	// Create article in database, this generates article ID
