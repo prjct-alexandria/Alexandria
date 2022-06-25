@@ -86,16 +86,15 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		// check if the specific thread ID string can actually be a commit ID
 		if !gitUtils.IsCommitHash(sid) {
 			err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", sid)
-			fmt.Println(err)
 			httperror.NewError(c, http.StatusBadRequest, err)
 			return
 		}
 		id, threadError = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "commitSelection":
 		// check if the specific thread ID string can actually be a commit ID
-		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
-		if len(sid) != 40 && err == nil {
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+		if !gitUtils.IsCommitHash(sid) {
+			err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", sid)
+			httperror.NewError(c, http.StatusBadRequest, err)
 			return
 		}
 
@@ -109,16 +108,14 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
-			fmt.Println(err)
-			c.Status(http.StatusBadRequest)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid requestID, got %v", sid))
 			return
 		}
 		id, threadError = contr.RequestThreadService.StartRequestThread(intSid, tid, loggedInAs)
 	case "review":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
-			fmt.Println(err)
-			c.Status(http.StatusBadRequest)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid reviewID, got %v", sid))
 			return
 		}
 		id, threadError = contr.ReviewThreadService.StartReviewThread(intSid, tid)
