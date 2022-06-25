@@ -51,6 +51,11 @@ export default function NavigationBar() {
                     Browse Articles
                   </Link>
                 </li>
+                <li className="nav-item d-flex active">
+                  <Link to="/about" className="nav-link">
+                    About
+                  </Link>
+                </li>
               </div>
               <div className="d-flex">
                 {!isLoggedIn && (
