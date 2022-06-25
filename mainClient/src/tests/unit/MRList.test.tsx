@@ -2,6 +2,7 @@ import * as React from "react";
 import MRList from "../../Components/Article/MRList";
 import {render, screen, waitFor} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
+import ArticleList from "../../Components/Article/ArticleList";
 
 // Arrange: Making a fake response
 
@@ -89,5 +90,44 @@ describe('MRList', () => {
             expect(screen.getByTestId("targetTitle" + i)).toHaveTextContent(mrListElement.targetTitle)
             expect(screen.getByTestId("status" + i)).toHaveTextContent(mrListElement.request.status)
         })
+    })
+})
+
+let alert = {
+    message: "message"
+}
+describe('MRList error', () => {
+    // Arrange: Mock the fetch
+    beforeEach(() => {
+        const response = {
+            status: 404,
+            ok: false,
+            json: jest.fn().mockResolvedValue(alert) };
+        mockedFetch = jest.fn().mockResolvedValue(response);
+        global.fetch = mockedFetch;
+    })
+
+    // Test whether the first article is a part of the articleList
+    test("test requests", async () => {
+        // Act: Render the article list
+        render(
+            <MemoryRouter>
+                <MRList />
+            </MemoryRouter>
+        );
+
+        // Wait until it is finished loading
+        const loadingSpinner = await screen.findByTestId("loadingSpinner")
+        await waitFor(() => {
+            expect(loadingSpinner).not.toBeInTheDocument()
+        })
+
+        // Assert that the fetch was used
+        expect(mockedFetch).toHaveBeenCalledTimes(1)
+
+        // Perform assertions for error message
+        expect(screen.getByRole("alert")).toHaveTextContent(
+            "Error: Something went wrong. Error: " + alert.message
+        )
     })
 })
