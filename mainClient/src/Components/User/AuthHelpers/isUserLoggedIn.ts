@@ -1,5 +1,6 @@
 import removeUserFromLocalStorage from "./removeUserFromLocalStorage";
 
+// Source: https://stackoverflow.com/a/52406518/14209629
 function getCookie(name: string) {
   let match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
   return match ? match[1] : null;
