@@ -11,7 +11,7 @@ type Config struct {
 	Hosting  HostingConfig  `json:"hosting"`
 	Database DatabaseConfig `json:"database"`
 	Auth     AuthConfig     `json:"auth"`
-	Git      GitConfig      `json:"git"`
+	Fs       StorerConfig   `json:"fs"`
 }
 
 type DatabaseConfig struct {
@@ -21,8 +21,10 @@ type DatabaseConfig struct {
 	DBName string    `json:"dbname"`
 }
 
-type GitConfig struct {
-	Path string `json:"path"`
+type StorerConfig struct {
+	Path        string `json:"path"`
+	DefaultFile string `json:"default-file"`
+	MutexCount  int    `json:"mutex-count"`
 }
 
 type AuthConfig struct {

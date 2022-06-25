@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
 )
@@ -120,8 +121,12 @@ func (r PgRequestRepository) GetRequestList(articleId int64, sourceId int64, tar
 	for rows.Next() {
 		var request models.Request
 		var mergeRequest models.RequestListElement
-		err = rows.Scan(&request.RequestID, &request.ArticleID, &request.SourceVersionID, &request.SourceHistoryID, &request.TargetVersionID,
+		err := rows.Scan(&request.RequestID, &request.ArticleID, &request.SourceVersionID, &request.SourceHistoryID, &request.TargetVersionID,
 			&request.TargetHistoryID, &request.Status, &request.Conflicted, &mergeRequest.SourceTitle, &mergeRequest.TargetTitle)
+		if err != nil {
+			fmt.Printf("GetRequestList: %v\n", err.Error())
+			continue
+		}
 		mergeRequest.Request = request
 		list = append(list, mergeRequest)
 	}

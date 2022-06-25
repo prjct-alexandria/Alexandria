@@ -25,7 +25,9 @@
     "jwt-secret": "thisShouldBeKeptVerySecret",
     "token-expire-minutes": 15
   },
-  "git": {
-    "path": "../../gitfiles"
+  "fs": {
+    "path": "../../gitfiles",
+    "default-file": "./resources/defaultArticle.qmd",
+    "mutex-count": 12
   }
 }

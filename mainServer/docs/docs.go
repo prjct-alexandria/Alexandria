@@ -127,7 +127,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Thread"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Thread"
+                            }
                         }
                     },
                     "400": {
@@ -182,6 +185,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/:articleID/versions/:versionID/history/:commitID/selectionThreads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all section threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SelectionThread"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
             "get": {
                 "description": "Gets a list with all threads belonging to a specific commit of an article",
@@ -209,7 +254,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Thread"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Thread"
+                            }
                         }
                     },
                     "400": {
@@ -1037,17 +1085,18 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Thread": {
+        "models.SelectionThread": {
             "type": "object",
             "required": [
                 "articleId",
-                "comment"
+                "comments",
+                "selection"
             ],
             "properties": {
                 "articleId": {
                     "type": "integer"
                 },
-                "comment": {
+                "comments": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entities.Comment"
@@ -1055,6 +1104,39 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
+                },
+                "specificId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Thread": {
+            "type": "object",
+            "required": [
+                "articleId",
+                "comments"
+            ],
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Comment"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
+                },
+                "specificId": {
+                    "type": "string"
                 }
             }
         },

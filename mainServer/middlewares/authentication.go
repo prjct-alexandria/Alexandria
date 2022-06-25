@@ -20,7 +20,6 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader, err := c.Request.Cookie("Authorization")
 		if err != nil {
-			c.Set("Email", nil)
 			return
 		}
 
@@ -28,7 +27,6 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 
 		token, err := validateToken(tokenString, []byte(cfg.Auth.JwtSecret))
 		if err != nil {
-			c.Set("Email", nil)
 			return
 		}
 
@@ -38,8 +36,8 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			//Should not be executed as the cookie should have been timed out by now, but extra check for security
 			exp := time.Unix(int64(claims["expiresAt"].(float64)), 0)
 			if (clock.RealClock{}.Now().After(exp)) {
-				c.Set("Email", nil)
 				//TODO: Notify user on frontend that sesssion has timed out?
+				ExpireJwtCookie(c, cfg)
 				return
 			}
 
@@ -84,13 +82,14 @@ func UpdateJwtCookie(c *gin.Context, email string, cfg *config.Config) error {
 	}
 
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, 60*15, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, 60*cfg.Auth.TokenExpireMinutes, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("isAuthorized", "true", 60*cfg.Auth.TokenExpireMinutes, "/", cfg.Hosting.Backend.Host, false, false)
 
 	return nil
 }
 
 // ExpireJwtCookie Function for expiring the JWT token for logging out
-func ExpireJwtCookie(c *gin.Context) error {
+func ExpireJwtCookie(c *gin.Context, cfg *config.Config) error {
 	jwtSecret := "temporaryVerySecretThisShouldBeInAConfigFile"
 	cl := clock.RealClock{}
 
@@ -108,7 +107,8 @@ func ExpireJwtCookie(c *gin.Context) error {
 
 	//TODO: Add domain when necessary
 	//TODO: Make secure once HTTPS connection is established
-	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", "localhost", false, true)
+	c.SetCookie("Authorization", "Bearer."+tokenString, -1, "/", cfg.Hosting.Backend.Host, false, true)
+	c.SetCookie("isAuthorized", "false", -1, "/", cfg.Hosting.Backend.Host, false, false)
 
 	return nil
 

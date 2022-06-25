@@ -17,6 +17,11 @@ import (
 
 func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
+	err := router.SetTrustedProxies(nil)
+	if err != nil {
+		return nil
+	}
+
 	router.Use(middlewares.AuthMiddleware(cfg))
 	router.Use(middlewares.CorsHeaders(cfg))
 
@@ -38,13 +43,11 @@ func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router.POST("/users", contrs.user.Register)
 	router.POST("/login", contrs.user.Login)
 	router.POST("/logout", contrs.user.Logout)
-	router.POST("/createExampleUser", contrs.user.CreateExampleUser)
-
-	//Example of how to make an endpoint use the authentication
-	router.GET("/getExampleUser", contrs.user.GetExampleUser)
 
 	router.GET("/articles/:articleID/versions/:versionID/history/:commitID/threads",
 		contrs.thread.GetCommitThreads)
+	router.GET("/articles/:articleID/versions/:versionID/history/:commitID/selectionThreads",
+		contrs.thread.GetCommitSelectionThreads)
 	router.GET("/articles/:articleID/requests/:requestID/threads", contrs.thread.GetRequestThreads)
 	router.POST("/articles/:articleID/thread/:threadType/id/:specificID", contrs.thread.CreateThread)
 	router.POST("/comments/thread/:threadID", contrs.thread.SaveComment)

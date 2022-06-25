@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/entities"
 	"mainServer/middlewares"
@@ -100,7 +99,7 @@ func (u *UserController) Login(c *gin.Context) {
 // @Failure		500 "Could not update token"
 // @Router		/logout	[post]
 func (u *UserController) Logout(c *gin.Context) {
-	err := middlewares.ExpireJwtCookie(c)
+	err := middlewares.ExpireJwtCookie(c, u.Cfg)
 
 	if err != nil {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not delete token to logout user"))
@@ -108,45 +107,4 @@ func (u *UserController) Logout(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, models.User{Name: "", Email: ""})
-}
-
-// CreateExampleUser godoc
-// @Summary      Temporary user creation endpoint
-// @Description  Creates a hardcoded user entity and adds it to the database, demonstrates how to add to database
-// @Produce      plain
-// @Success      200  {object} string
-// @Router       /createExampleUser [post]
-func (u *UserController) CreateExampleUser(c *gin.Context) {
-	user := entities.User{
-		Name:  "Pietje",
-		Email: "pietjepuk@gmail.com",
-		Pwd:   "password123",
-	}
-
-	err := u.UserService.SaveUser(user)
-	if err != nil {
-		fmt.Println(err)
-		c.String(http.StatusBadRequest, "Fail")
-	} else {
-		c.String(http.StatusOK, "Success")
-	}
-}
-
-// GetExampleUser godoc
-// @Summary      Get test user from database endpoint
-// @Description  Returns a user with a hardcoded email address, demonstrates how to use the services.
-// @Produce      json
-// @Success      200  {object} entities.User
-// @Router       /getExampleUser [get]
-func (u *UserController) GetExampleUser(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
-	user, err := u.UserService.GetUserByEmail("pietjepuk@gmail.com")
-
-	if err != nil {
-		fmt.Println(err)
-		c.String(http.StatusBadRequest, "Fail")
-	} else {
-		c.IndentedJSON(http.StatusOK, user)
-	}
 }

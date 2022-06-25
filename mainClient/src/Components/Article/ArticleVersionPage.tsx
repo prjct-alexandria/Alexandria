@@ -11,6 +11,9 @@ import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import InlineEditor from "./InlineEditor";
 import getLoggedInEmail from "../User/AuthHelpers/getLoggedInEmail";
+import CreateSelectionThread from "./CreateSelectionThread";
+import CreateThread from "./CreateThread";
+import SelectionThreadList from "./SelectionThreadList";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -24,12 +27,20 @@ export default function ArticleVersionPage() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+  let [isOutdated, setOutdated] = useState<boolean>();
   let [isUserAnOwner, setIsOwner] = useState<boolean>(false);
   let [editorContent, setContent] = useState<string>("");
+
+  let [xPosCommentButton, setXPosCommentButton] = useState<number>(0)
+  let [yPosCommentButton, setYPosCommentButton] = useState<number>(0)
+  let [commentButtonHidden, setCommentButtonHidden] = useState<boolean>(true)
+  let [selection, setSelection] = useState<string>("")
+
 
   function isLoggedInUserTheOwner() {
     return versionData && versionData.owners.includes(getLoggedInEmail() || "");
   }
+
 
   // Listen for userAccountEvent that fires when user in localstorage changes
   window.addEventListener("userAccountEvent", () => {
@@ -53,8 +64,8 @@ export default function ArticleVersionPage() {
     params.versionId;
 
   // get the optional specific history param
-  const [searchParams] = useSearchParams(); // used for the source and target
-  let historyID = searchParams.get("history");
+  const [searchParams] = useSearchParams();
+  const historyID = searchParams.get("history");
   if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
@@ -77,6 +88,7 @@ export default function ArticleVersionPage() {
           viewingOldVersion = VersionData.latestHistoryID != historyID
           setData(VersionData);
           setLoaded(true);
+          setOutdated(historyID != null && VersionData.latestHistoryID != historyID)
           setIsOwner(isLoggedInUserTheOwner() || false);
         } else {
           // Set error with message returned from the server
@@ -95,6 +107,24 @@ export default function ArticleVersionPage() {
       }
     );
   }, []);
+
+  function showAddSectionComment(e: React.MouseEvent<HTMLDivElement>) {
+    let selection = window.getSelection()
+    if (selection) {
+      let selectedText = selection.toString()
+      if (selectedText === null || selectedText === "") {
+        setCommentButtonHidden(true)
+        return
+      }
+      setCommentButtonHidden(false)
+      setXPosCommentButton(e.clientX + window.scrollX)
+      setYPosCommentButton(e.clientY + window.scrollY)
+      setSelection(selectedText)
+
+      } else {
+      setCommentButtonHidden(true)
+    }
+  }
 
   return (
     <div className={"row justify-content-center wrapper"}>
@@ -154,7 +184,7 @@ export default function ArticleVersionPage() {
               <FileDownload />
             </a>
           </li>
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -179,7 +209,7 @@ export default function ArticleVersionPage() {
               </a>
             </li>
           )}
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -209,7 +239,7 @@ export default function ArticleVersionPage() {
           )}
         </ul>
 
-        {viewingOldVersion && (
+        {isOutdated && (
           <p>
             <em>
               {
@@ -273,7 +303,7 @@ export default function ArticleVersionPage() {
                 </button>
               </li>
 
-              {!viewingOldVersion && isLoggedIn && (
+              {!isOutdated && isLoggedIn && (
                 <li className="nav-item" role="presentation">
                   <button
                     className="nav-link"
@@ -312,7 +342,8 @@ export default function ArticleVersionPage() {
                 aria-labelledby="raw-tab"
                 tabIndex={0}
               >
-                <div className="raw-article">
+                <div className="raw-article" onMouseUp={(e) =>
+                    (isLoggedIn && showAddSectionComment(e))}>
                   {versionData && versionData.content}
                 </div>
               </div>
@@ -341,18 +372,32 @@ export default function ArticleVersionPage() {
               </div>
             </div>
           </div>
-
-          <div className="col-3">
-            {(versionData && !viewingOldVersion && (
+          <div className="col-3" style={{alignContent: 'center'}}>
+            {(versionData && !isOutdated && (
               <ThreadList
                 threadType={"commit"}
-                specificId={versionData && versionData.latestHistoryID}
+                specificId={versionData.latestHistoryID}
               />
             )) ||
               (historyID && (
                 <ThreadList threadType={"commit"} specificId={historyID} />
               ))}
           </div>
+        </div>
+      </div>
+      <div className={"col-10"}>
+        <CreateSelectionThread id={undefined} specificId={versionData && versionData.latestHistoryID}
+                               threadType={"commitSelection"} posX={xPosCommentButton} posY={yPosCommentButton}
+                               hidden={commentButtonHidden} selection={selection}/>
+        <div>
+          {versionData && !isOutdated && <SelectionThreadList
+                  threadType={"commitSection"}
+                  specificId={versionData && versionData.latestHistoryID}
+              />
+              || historyID && <SelectionThreadList
+                  threadType={"commitSelection"}
+                  specificId={historyID}
+              />}
         </div>
       </div>
     </div>

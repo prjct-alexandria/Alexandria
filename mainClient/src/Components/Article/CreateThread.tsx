@@ -11,13 +11,15 @@ type ThreadProps = {
 export default function CreateThread(props: ThreadProps) {
     let [key, setKey] = useState(1);
     let [newThreadList, setNewThreadList] = useState([
-        <CreateComment key={key} id={(props.id) ? undefined : props.id} specificId={props.specificId} threadType={props.threadType}/>
+        <CreateComment key={key} id={(props.id) ? undefined : props.id} specificId={props.specificId}
+                       threadType={props.threadType} selection={undefined}/>
     ]);
 
     const addThread = () => {
         setKey(key+1);
         setNewThreadList(newThreadList.concat(
-            <CreateComment key={key} id={(props.id) ? undefined : props.id} specificId={props.specificId} threadType={props.threadType}/>
+            <CreateComment key={key} id={(props.id) ? undefined : props.id} specificId={props.specificId}
+                           threadType={props.threadType} selection={undefined}/>
         ));
     }
 
