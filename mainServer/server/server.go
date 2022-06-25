@@ -14,7 +14,7 @@ import (
 )
 
 type RepoEnv struct {
-	storer                storer.Storer
+	storer                interfaces.Storer
 	article               interfaces.ArticleRepository
 	user                  interfaces.UserRepository
 	version               interfaces.VersionRepository

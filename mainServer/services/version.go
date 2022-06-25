@@ -7,14 +7,13 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"mainServer/repositories/storer"
 	"mainServer/utils/arrays"
 	"mime/multipart"
 )
 
 type VersionService struct {
 	VersionRepo interfaces.VersionRepository
-	Storer      storer.Storer
+	Storer      interfaces.Storer
 	UserRepo    interfaces.UserRepository
 }
 

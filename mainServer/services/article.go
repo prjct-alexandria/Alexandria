@@ -6,7 +6,6 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"mainServer/repositories/storer"
 	"mainServer/utils/arrays"
 )
 
@@ -14,10 +13,10 @@ type ArticleService struct {
 	articlerepo interfaces.ArticleRepository
 	versionrepo interfaces.VersionRepository
 	userrepo    interfaces.UserRepository
-	storer      storer.Storer
+	storer      interfaces.Storer
 }
 
-func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, userrepo interfaces.UserRepository, storer storer.Storer) ArticleService {
+func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo interfaces.VersionRepository, userrepo interfaces.UserRepository, storer interfaces.Storer) ArticleService {
 	return ArticleService{
 		articlerepo: articlerepo,
 		versionrepo: versionrepo,

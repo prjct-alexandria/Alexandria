@@ -6,14 +6,13 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
-	"mainServer/repositories/storer"
 	"mainServer/utils/arrays"
 )
 
 type RequestService struct {
 	Repo        interfaces.RequestRepository
 	Versionrepo interfaces.VersionRepository
-	Storer      storer.Storer
+	Storer      interfaces.Storer
 }
 
 func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64, loggedInAs string) (models.Request, error) {
