@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
-	"mainServer/repositories"
 	"mainServer/repositories/interfaces"
+	"mainServer/repositories/storer"
+	"mainServer/utils"
 )
 
 type RequestService struct {
 	Repo        interfaces.RequestRepository
 	Versionrepo interfaces.VersionRepository
-	Gitrepo     repositories.GitRepository
+	Storer      storer.Storer
 }
 
 func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64, loggedInAs string) (models.Request, error) {
@@ -58,30 +59,26 @@ func (s RequestService) RejectRequest(request int64, loggedInAs string) error {
 		return err
 	}
 
-	// check if logged-in user owns target version
-	target := req.TargetVersionID
-	isTargetOwner, err := s.Versionrepo.CheckIfOwner(target, loggedInAs)
+	// get source and target version info for checking owners and latest commits
+	source, err := s.Versionrepo.GetVersion(req.SourceVersionID)
 	if err != nil {
 		return err
 	}
-	if !isTargetOwner {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
-	}
-
-	// record the current most recent history/commit IDs of both versions (branches)
-	req.SourceHistoryID, err = s.Gitrepo.GetLatestCommit(req.ArticleID, req.SourceVersionID)
-	if err != nil {
-		return err
-	}
-	req.TargetHistoryID, err = s.Gitrepo.GetLatestCommit(req.ArticleID, req.TargetVersionID)
-	if err != nil {
-		return err
-	}
-	err = s.Repo.UpdateRequest(req)
+	target, err := s.Versionrepo.GetVersion(req.TargetVersionID)
 	if err != nil {
 		return err
 	}
 
+	// check if logged-in user owns the target version
+	if !utils.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	}
+
+	// update the request comparison one last time before rejecting
+	err = s.UpdateRequestComparison(req, source, target)
+	if err != nil {
+		return err
+	}
 	// reject the request
 	return s.Repo.SetStatus(request, entities.RequestRejected)
 }
@@ -99,44 +96,35 @@ func (s RequestService) AcceptRequest(request int64, loggedInAs string) error {
 		return fmt.Errorf("request %d cannot be accepted, because there would be merge conflicts", request)
 	}
 
-	// check if logged-in user owns target version
-	target := req.TargetVersionID
-	isTargetOwner, err := s.Versionrepo.CheckIfOwner(target, loggedInAs)
+	// get source and target version info for checking owners and latest commits
+	source, err := s.Versionrepo.GetVersion(req.SourceVersionID)
 	if err != nil {
 		return err
 	}
-	if !isTargetOwner {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
-	}
-
-	// record the current most recent history/commit IDs of both versions (branches)
-	req.SourceHistoryID, err = s.Gitrepo.GetLatestCommit(req.ArticleID, req.SourceVersionID)
-	if err != nil {
-		return err
-	}
-	req.TargetHistoryID, err = s.Gitrepo.GetLatestCommit(req.ArticleID, req.TargetVersionID)
-	if err != nil {
-		return err
-	}
-	err = s.Repo.UpdateRequest(req)
+	target, err := s.Versionrepo.GetVersion(req.TargetVersionID)
 	if err != nil {
 		return err
 	}
 
-	// commit the merge in git
-	err = s.Gitrepo.Merge(req.ArticleID, req.SourceVersionID, req.TargetVersionID)
+	// check if logged-in user owns the target version
+	if !utils.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	}
+
+	// update the request comparison one last time before accept
+	err = s.UpdateRequestComparison(req, source, target)
 	if err != nil {
 		return err
 	}
 
-	// get the latest commit from the git branch after merging
-	commit, err := s.Gitrepo.GetLatestCommit(req.ArticleID, req.TargetVersionID)
+	// Merge
+	commit, err := s.Storer.Merge(req.ArticleID, source.Id, target.Id)
 	if err != nil {
 		return err
 	}
 
-	// update the commit id of the version in the database
-	err = s.Versionrepo.UpdateVersionLatestCommit(req.TargetVersionID, commit)
+	// Store the commit id in the database
+	err = s.Versionrepo.UpdateVersionLatestCommit(target.Id, commit)
 	if err != nil {
 		return err
 	}
@@ -163,14 +151,14 @@ func (s RequestService) GetRequest(request int64) (models.RequestWithComparison,
 		return models.RequestWithComparison{}, err
 	}
 
-	// ensure that the before-and-after comparison is up to date
+	// ensure that the before-and-after comparison is up-to-date
 	err = s.UpdateRequestComparison(req, source, target)
 	if err != nil {
 		return models.RequestWithComparison{}, err
 	}
 
 	// Get the request preview
-	before, after, err := s.Gitrepo.GetRequestComparison(req.ArticleID, req.RequestID)
+	before, after, err := s.Storer.GetRequestComparison(req.ArticleID, req.RequestID)
 	if err != nil {
 		return models.RequestWithComparison{}, err
 	}
@@ -199,11 +187,12 @@ func (s RequestService) GetRequest(request int64) (models.RequestWithComparison,
 
 // UpdateRequestComparison stores the before and after of the request, if it isn't up-to-date yet
 func (s RequestService) UpdateRequestComparison(req entities.Request, source entities.Version, target entities.Version) error {
+	// if not pending anymore, the comparison should not be updated
 	if req.Status != "pending" {
-		// if not pending anymore, the comparison should not be updated
 		return nil
 	}
 
+	// if the history ID's as in the request entity are the same as in the versions itself, it's up-to-date
 	if req.SourceHistoryID == source.LatestCommitID && req.TargetHistoryID == target.LatestCommitID {
 		// if the commits that the request compares are up-to-date, the current comparison can be used
 		return nil
@@ -212,13 +201,13 @@ func (s RequestService) UpdateRequestComparison(req entities.Request, source ent
 	req.TargetHistoryID = target.LatestCommitID
 
 	// store the preview using git merging and check if there will be conflicts
-	conflicted, err := s.Gitrepo.StoreRequestComparison(req)
+	conflicted, err := s.Storer.StoreRequestComparison(req.ArticleID, req.RequestID, req.SourceVersionID, req.TargetVersionID)
 	if err != nil {
 		return err
 	}
-	req.Conflicted = conflicted
 
 	// now that the comparison has successfully been updated, store the correct commit IDs in the db
+	req.Conflicted = conflicted
 	err = s.Repo.UpdateRequest(req)
 	if err != nil {
 		return err

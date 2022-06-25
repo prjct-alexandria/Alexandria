@@ -15,6 +15,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import VersionList from "./Components/Article/VersionList";
 import CompareView from "./Components/Article/CompareView";
 import MRList from "./Components/Article/MRList";
+import About from "./Components/About"
 
 function App() {
   return (
@@ -44,6 +45,10 @@ function App() {
               <Route
                 path="/articles/:articleId/requests/*"
                 element={<MRList />}
+              ></Route>
+              <Route
+                  path="/about"
+                  element={<About />}
               ></Route>
             </Routes>
           </div>

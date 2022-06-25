@@ -1,16 +1,15 @@
 package controllers
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils"
 	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -49,31 +48,22 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	}
 
 	// get optional query parameter for specific history/commit ID
-	values := c.Request.URL.Query()
-	var usingCommit bool
-	var commitHashArr *[20]byte
-	if commitStr, ok := values["historyID"]; ok {
-		// read the string like 'a8fc73280...' into a byte array for the commit hash
-		commitHashSlice, err := hex.DecodeString(commitStr[0])
-		if err != nil || len(commitHashSlice) != 20 {
-			fmt.Println(err)
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitStr[0]))
-			return
-		}
-
-		// cast the Go slice to a fixed length array, after having checked if the slice had the right length
-		commitHashArr = (*[20]byte)(commitHashSlice)
-		usingCommit = true
+	commitID := c.Query("historyID")
+	usingCommit := commitID != ""
+	if usingCommit && !utils.IsCommitHash(commitID) {
+		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	// Get either a specific version or just the latest
 	var res models.Version
 	if usingCommit {
-		res, err = contr.Serv.GetVersionByCommitID(article, version, *commitHashArr)
+		res, err = contr.Serv.GetVersionByCommitID(article, version, commitID)
 	} else {
 		res, err = contr.Serv.GetVersion(article, version)
 	}
-
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
@@ -242,21 +232,14 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 		return
 	}
 
-	path, err := contr.Serv.GetVersionFiles(article, version)
+	path, cleanup, err := contr.Serv.GetVersionFiles(article, version)
 	if err != nil {
 		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
 		return
 	}
-
-	//GetVersionFiles creates a temporary zip file, which needs to be removed after this method is finished
-
-	defer func(name string) {
-		err := os.Remove(name)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(path)
+	// delete temporary files when done
+	defer cleanup()
 
 	//Return files
 	c.Header("Access-Control-Expose-Headers", "content-disposition")
