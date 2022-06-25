@@ -110,7 +110,11 @@ export default function VersionList() {
         )}
         {dataVersions &&
           dataMain &&
-          dataVersions.map((version, i) => (
+          dataVersions
+              .sort(
+                  (a,b) => a.versionID > b.versionID ? 1 : -1
+              )
+              .map((version, i) => (
             <VersionListElement key={i} version={version} mv={dataMain} />
           ))}
       </div>

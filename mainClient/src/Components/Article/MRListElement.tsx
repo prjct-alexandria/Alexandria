@@ -12,27 +12,25 @@ type MRListProps = {
 
 export default function MRListElement(props: MRListProps) {
   return (
-    <div>
-      <Link
-        to={
-          "/articles/" +
-          props.MR.request.articleID +
-          "/requests/" +
-          props.MR.request.requestID
-        }
-        className="text-decoration-none"
-      >
+    <div className="row mb-2">
         <button
-          className="row row-no-gutters col-md-12 m-1"
-          style={{ textAlign: "left" }}
+          className="text-start btn btn-secondary"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = "/articles/" +
+                props.MR.request.articleID +
+                "/requests/" +
+                props.MR.request.requestID;
+          }}
         >
-          <div className="col-md-4" data-testid={"sourceTitle" + props.MR.request.requestID}>{props.MR.sourceTitle}</div>
-          {/*<div className="col-md-2">{props.MR.sourceHistoryID}</div>*/}
-          <div className="col-md-4" data-testid={"targetTitle" + props.MR.request.requestID}>{props.MR.targetTitle}</div>
-          {/*<div className="col-md-2">{props.MR.targetHistoryID}</div>*/}
-          <div className="col-md-4" data-testid={"status" + props.MR.request.requestID}>{props.MR.request.status}</div>
+          <div className="row">
+            <div className="col-md-4" data-testid={"sourceTitle" + props.MR.request.requestID}>{props.MR.sourceTitle}</div>
+            {/*<div className="col-md-2">{props.MR.sourceHistoryID}</div>*/}
+            <div className="col-md-4" data-testid={"targetTitle" + props.MR.request.requestID}>{props.MR.targetTitle}</div>
+            {/*<div className="col-md-2">{props.MR.targetHistoryID}</div>*/}
+            <div className="col-md-4" data-testid={"status" + props.MR.request.requestID}>{props.MR.request.status}</div>
+          </div>
         </button>
-      </Link>
     </div>
   );
 }
