@@ -8,6 +8,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
+	"mainServer/utils/arrays"
 	"mime/multipart"
 )
 
@@ -99,16 +100,28 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 }
 
 // CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
-func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string) (models.Version, error) {
+func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
+	// Remove possible duplicates in owners array
+	owners = arrays.RemoveDuplicateStr(owners)
+
 	// Check if owners exist in database
+	// Also checks if the authenticated user is in this list
+	authenticatedUserPresent := false
 	for _, email := range owners {
 		exists, err := serv.UserRepo.CheckIfExists(email)
 		if err != nil {
-			return models.Version{}, errors.New(fmt.Sprintf("could not check if %s exists in the database: %s", email, err.Error()))
+			return models.Version{}, fmt.Errorf("could not check if %s exists in the database: %s", email, err.Error())
 		}
 		if !exists {
-			return models.Version{}, errors.New(fmt.Sprintf("%s is not a registered email address", email))
+			return models.Version{}, fmt.Errorf("%s is not a registered email address", email)
 		}
+		if loggedInAs == email {
+			authenticatedUserPresent = true
+		}
+	}
+	// TODO Make this lead to a 403 Forbidden
+	if !authenticatedUserPresent {
+		return models.Version{}, errors.New("authenticated user is not present in list of owners")
 	}
 
 	// Create entity to store in db
@@ -148,7 +161,15 @@ func (serv VersionService) CreateVersionFrom(article int64, source int64, title 
 }
 
 // UpdateVersion overwrites file of specified article version and commits
-func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
+func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
+	//Check if user is the owner
+	isOwner, err := serv.VersionRepo.CheckIfOwner(version, loggedInAs)
+	if err != nil {
+		return errors.New("could not verify version ownership")
+	}
+	if !isOwner {
+		return fmt.Errorf("updateVersion: %v is not an owner", loggedInAs)
+	}
 
 	// Update the version contents in the (git) file system
 	commit, err := serv.Storer.UpdateAndCommit(c, file, article, version)

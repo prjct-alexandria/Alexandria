@@ -18,7 +18,7 @@ func (r PgVersionRepository) GetVersion(version int64) (entities.Version, error)
 	}
 
 	// add owners
-	owners, err := r.getOwners(version)
+	owners, err := r.GetOwners(version)
 	if err != nil {
 		return entities.Version{}, err
 	}
@@ -216,7 +216,7 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 }
 
 // GetOwners gets a string of owner emails, belonging to the specified version
-func (r PgVersionRepository) getOwners(version int64) ([]string, error) {
+func (r PgVersionRepository) GetOwners(version int64) ([]string, error) {
 	// Prepare and execute query
 	stmt, err := r.Db.Prepare("SELECT email FROM versionOwners WHERE versionid=$1")
 	if err != nil {

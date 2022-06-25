@@ -6,7 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
-	"mainServer/utils"
+	"mainServer/utils/auth"
+	gitUtils "mainServer/utils/git"
 	"mainServer/utils/httperror"
 	"net/http"
 	"path/filepath"
@@ -28,8 +29,6 @@ type VersionController struct {
 // @Failure 	400 {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -51,7 +50,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	// get optional query parameter for specific history/commit ID
 	commitID := c.Query("historyID")
 	usingCommit := commitID != ""
-	if usingCommit && !utils.IsCommitHash(commitID) {
+	if usingCommit && !gitUtils.IsCommitHash(commitID) {
 		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, err)
@@ -70,7 +69,9 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // ListVersions 	godoc
@@ -83,8 +84,6 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Failure 	500  {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions [get]
 func (contr VersionController) ListVersions(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -101,7 +100,9 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get versions of aid=%d", article))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // UpdateVersion godoc
@@ -114,6 +115,12 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 // @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// get file from form data
 	file, err := c.FormFile("file")
@@ -142,7 +149,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	}
 
 	// update version data
-	if err := contr.Serv.UpdateVersion(c, file, article, version); err != nil {
+	if err := contr.Serv.UpdateVersion(c, file, article, version, loggedInAs); err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
 		return
@@ -162,6 +169,12 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 // @Failure      500  {object} httperror.HTTPError
 // @Router       /articles/{articleID}/versions [post]
 func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+	// Check if logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// Extract article id
 	aid := c.Param("articleID")
@@ -182,7 +195,7 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	}
 
 	// Create version
-	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
+	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError,

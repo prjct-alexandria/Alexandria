@@ -1,12 +1,13 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
-	"mainServer/utils"
+	"mainServer/utils/arrays"
 )
 
 type RequestService struct {
@@ -15,15 +16,31 @@ type RequestService struct {
 	Storer      storer.Storer
 }
 
-func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64) (models.Request, error) {
+func (s RequestService) CreateRequest(article int64, sourceVersion int64, targetVersion int64, loggedInAs string) (models.Request, error) {
+	// Create request object
 	req := entities.Request{
 		ArticleID:       article,
 		SourceVersionID: sourceVersion,
 		TargetVersionID: targetVersion,
 	}
 
+	//Check if user is allowed to create request
+	isSourceOwner, err := s.Versionrepo.CheckIfOwner(req.SourceVersionID, loggedInAs)
+	if err != nil {
+		return models.Request{}, errors.New("could not verify version ownership")
+	}
+	isTargetOwner, err := s.Versionrepo.CheckIfOwner(req.TargetVersionID, loggedInAs)
+	if err != nil {
+		return models.Request{}, errors.New("could not verify version ownership")
+	}
+	// TODO make endpoint return 403 Forbidden after this error
+	if !(isSourceOwner || isTargetOwner) {
+		return models.Request{},
+			fmt.Errorf(`request creation forbidden: %v does not own source or target version`, loggedInAs)
+	}
+
 	// create the request entity in the db
-	req, err := s.Repo.CreateRequest(req)
+	req, err = s.Repo.CreateRequest(req)
 	if err != nil {
 		return models.Request{}, err
 	}
@@ -34,7 +51,7 @@ func (s RequestService) CreateRequest(article int64, sourceVersion int64, target
 
 // RejectRequest rejects the specified request, changing its status
 // returns an error if the current user doesn't own the target version
-func (s RequestService) RejectRequest(request int64, email string) error {
+func (s RequestService) RejectRequest(request int64, loggedInAs string) error {
 
 	// get the request information
 	req, err := s.Repo.GetRequest(request)
@@ -53,8 +70,8 @@ func (s RequestService) RejectRequest(request int64, email string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !utils.Contains(target.Owners, email) {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	if !arrays.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 
 	// update the request comparison one last time before rejecting
@@ -68,7 +85,7 @@ func (s RequestService) RejectRequest(request int64, email string) error {
 
 // AcceptRequest accepts the specified request, changing its status, recording the last commits and committing the merge in git.
 // returns an error if the current user doesn't own the target version
-func (s RequestService) AcceptRequest(request int64, email string) error {
+func (s RequestService) AcceptRequest(request int64, loggedInAs string) error {
 
 	// get the request information
 	req, err := s.Repo.GetRequest(request)
@@ -90,8 +107,8 @@ func (s RequestService) AcceptRequest(request int64, email string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !utils.Contains(target.Owners, email) {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	if !arrays.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 
 	// update the request comparison one last time before accept
