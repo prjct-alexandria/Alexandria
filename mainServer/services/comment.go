@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"mainServer/entities"
 	"mainServer/repositories/interfaces"
@@ -16,7 +15,7 @@ type CommentService struct {
 func (serv CommentService) SaveComment(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
 	if loggedInAs != comment.AuthorId {
 		return int64(-1),
-			errors.New(fmt.Sprintf("provided author %v does not match logged in author %v", comment.AuthorId, loggedInAs))
+			fmt.Errorf("provided author %v does not match logged-in author %v", comment.AuthorId, loggedInAs)
 	}
 
 	var err error

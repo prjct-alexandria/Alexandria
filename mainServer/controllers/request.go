@@ -79,6 +79,7 @@ func (contr RequestController) CreateRequest(c *gin.Context) {
 // @Router      /articles/{articleID}/requests/{requestID}/reject [put]
 func (contr RequestController) RejectRequest(c *gin.Context) {
 	// Check if user is logged in
+	// Checking if this owner is allowed to reject is done by the service
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 		return
@@ -128,6 +129,7 @@ func (contr RequestController) RejectRequest(c *gin.Context) {
 // @Router      /articles/{articleID}/requests/{requestID}/accept [put]
 func (contr RequestController) AcceptRequest(c *gin.Context) {
 	// Check if user is logged in
+	// Checking if this owner is allowed to accept is done by the service
 	if !auth.IsLoggedIn(c) {
 		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
 		return

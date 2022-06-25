@@ -8,7 +8,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
-	"mainServer/utils/arrays"
+	"mainServer/utils/arrayUtils"
 	"mime/multipart"
 )
 
@@ -102,7 +102,7 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 // CreateVersionFrom makes a new version, based of an existing one. Version content is ignored in return value
 func (serv VersionService) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
 	// Remove possible duplicates in owners array
-	owners = arrays.RemoveDuplicateStr(owners)
+	owners = arrayUtils.RemoveDuplicateStr(owners)
 
 	// Check if owners exist in database
 	// Also checks if the authenticated user is in this list
@@ -170,7 +170,6 @@ func (serv VersionService) UpdateVersion(c *gin.Context, file *multipart.FileHea
 	if !isOwner {
 		return errors.New(fmt.Sprintf("updateVersion: %v is not an owner", loggedInAs))
 	}
-
 
 	// Update the version contents in the (git) file system
 	commit, err := serv.Storer.UpdateAndCommit(c, file, article, version)

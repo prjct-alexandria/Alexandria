@@ -7,7 +7,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
-	"mainServer/utils"
+	"mainServer/utils/arrayUtils"
 )
 
 type RequestService struct {
@@ -36,7 +36,7 @@ func (s RequestService) CreateRequest(article int64, sourceVersion int64, target
 	// TODO make endpoint return 403 Forbidden after this error
 	if !(isSourceOwner || isTargetOwner) {
 		return models.Request{},
-			errors.New(fmt.Sprintf(`request creation forbidden: %v does not own source or target version`, loggedInAs))
+			fmt.Errorf(`request creation forbidden: %v does not own source or target version`, loggedInAs)
 	}
 
 	// create the request entity in the db
@@ -70,8 +70,8 @@ func (s RequestService) RejectRequest(request int64, loggedInAs string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !utils.Contains(target.Owners, loggedInAs) {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	if !arrayUtils.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 
 	// update the request comparison one last time before rejecting
@@ -107,8 +107,8 @@ func (s RequestService) AcceptRequest(request int64, loggedInAs string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !utils.Contains(target.Owners, loggedInAs) {
-		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", email, target)
+	if !arrayUtils.Contains(target.Owners, loggedInAs) {
+		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 
 	// update the request comparison one last time before accept
