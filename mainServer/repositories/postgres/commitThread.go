@@ -41,7 +41,8 @@ func (r PgCommitThreadRepository) GetCommitThreads(aid int64, cid string) ([]mod
 		var cd string
 		var c string
 		if err := rows.Scan(&tid, &aid, &cid, &coid, &auid, &cd, &c); err != nil {
-			return threads, fmt.Errorf("GetCommitThreads: %v", err)
+			fmt.Printf("GetCommitThreads: %v\n", err.Error())
+			continue
 		}
 		// find index of tid in the threads list
 		index := -1
