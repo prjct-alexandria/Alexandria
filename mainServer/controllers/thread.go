@@ -7,8 +7,8 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/services/interfaces"
-	"mainServer/utils"
 	"mainServer/utils/auth"
+	gitUtils "mainServer/utils/git"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
@@ -84,7 +84,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	switch threadType {
 	case "commit":
 		// check if the specific thread ID string can actually be a commit ID
-		if !utils.IsCommitHash(sid) {
+		if !gitUtils.IsCommitHash(sid) {
 			err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", sid)
 			fmt.Println(err)
 			httperror.NewError(c, http.StatusBadRequest, err)

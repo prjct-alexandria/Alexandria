@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
-	"mainServer/utils"
 	"mainServer/utils/auth"
+	gitUtils "mainServer/utils/git"
 	"mainServer/utils/httperror"
 	"net/http"
 	"path/filepath"
@@ -50,7 +50,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	// get optional query parameter for specific history/commit ID
 	commitID := c.Query("historyID")
 	usingCommit := commitID != ""
-	if usingCommit && !utils.IsCommitHash(commitID) {
+	if usingCommit && !gitUtils.IsCommitHash(commitID) {
 		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusBadRequest, err)

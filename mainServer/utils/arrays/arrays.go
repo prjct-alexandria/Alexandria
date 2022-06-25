@@ -1,4 +1,4 @@
-package arrayUtils
+package arrays
 
 // Contains is a helper function to check if string is in a string slice
 func Contains(s []string, e string) bool {

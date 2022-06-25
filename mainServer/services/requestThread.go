@@ -28,7 +28,7 @@ func (serv RequestThreadService) StartRequestThread(rid int64, tid int64, logged
 	// TODO make endpoint return 403 Forbidden after this error
 	if !(isSourceOwner || isTargetOwner) {
 		return -1,
-			errors.New(fmt.Sprintf(`request creation forbidden: %v does not own source or target version`, loggedInAs))
+			fmt.Errorf("request creation forbidden: %v does not own source or target version", loggedInAs)
 	}
 
 	// create requestThread

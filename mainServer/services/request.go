@@ -7,7 +7,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
-	"mainServer/utils/arrayUtils"
+	"mainServer/utils/arrays"
 )
 
 type RequestService struct {
@@ -70,7 +70,7 @@ func (s RequestService) RejectRequest(request int64, loggedInAs string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !arrayUtils.Contains(target.Owners, loggedInAs) {
+	if !arrays.Contains(target.Owners, loggedInAs) {
 		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 
@@ -107,7 +107,7 @@ func (s RequestService) AcceptRequest(request int64, loggedInAs string) error {
 	}
 
 	// check if logged-in user owns the target version
-	if !arrayUtils.Contains(target.Owners, loggedInAs) {
+	if !arrays.Contains(target.Owners, loggedInAs) {
 		return fmt.Errorf("request cannot be rejected, because %v does not own version %v", loggedInAs, target)
 	}
 

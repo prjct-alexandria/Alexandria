@@ -1,4 +1,4 @@
-package utils
+package gitUtils
 
 import "encoding/hex"
 

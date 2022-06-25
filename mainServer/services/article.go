@@ -7,7 +7,7 @@ import (
 	"mainServer/models"
 	"mainServer/repositories/interfaces"
 	"mainServer/repositories/storer"
-	"mainServer/utils/arrayUtils"
+	"mainServer/utils/arrays"
 )
 
 type ArticleService struct {
@@ -28,7 +28,7 @@ func NewArticleService(articlerepo interfaces.ArticleRepository, versionrepo int
 // CreateArticle creates a new article repo and main article version, returns main version
 func (serv ArticleService) CreateArticle(title string, owners []string, loggedInAs string) (models.Version, error) {
 	// Remove possible duplicates in owners array
-	owners = arrayUtils.RemoveDuplicateStr(owners)
+	owners = arrays.RemoveDuplicateStr(owners)
 
 	// Check if owners exist in database
 	// Also checks if the authenticated user is in this list
