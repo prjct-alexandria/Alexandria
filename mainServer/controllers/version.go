@@ -185,7 +185,8 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create new version on server"))
+		httperror.NewError(c, http.StatusInternalServerError,
+			errors.New("could not create new version on server, version name might already be in use"))
 		return
 	}
 

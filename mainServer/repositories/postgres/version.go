@@ -129,7 +129,7 @@ func (r PgVersionRepository) createVersionTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS version (
     			id SERIAL PRIMARY KEY,
     			articleID int NOT NULL,
-    			title VARCHAR(255) NOT NULL,
+    			title VARCHAR(255) UNIQUE NOT NULL,
     			status VARCHAR(16) NOT NULL DEFAULT 'draft',
     			latestCommit CHAR(40),
     			FOREIGN KEY (articleID) REFERENCES article(id)    			
