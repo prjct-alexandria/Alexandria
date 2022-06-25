@@ -1,4 +1,21 @@
 definitions:
+  entities.Comment:
+    properties:
+      authorId:
+        type: string
+      content:
+        type: string
+      creationDate:
+        type: string
+      id:
+        type: integer
+      threadId:
+        type: integer
+    required:
+    - authorId
+    - content
+    - creationDate
+    type: object
   entities.User:
     properties:
       email:
@@ -8,6 +25,181 @@ definitions:
       pwd:
         type: string
     type: object
+  httperror.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  models.ArticleCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - owners
+    - title
+    type: object
+  models.ArticleListElement:
+    properties:
+      articleId:
+        type: integer
+      mainVersionId:
+        type: integer
+      owners:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - articleId
+    - mainVersionId
+    - owners
+    - title
+    type: object
+  models.LoginForm:
+    properties:
+      email:
+        type: string
+      pwd:
+        type: string
+    required:
+    - email
+    - pwd
+    type: object
+  models.Request:
+    properties:
+      articleID:
+        type: integer
+      conflicted:
+        type: boolean
+      requestID:
+        type: integer
+      sourceHistoryID:
+        type: string
+      sourceVersionID:
+        type: integer
+      status:
+        type: string
+      targetHistoryID:
+        type: string
+      targetVersionID:
+        type: integer
+    type: object
+  models.RequestCreationForm:
+    properties:
+      sourceVersionID:
+        type: integer
+      targetVersionID:
+        type: integer
+    required:
+    - sourceVersionID
+    - targetVersionID
+    type: object
+  models.RequestWithComparison:
+    properties:
+      after:
+        type: string
+      before:
+        type: string
+      request:
+        $ref: '#/definitions/models.Request'
+      source:
+        $ref: '#/definitions/models.Version'
+      target:
+        $ref: '#/definitions/models.Version'
+    type: object
+  models.ReturnThreadIds:
+    properties:
+      CommentId:
+        type: integer
+      id:
+        type: integer
+      threadId:
+        type: integer
+    required:
+    - CommentId
+    - id
+    - threadId
+    type: object
+  models.SelectionThread:
+    properties:
+      articleId:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      id:
+        type: integer
+      selection:
+        type: string
+      specificId:
+        type: string
+    required:
+    - articleId
+    - comments
+    - selection
+    type: object
+  models.Thread:
+    properties:
+      articleId:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/entities.Comment'
+        type: array
+      id:
+        type: integer
+      selection:
+        type: string
+      specificId:
+        type: string
+    required:
+    - articleId
+    - comments
+    type: object
+  models.Version:
+    properties:
+      articleID:
+        type: integer
+      content:
+        type: string
+      latestHistoryID:
+        type: string
+      owners:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      title:
+        type: string
+      versionID:
+        type: integer
+    type: object
+  models.VersionCreationForm:
+    properties:
+      owners:
+        items:
+          type: string
+        type: array
+      sourceVersionID:
+        type: integer
+      title:
+        type: string
+    required:
+    - owners
+    - sourceVersionID
+    - title
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -16,7 +208,441 @@ info:
   title: API documentation
   version: 1.0.0
 paths:
+  /articles:
+    get:
+      description: Gets a list of all articles in the database + some metadata about
+        the main version.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ArticleListElement'
+            type: array
+        "500":
+          description: server could not retrieve article list
+      summary: Get a list of all articles
+    post:
+      consumes:
+      - application/json
+      description: Creates new article, including main article version. Returns main
+        version info, excluding contents. Owners must be specified as email addresses,
+        not usernames.
+      parameters:
+      - description: Article info
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.ArticleCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Create new article
+  /articles/:articleID/mainVersion:
+    get:
+      description: Get main version of an article by specifying the article id. Returns
+        the version id of the main version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get main version id of article
+  /articles/:articleID/requests/:requestID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific request of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Request ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Thread'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a request
+  /articles/:articleID/thread/:threadType/id/:specificID/:
+    post:
+      consumes:
+      - application/json
+      description: Creates thread entity, and specific thread entity. Returns id's
+        of thread, specific thread and comment
+      parameters:
+      - description: Thread
+        in: body
+        name: thread
+        required: true
+        schema:
+          $ref: '#/definitions/models.Thread'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReturnThreadIds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Creates thread entity
+  /articles/:articleID/versions/:versionID/history/:commitID/selectionThreads:
+    get:
+      description: Gets a list with all threads belonging to a specific commit of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Commit ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SelectionThread'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all section threads for a commit
+  /articles/:articleID/versions/:versionID/history/:commitID/threads:
+    get:
+      description: Gets a list with all threads belonging to a specific commit of
+        an article
+      parameters:
+      - description: Article ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Commit ID
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Thread'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all threads for a commit
+  /articles/{articleID}/requests:
+    get:
+      description: Gets a list of merge requests (with possible filtering conditions)
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Source version
+        in: query
+        name: sourceID
+        type: string
+      - description: Target version
+        in: query
+        name: targetID
+        type: string
+      - description: Source or Target version
+        in: query
+        name: relatedID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Request'
+            type: array
+        "400":
+          description: Invalid article ID provided
+        "404":
+          description: Could not find merge requests for this article
+      summary: Get a list of merge requests
+    post:
+      consumes:
+      - application/json
+      description: Creates request to merge one article versions' changes into another
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Request'
+        "400":
+          description: Invalid article ID or request creation data
+        "500":
+          description: Error creating request on server
+      summary: Create request
+  /articles/{articleID}/requests/{requestID}:
+    get:
+      consumes:
+      - text/plain
+      description: Returns the information of a given request, including the information
+        of both versions. Note that comparing target and source versions directly,
+        isn't reliable as before-and-after comparison. That's why, instead of filling
+        in the contents of the version fields, a before and after string is included
+        in the response.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RequestWithComparison'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get Request
+  /articles/{articleID}/requests/{requestID}/accept:
+    put:
+      consumes:
+      - text/plain
+      description: Accepts request to merge one article versions' changes into another.
+        Updates target version and archives the request, by recording the current
+        latest commits and setting its state to 'accepted'.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Accepts request
+  /articles/{articleID}/requests/{requestID}/reject:
+    put:
+      consumes:
+      - text/plain
+      description: Rejects request to merge one article versions' changes into another.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Request ID
+        in: path
+        name: requestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Reject request
+  /articles/{articleID}/versions:
+    get:
+      description: Gets all versions belonging to a specific article. Does not include
+        version contents.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Version'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: List article versions
+    post:
+      consumes:
+      - application/json
+      description: Creates new version from an existing one of the same article
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version info
+        in: body
+        name: version
+        required: true
+        schema:
+          $ref: '#/definitions/models.VersionCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Create new version
   /articles/{articleID}/versions/{versionID}:
+    get:
+      description: Gets the version content + metadata from the database + filesystem.
+        Must be accessible without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      - description: History ID
+        in: query
+        name: historyID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Version'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get version content + metadata
     post:
       consumes:
       - multipart/form-data
@@ -38,10 +664,60 @@ paths:
         "200":
           description: Success
         "400":
-          description: Bad request, possibly bad file data or permissions
-        "404":
-          description: Specified article version not found
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
       summary: Update article version
+  /articles/{articleID}/versions/{versionID}/files:
+    get:
+      description: Get all the files of an article version as a zip, should be accessible
+        without being authenticated.
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleID
+        required: true
+        type: string
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/x-zip-compressed
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperror.HTTPError'
+      summary: Get all the files of a version as a zip
+  /comments/thread/:threadID:
+    post:
+      consumes:
+      - application/json
+      description: Save all types (commit/request/review) of comments to the database
+      parameters:
+      - description: Comment
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Comment'
+      - description: Thread ID
+        in: path
+        name: threadID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad request
+        "500":
+          description: failed saving comment
+      summary: Save comment
   /createExampleUser:
     post:
       description: Creates a hardcoded user entity and adds it to the database, demonstrates
@@ -66,4 +742,70 @@ paths:
           schema:
             $ref: '#/definitions/entities.User'
       summary: Get test user from database endpoint
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user email and password from a JSON body, verifies if
+        they are correct with the database and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginForm'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "403":
+          description: Invalid password
+        "500":
+          description: Could not create token
+      summary: Endpoint for user logging in
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Sets an expired cookie with an empty email and returns a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginForm'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid JSON provided
+        "500":
+          description: Could not update token
+      summary: Endpoint for user logging out
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Takes in user credentials from a JSON body, and makes sure they
+        are securely stored in the database.
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Invalid user JSON provided
+        "403":
+          description: Could not generate password hash
+        "409":
+          description: Could not save user to database
+      summary: Endpoint for user registration
 swagger: "2.0"

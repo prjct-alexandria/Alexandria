@@ -1,0 +1,200 @@
+// Declare SASS variables
+$primary-color: #0c2728;
+$primary-accent-color: cornflowerblue;
+$link-hover-color: #0a58ca;
+$added-color: green;
+$added-background-color: #b5efdb;
+$removed-color:red;
+$removed-background-color: #fec4c0;
+$error-color: #c70000;
+$header-color: #174c4f;
+
+// article contents SASS
+$article-content-background-color: #f3f3f3;
+$article-content-border-color: #ccc;
+.navbar-user-buttons {
+  margin-right: 100px;
+}
+.inline-block {
+  display: inline-block;
+}
+.bi {
+  margin-right: 5px;
+}
+.navbar-nav {
+  width: 100%;
+}
+.raw-article {
+  white-space: pre-line;
+  border:1px solid $article-content-border-color;
+  background-color:$article-content-background-color;
+  padding:50px;
+}
+.inline-editor-article {
+  white-space: pre-line;
+  border:1px solid $article-content-border-color;
+  background-color:$article-content-background-color;
+  padding:10px;
+}
+.inline-editor-article:hover, .inline-editor-textarea:hover, .inline-editor-textarea:focus {
+  cursor: text !important;
+}
+header {
+  background-color: $header-color;
+}
+body {
+  // to prevent the browser from shaking when threads are opened
+  overflow: scroll;
+}
+.App {
+  margin-top: 100px;
+}
+.textarea {
+  background-color: transparent;
+  border: 0;
+  padding: 8px;
+  resize: none;
+  width: 100%;
+  overflow: auto;
+  min-height: 300px;
+}
+.textarea:hover {
+  background-color: #d3d3d3;
+  cursor: pointer;
+}
+.article {
+  margin-top:15px;
+  border-bottom: 1px solid #bbbbbb;
+}
+.ownersLi {
+  display: inline;
+  padding-right: 10px;
+}
+.notification-alert {
+  z-index:100;
+}
+.input-validation {
+  color: $error-color;
+}
+.create-article-input {
+  width: 100%;
+}
+.create-article-modal {
+  color: $primary-color;
+}
+.header-image {
+  background-image: url('../public/header-photo.png');
+  background-size: cover;
+  width: 800px;
+  margin: -45px auto 0;
+  height:250px;
+}
+.text-primary {
+  color: $primary-accent-color;
+}
+a {
+  color: $primary-color;
+}
+a:hover {
+  color: $link-hover-color;
+  text-decoration: underline;
+}
+.file-upload-input:hover {
+  cursor: pointer;
+}
+.article-elem-btn {
+  padding: 0 20px;
+}
+.article-elem-title {
+  text-align: left;
+  margin: 0;
+  color: $primary-color;
+}
+.article-elem-header {
+  padding: 10px;
+}
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+//
+//.App-header {
+//  background-color: #282c34;
+//  min-height: 100vh;
+//  display: flex;
+//  flex-direction: column;
+//  align-items: center;
+//  justify-content: center;
+//  font-size: calc(10px + 2vmin);
+//  color: white;
+//}
+//
+//.App-link {
+//  color: #61dafb;
+//}
+//
+//@keyframes App-logo-spin {
+//  from {
+//    transform: rotate(0deg);
+//  }
+//  to {
+//    transform: rotate(360deg);
+//  }
+//}
+
+
+.added {
+  color: $added-color;
+  background-color: $added-background-color;
+  text-shadow: none;
+}
+
+.removed {
+  color: $removed-color;
+  background-color: $removed-background-color;
+  text-shadow: none;
+}
+
+.articleContent {
+  background-color: $article-content-background-color;
+  padding: 15px;
+  border: $article-content-border-color solid;
+  border-radius: 5px;
+}
+
+.alert {
+  position: fixed;
+  bottom: 0;
+  margin:0;
+  width: 75%;
+  left: 50%;
+  transform: translate(-50%)
+}
+
+.comment {
+  border: 1px solid #e9ecef;
+}
+
+.commentHeader {
+  background-color: transparent;
+}
+.header-buttons-wrapper {
+  position: relative;
+  top:-40px;
+  left:160px;
+}
+.header-browse-articles {
+  margin-right: 10px;
+}
+#btn-open-login-form {
+  margin-right: 2px;
+}
+.navbar {
+  background-color: $primary-color !important;
+}

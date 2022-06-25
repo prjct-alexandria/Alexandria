@@ -5,10 +5,13 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-git/go-git/v5 v5.4.2
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/ldez/go-git-cmd-wrapper/v2 v2.3.0
 	github.com/lib/pq v1.10.5
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.4.3
 	github.com/swaggo/swag v1.8.2
+	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
 )
 
 require (
@@ -42,7 +45,6 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
 	golang.org/x/net v0.0.0-20220516133312-45b265872317 // indirect
 	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/tools v0.1.10 // indirect

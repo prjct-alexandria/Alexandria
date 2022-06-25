@@ -16,7 +16,637 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/articles": {
+            "get": {
+                "description": "Gets a list of all articles in the database + some metadata about the main version.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a list of all articles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ArticleListElement"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "server could not retrieve article list"
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates new article, including main article version. Returns main version info, excluding contents. Owners must be specified as email addresses, not usernames.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new article",
+                "parameters": [
+                    {
+                        "description": "Article info",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ArticleCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/mainVersion": {
+            "get": {
+                "description": "Get main version of an article by specifying the article id. Returns the version id of the main version",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get main version id of article",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/requests/:requestID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific request of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Request ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Thread"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/thread/:threadType/id/:specificID/": {
+            "post": {
+                "description": "Creates thread entity, and specific thread entity. Returns id's of thread, specific thread and comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Creates thread entity",
+                "parameters": [
+                    {
+                        "description": "Thread",
+                        "name": "thread",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReturnThreadIds"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/versions/:versionID/history/:commitID/selectionThreads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all section threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SelectionThread"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/:articleID/versions/:versionID/history/:commitID/threads": {
+            "get": {
+                "description": "Gets a list with all threads belonging to a specific commit of an article",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all threads for a commit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Commit ID",
+                        "name": "ID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Thread"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests": {
+            "get": {
+                "description": "Gets a list of merge requests (with possible filtering conditions)",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a list of merge requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source version",
+                        "name": "sourceID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Target version",
+                        "name": "targetID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source or Target version",
+                        "name": "relatedID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Request"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid article ID provided"
+                    },
+                    "404": {
+                        "description": "Could not find merge requests for this article"
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates request to merge one article versions' changes into another",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Request"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid article ID or request creation data"
+                    },
+                    "500": {
+                        "description": "Error creating request on server"
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests/{requestID}": {
+            "get": {
+                "description": "Returns the information of a given request, including the information of both versions. Note that comparing target and source versions directly, isn't reliable as before-and-after comparison. That's why, instead of filling in the contents of the version fields, a before and after string is included in the response.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestWithComparison"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests/{requestID}/accept": {
+            "put": {
+                "description": "Accepts request to merge one article versions' changes into another. Updates target version and archives the request, by recording the current latest commits and setting its state to 'accepted'.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Accepts request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/requests/{requestID}/reject": {
+            "put": {
+                "description": "Rejects request to merge one article versions' changes into another.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Reject request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/versions": {
+            "get": {
+                "description": "Gets all versions belonging to a specific article. Does not include version contents.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article versions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Version"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates new version from an existing one of the same article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Version info",
+                        "name": "version",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VersionCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/{articleID}/versions/{versionID}": {
+            "get": {
+                "description": "Gets the version content + metadata from the database + filesystem. Must be accessible without being authenticated.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get version content + metadata",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "History ID",
+                        "name": "historyID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Version"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Upload files to update an article version, can only be done by an owner. Requires multipart form data, with a file attached as the field \"file\"",
                 "consumes": [
@@ -44,10 +674,84 @@ const docTemplate = `{
                         "description": "Success"
                     },
                     "400": {
-                        "description": "Bad request, possibly bad file data or permissions"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{articleID}/versions/{versionID}/files": {
+            "get": {
+                "description": "Get all the files of an article version as a zip, should be accessible without being authenticated.",
+                "produces": [
+                    "application/x-zip-compressed"
+                ],
+                "summary": "Get all the files of a version as a zip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "articleID",
+                        "in": "path",
+                        "required": true
                     },
-                    "404": {
-                        "description": "Specified article version not found"
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperror.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/thread/:threadID": {
+            "post": {
+                "description": "Save all types (commit/request/review) of comments to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Save comment",
+                "parameters": [
+                    {
+                        "description": "Comment",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Comment"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "threadID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "failed saving comment"
                     }
                 }
             }
@@ -85,9 +789,133 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/login": {
+            "post": {
+                "description": "Takes in user email and password from a JSON body, verifies if they are correct with the database and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging in",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "403": {
+                        "description": "Invalid password"
+                    },
+                    "500": {
+                        "description": "Could not create token"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "Sets an expired cookie with an empty email and returns a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user logging out",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid JSON provided"
+                    },
+                    "500": {
+                        "description": "Could not update token"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "description": "Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Endpoint for user registration",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid user JSON provided"
+                    },
+                    "403": {
+                        "description": "Could not generate password hash"
+                    },
+                    "409": {
+                        "description": "Could not save user to database"
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "entities.Comment": {
+            "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "creationDate"
+            ],
+            "properties": {
+                "authorId": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
         "entities.User": {
             "type": "object",
             "properties": {
@@ -98,6 +926,267 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "pwd": {
+                    "type": "string"
+                }
+            }
+        },
+        "httperror.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
+                }
+            }
+        },
+        "models.ArticleCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ArticleListElement": {
+            "type": "object",
+            "required": [
+                "articleId",
+                "mainVersionId",
+                "owners",
+                "title"
+            ],
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
+                "mainVersionId": {
+                    "type": "integer"
+                },
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginForm": {
+            "type": "object",
+            "required": [
+                "email",
+                "pwd"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "pwd": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Request": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "conflicted": {
+                    "type": "boolean"
+                },
+                "requestID": {
+                    "type": "integer"
+                },
+                "sourceHistoryID": {
+                    "type": "string"
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "targetHistoryID": {
+                    "type": "string"
+                },
+                "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RequestCreationForm": {
+            "type": "object",
+            "required": [
+                "sourceVersionID",
+                "targetVersionID"
+            ],
+            "properties": {
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "targetVersionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RequestWithComparison": {
+            "type": "object",
+            "properties": {
+                "after": {
+                    "type": "string"
+                },
+                "before": {
+                    "type": "string"
+                },
+                "request": {
+                    "$ref": "#/definitions/models.Request"
+                },
+                "source": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "target": {
+                    "$ref": "#/definitions/models.Version"
+                }
+            }
+        },
+        "models.ReturnThreadIds": {
+            "type": "object",
+            "required": [
+                "CommentId",
+                "id",
+                "threadId"
+            ],
+            "properties": {
+                "CommentId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "threadId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.SelectionThread": {
+            "type": "object",
+            "required": [
+                "articleId",
+                "comments",
+                "selection"
+            ],
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Comment"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
+                },
+                "specificId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Thread": {
+            "type": "object",
+            "required": [
+                "articleId",
+                "comments"
+            ],
+            "properties": {
+                "articleId": {
+                    "type": "integer"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Comment"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "selection": {
+                    "type": "string"
+                },
+                "specificId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Version": {
+            "type": "object",
+            "properties": {
+                "articleID": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "latestHistoryID": {
+                    "type": "string"
+                },
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "versionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.VersionCreationForm": {
+            "type": "object",
+            "required": [
+                "owners",
+                "sourceVersionID",
+                "title"
+            ],
+            "properties": {
+                "owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sourceVersionID": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }
