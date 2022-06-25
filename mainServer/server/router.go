@@ -17,6 +17,11 @@ import (
 
 func SetUpRouter(cfg *config.Config, contrs ControllerEnv) *gin.Engine {
 	router := gin.Default()
+	err := router.SetTrustedProxies(nil)
+	if err != nil {
+		return nil
+	}
+
 	router.Use(middlewares.AuthMiddleware(cfg))
 	router.Use(middlewares.CorsHeaders(cfg))
 

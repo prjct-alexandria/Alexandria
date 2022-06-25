@@ -77,7 +77,7 @@ func (serv VersionService) GetVersionByCommitID(article int64, version int64, co
 	// Get file contents from the (git) file system
 	content, err := serv.Storer.GetVersionByCommit(article, commit)
 	if err != nil {
-		return models.Version{}, nil
+		return models.Version{}, err
 	}
 
 	// Get other version info from database, this should be the same for every commit

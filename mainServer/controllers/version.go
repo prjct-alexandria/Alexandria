@@ -49,7 +49,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	}
 
 	// get optional query parameter for specific history/commit ID
-	commitID := c.Request.URL.Query().Get("historyID")
+	commitID := c.Query("historyID")
 	usingCommit := commitID != ""
 	if usingCommit && !utils.IsCommitHash(commitID) {
 		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
