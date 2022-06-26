@@ -45,6 +45,12 @@ func globalSetup() {
 	r.PUT("/articles/:articleID/requests/:requestID/accept", func(c *gin.Context) {
 		contr.AcceptRequest(c)
 	})
+	r.GET("/articles/:articleID/requests/:requestID", func(c *gin.Context) {
+		contr.GetRequest(c)
+	})
+	r.GET("/articles/:articleID/requests", func(c *gin.Context) {
+		contr.GetRequestList(c)
+	})
 }
 
 // localSetup should be called before each individual test
@@ -392,15 +398,240 @@ func TestRejectRequestInternalError(t *testing.T) {
 	})
 }
 
-// TODO: getRequest
-// success
-// bad parameters
-// internal error
+func TestGetRequest(t *testing.T) {
+	localSetup()
 
-// TODO: getRequest
-// success
-// bad parameters
-// internal error
+	// define mock behaviour
+	services.GetRequestMock = func(request int64) (models.RequestWithComparison, error) {
+		return exampleRequestWithComparison, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests/1", nil,
+		http.StatusOK, exampleRequestWithComparison)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequest", 1)
+	requestServMock.Mock.AssertCalledWith(t, "GetRequest", &map[string]interface{}{
+		"request": int64(1),
+	})
+}
+
+func TestGetRequestBadParameter(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestMock = func(request int64) (models.RequestWithComparison, error) {
+		return exampleRequestWithComparison, nil
+	}
+
+	// fake auth middleware and set the logged-in user
+	user := "john@mail.com"
+	loggedInUser = &user
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/a/requests/1", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequest", 0)
+}
+
+func TestGetRequestBadParameter2(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestMock = func(request int64) (models.RequestWithComparison, error) {
+		return exampleRequestWithComparison, nil
+	}
+
+	// fake auth middleware and set the logged-in user
+	user := "john@mail.com"
+	loggedInUser = &user
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests/a", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequest", 0)
+}
+
+func TestGetRequestInternalError(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestMock = func(request int64) (models.RequestWithComparison, error) {
+		return models.RequestWithComparison{}, errors.New("fake error for testing")
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests/1", nil,
+		http.StatusInternalServerError, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequest", 1)
+	requestServMock.Mock.AssertCalledWith(t, "GetRequest", &map[string]interface{}{
+		"request": int64(1),
+	})
+}
+
+func TestGetRequestList(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests", nil,
+		http.StatusOK, exampleRequestList)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 1)
+	requestServMock.Mock.AssertCalledWith(t, "GetRequestList", &map[string]interface{}{
+		"articleId": int64(2),
+		"sourceId":  int64(-1),
+		"targetId":  int64(-1),
+		"relatedId": int64(-1),
+	})
+}
+
+func TestGetRequestListWithFilters(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests?sourceID=5&relatedID=2&targetID=8", nil,
+		http.StatusOK, exampleRequestList)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 1)
+	requestServMock.Mock.AssertCalledWith(t, "GetRequestList", &map[string]interface{}{
+		"articleId": int64(2),
+		"sourceId":  int64(5),
+		"targetId":  int64(8),
+		"relatedId": int64(2),
+	})
+}
+
+func TestGetRequestListBadParameter(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/a/requests?sourceID=5&relatedID=2&targetID=8", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 0)
+}
+
+func TestGetRequestListBadParameter2(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/1/requests?sourceID=a&relatedID=2&targetID=8", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 0)
+}
+
+func TestGetRequestListBadParameter3(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests?sourceID=5&relatedID=a&targetID=8", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 0)
+}
+
+func TestGetRequestListBadParameter4(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return exampleRequestList, nil
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests?sourceID=5&relatedID=2&targetID=a", nil,
+		http.StatusBadRequest, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 0)
+}
+
+func TestGetRequestListInternalError(t *testing.T) {
+	localSetup()
+
+	// define mock behaviour
+	services.GetRequestListMock = func(article int64, sourceId int64, targetId int64, relatedId int64) ([]models.RequestListElement, error) {
+		return nil, errors.New("fake error for testing")
+	}
+
+	// this should be accessible without being logged in
+	loggedInUser = nil
+
+	// execute and test the http request
+	tests.TestEndpoint(t, r, "GET", "/articles/2/requests", nil,
+		http.StatusInternalServerError, nil)
+
+	// check the service mock
+	requestServMock.Mock.AssertCalled(t, "GetRequestList", 1)
+	requestServMock.Mock.AssertCalledWith(t, "GetRequestList", &map[string]interface{}{
+		"articleId": int64(2),
+		"sourceId":  int64(-1),
+		"targetId":  int64(-1),
+		"relatedId": int64(-1),
+	})
+}
 
 var exampleRequestCreation = models.RequestCreationForm{
 	SourceVersionID: 1,
@@ -416,4 +647,20 @@ var exampleRequest = models.Request{
 	TargetHistoryID: "0123456789012345678901234567890123456789",
 	Status:          "draft",
 	Conflicted:      false,
+}
+
+var exampleRequestList = []models.RequestListElement{
+	{
+		Request:     exampleRequest,
+		SourceTitle: "Some proposed changes",
+		TargetTitle: "Main article version",
+	},
+}
+
+var exampleRequestWithComparison = models.RequestWithComparison{
+	Request: exampleRequest,
+	Source:  models.Version{Id: 1},
+	Target:  models.Version{Id: 2},
+	Before:  "old",
+	After:   "new",
 }
