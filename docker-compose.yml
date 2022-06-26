@@ -1,22 +1,27 @@
-version: '3.8'
+version: '3.7'
 
 services:
   front-end:
-    container_name: client_container
-    image: node:18
-    command: sh -c "npm install && npm start"
+    container_name: react_containerk
     restart: always
+    build:
+      context: mainClient
+      dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    working_dir: /mainClient
   back-end:
-    container_name: server_container
-    image: alexandria/go_server
+    container_name: golang_container
     restart: always
+    build:
+      context: mainServer
+      dockerfile: Dockerfile
     ports:
-      - '8000:8000'
-#    Persistent git files
-  database:
+      - '8080:8080'
+    depends_on:
+      - db
+    volumes:
+      - ./gitfiles:/gitfiles
+  db:
     container_name: pg_container
     image: postgres
     restart: always
@@ -25,4 +30,6 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: AlexandriaPG
     ports:
-      - '5432:5432'
+      - '5433:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data

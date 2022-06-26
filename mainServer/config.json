@@ -1,7 +1,7 @@
 {
   "hosting":  {
     "back-end": {
-      "host" : "localhost",
+      "host" : "",
       "port": 8080,
       "use-ssl": false
     },
@@ -13,8 +13,8 @@
   },
   "database": {
     "url" : {
-      "host": "localhost",
-      "port": 5432,
+      "host": "host.docker.internal",
+      "port": 5433,
       "use-ssl": false
     },
     "user": "postgres",
@@ -26,7 +26,7 @@
     "token-expire-minutes": 15
   },
   "fs": {
-    "path": "../../gitfiles",
+    "path": "gitfiles",
     "default-file": "./resources/defaultArticle.qmd",
     "mutex-count": 12
   }

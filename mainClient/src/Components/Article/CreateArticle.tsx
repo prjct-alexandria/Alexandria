@@ -79,8 +79,7 @@ export default function CreateArticle() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              configData.front_end_url +
-              "/articles/" +
+                "/articles/" +
               articleId +
               "/versions/" +
               versionId;
