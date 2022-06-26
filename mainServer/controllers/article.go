@@ -98,5 +98,5 @@ func (contr ArticleController) ArticleList(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("server could not retrieve article list"))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, list)
+	c.JSON(http.StatusOK, list)
 }

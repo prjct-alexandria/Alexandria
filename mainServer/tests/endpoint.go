@@ -9,13 +9,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
-// TestEndpoint is a helper function for the common steps of controller tests
-// performs a http request to the router and makes assertions on the http status code and body.
-// Body and expectBody parameters can be passed as their model or entity structs directly, no need to convert to JSON string.
+// TestEndpoint is a helper function for the common steps of controller tests.
+// Performs a http request to the router and makes assertions on the http status code and body.
+// The body and expectBody parameters are converted to JSON inside this function,
+// can be passed directly as go structs or primitives
 func TestEndpoint(t *testing.T, r *gin.Engine, method string, url string, body any, expectCode int, expectBody any) {
 
 	// create the request body
@@ -43,21 +43,16 @@ func TestEndpoint(t *testing.T, r *gin.Engine, method string, url string, body a
 
 	// check the response body
 	if expectBody != nil {
-		// convert the expected body to JSON interface map
-		var expectedInterface map[string]interface{}
-		expected, _ := json.Marshal(expectBody)
-		err = json.Unmarshal(expected, &expectedInterface)
-		assert.NoError(t, err)
+		responseBody := string(b)
 
-		// convert the response body to JSON interface map
-		responseType := reflect.TypeOf(expectBody)
-		responseInterface := reflect.Zero(responseType).Interface()
-		err = json.Unmarshal(b, &responseInterface)
+		// convert the expected body to JSON interface map
+		expectedBytes, err := json.Marshal(expectBody)
 		assert.NoError(t, err)
+		expectedJson := string(expectedBytes)
 
 		// compare the two
-		if !reflect.DeepEqual(responseInterface, expectedInterface) {
-			t.Errorf("Expected response body=%v but got actual=%v", responseInterface, expectedInterface)
+		if responseBody != expectedJson {
+			t.Errorf("Expected response body=%v but got actual=%v", expectedJson, responseBody)
 		}
 	}
 }
