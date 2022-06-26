@@ -238,7 +238,12 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	intAid, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("articleID id %v is invalid", aid))
+		return
+	}
+
+	if !gitUtils.IsCommitHash(cid) {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("commit id %v is invalid", cid))
 		return
 	}
 
@@ -269,7 +274,12 @@ func (contr *ThreadController) GetCommitSelectionThreads(c *gin.Context) {
 	intAid, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("articleID id %v is invalid", aid))
+		return
+	}
+
+	if !gitUtils.IsCommitHash(cid) {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("commit id %v is invalid", cid))
 		return
 	}
 
