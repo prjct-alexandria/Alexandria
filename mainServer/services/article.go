@@ -82,19 +82,20 @@ func (serv ArticleService) CreateArticle(title string, owners []string, loggedIn
 
 	// Return frontend-readable description of created data, (excluding file contents)
 	return models.Version{
-		ArticleID: version.ArticleID,
-		Id:        version.Id,
-		Title:     version.Title,
-		Owners:    version.Owners,
-		Content:   "",
-		Status:    entities.VersionDraft,
+		ArticleID:      version.ArticleID,
+		Id:             version.Id,
+		Title:          version.Title,
+		Owners:         version.Owners,
+		Content:        "",
+		Status:         entities.VersionDraft,
+		LatestCommitID: commit,
 	}, nil
 }
 
 func (serv ArticleService) GetMainVersion(article int64) (int64, error) {
 	mv, err := serv.articlerepo.GetMainVersion(article)
 	if err != nil {
-		return 0, err
+		return -1, err
 	}
 	return mv, nil
 }

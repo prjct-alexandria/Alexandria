@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-playground/assert/v2 v2.0.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/ldez/go-git-cmd-wrapper/v2 v2.3.0
 	github.com/lib/pq v1.10.5
