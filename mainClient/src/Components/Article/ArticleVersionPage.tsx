@@ -69,6 +69,7 @@ export default function ArticleVersionPage() {
   if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
+  let viewingOldVersion = false;
 
   useEffect(() => {
     fetch(url, {
@@ -84,6 +85,7 @@ export default function ArticleVersionPage() {
         if (response.ok) {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
+          viewingOldVersion = VersionData.latestHistoryID != historyID
           setData(VersionData);
           setLoaded(true);
           setOutdated(historyID != null && VersionData.latestHistoryID != historyID)
