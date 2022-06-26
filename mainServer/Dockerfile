@@ -4,5 +4,4 @@ COPY . /app
 RUN go get -v -d ./...
 RUN go build
 EXPOSE 8080
-#EXPOSE 5432
-CMD [ "go", "run", "main.go"]
+CMD [ "go", "run", "main.go", "-dockerconfig"]
