@@ -31,12 +31,3 @@ func (m UserServiceMock) CheckPassword(email string, pwdClaim string) (entities.
 	})
 	return CheckPasswordMock(email, pwdClaim)
 }
-
-var GetUserByEmailMock func(email string) (entities.User, error)
-
-func (m UserServiceMock) GetUserByEmail(email string) (entities.User, error) {
-	m.Mock.CallFunc("GetUserByEmail", &map[string]interface{}{
-		"email": email,
-	})
-	return GetUserByEmailMock(email)
-}

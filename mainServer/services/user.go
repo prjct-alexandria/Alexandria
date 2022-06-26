@@ -27,7 +27,3 @@ func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.Use
 	}
 	return dbUser, bcrypt.CompareHashAndPassword([]byte(dbUser.Pwd), []byte(pwdClaim))
 }
-
-func (u *UserService) GetUserByEmail(email string) (entities.User, error) {
-	return u.userRepository.GetFullUserByEmail(email)
-}

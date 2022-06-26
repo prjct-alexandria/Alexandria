@@ -45,7 +45,6 @@ func globalSetup() {
 	r.GET("/articles", func(c *gin.Context) {
 		contr.ArticleList(c)
 	})
-
 }
 
 // localSetup should be called before each individual test
