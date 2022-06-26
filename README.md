@@ -15,7 +15,7 @@ All the different components can be started together using docker-compose:
 After running this command from the project root, the UI will be accessible at `localhost:3000`. No extra installations apart from docker and docker-compose are required.
 
 Note that this option will create git repositories for internal use within the Alexandria repository, which might be annoying during the development process.
-This option uses the `dockerconfig.json` file together with `Dockerfiles` to correctly configure all ports. Changes to `config.json` will be ignored.
+This option uses the `dockerconfig.json` file together with `Dockerfile` to correctly configure all ports and URL's. Changes to `mainServer/config.json` will be ignored using this option.
 
 ## Without docker
 ### Database
