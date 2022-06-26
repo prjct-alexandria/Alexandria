@@ -11,14 +11,14 @@ type StorerMock struct {
 	Mock *mocks.Mock
 }
 
-var GetVersionMock func(article int64, version int64) (string, error)
+var GetVersionMockStorer func(article int64, version int64) (string, error)
 
 func (m StorerMock) GetVersion(article int64, version int64) (string, error) {
 	m.Mock.CallFunc("GetVersion", &map[string]interface{}{
 		"article": article,
 		"version": version,
 	})
-	return GetVersionMock(article, version)
+	return GetVersionMockStorer(article, version)
 }
 
 var GetVersionByCommitMock func(article int64, commit string) (string, error)
