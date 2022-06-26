@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 )
 
 type RequestController struct {
-	Serv services.RequestService
+	Serv interfaces.RequestService
 }
 
 // CreateRequest godoc

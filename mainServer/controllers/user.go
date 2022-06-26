@@ -7,13 +7,13 @@ import (
 	"mainServer/middlewares"
 	"mainServer/models"
 	"mainServer/server/config"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 )
 
 type UserController struct {
-	UserService services.UserService
+	UserService interfaces.UserService
 	Cfg         *config.Config
 }
 

@@ -8,15 +8,19 @@ import (
 )
 
 type UserService struct {
-	UserRepository interfaces.UserRepository
+	userRepository interfaces.UserRepository
+}
+
+func NewUserService(userRepository interfaces.UserRepository) *UserService {
+	return &UserService{userRepository: userRepository}
 }
 
 func (u *UserService) SaveUser(user entities.User) error {
-	return u.UserRepository.CreateUser(user)
+	return u.userRepository.CreateUser(user)
 }
 
 func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.User, error) {
-	dbUser, err := u.UserRepository.GetFullUserByEmail(email)
+	dbUser, err := u.userRepository.GetFullUserByEmail(email)
 	if err != nil {
 		fmt.Println(err)
 		return entities.User{}, err
@@ -25,5 +29,5 @@ func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.Use
 }
 
 func (u *UserService) GetUserByEmail(email string) (entities.User, error) {
-	return u.UserRepository.GetFullUserByEmail(email)
+	return u.userRepository.GetFullUserByEmail(email)
 }
