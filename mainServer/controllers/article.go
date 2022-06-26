@@ -78,7 +78,7 @@ func (contr ArticleController) GetMainVersion(c *gin.Context) {
 	mv, err := contr.serv.GetMainVersion(article)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot get main version ID"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get main version ID"))
 		return
 	}
 	c.Header("Content-Type", "application/json")
