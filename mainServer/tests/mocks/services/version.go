@@ -7,54 +7,76 @@ import (
 	"mime/multipart"
 )
 
-// VersionServiceMock mocks class using publicly modifiable mock functions
 type VersionServiceMock struct {
 	Mock *mocks.Mock
 }
 
-// NewVersionServiceMock initializes a mock with variables that are passed by reference,
-// so the values can be retrieved from anywhere in the program
 func NewVersionServiceMock() VersionServiceMock {
 	return VersionServiceMock{Mock: mocks.NewMock()}
 }
 
-// UpdateVersionMock is a declared function whose behaviour can be modified by individual tests
-var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error
+var UpdateVersionMock func(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error
 
-func (m VersionServiceMock) ListVersions(article int64) ([]models.Version, error) {
-	// added to solve merge conflicts after the testing issue was finished
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Version, error) {
-	// added to solve merge conflicts after the testing issue was finished
-	// TODO: implement for future testing
-	panic("implement me")
-}
-
-func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, commit string) (models.Version, error) {
-	// added to solve merge conflicts after the testing issue was finished
-	// TODO: implement for future testing
-	panic("implement me")
-}
-
-func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, func(), error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-// UpdateVersion implements the corresponding version from the VersionService interface.
-// Stores in the mock that it was called, including the arguments, and executes the custom UpdateVersionMock function
 func (m VersionServiceMock) UpdateVersion(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
 	m.Mock.CallFunc("UpdateVersion", &map[string]interface{}{
+		"c":          c,
+		"file":       file,
+		"article":    article,
+		"version":    version,
+		"loggedInAs": loggedInAs,
+	})
+	return UpdateVersionMock(c, file, article, version, loggedInAs)
+}
+
+var GetVersionMock func(article int64, version int64) (models.Version, error)
+
+func (m VersionServiceMock) GetVersion(article int64, version int64) (models.Version, error) {
+	m.Mock.CallFunc("GetVersion", &map[string]interface{}{
 		"article": article,
 		"version": version,
 	})
-	return UpdateVersionMock(c, file, article, version)
+	return GetVersionMock(article, version)
+}
+
+var GetVersionByCommitIDMock func(article int64, version int64, commit string) (models.Version, error)
+
+func (m VersionServiceMock) GetVersionByCommitID(article int64, version int64, commit string) (models.Version, error) {
+	m.Mock.CallFunc("GetVersionByCommitID", &map[string]interface{}{
+		"article": article,
+		"version": version,
+		"commit":  commit,
+	})
+	return GetVersionByCommitIDMock(article, version, commit)
+}
+
+var CreateVersionFromMock func(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error)
+
+func (m VersionServiceMock) CreateVersionFrom(article int64, source int64, title string, owners []string, loggedInAs string) (models.Version, error) {
+	m.Mock.CallFunc("CreateVersionFrom", &map[string]interface{}{
+		"article":    article,
+		"source":     source,
+		"title":      title,
+		"owners":     owners,
+		"loggedInAs": loggedInAs,
+	})
+	return CreateVersionFromMock(article, source, title, owners, loggedInAs)
+}
+
+var ListVersionsMock func(article int64) ([]models.Version, error)
+
+func (m VersionServiceMock) ListVersions(article int64) ([]models.Version, error) {
+	m.Mock.CallFunc("ListVersions", &map[string]interface{}{
+		"article": article,
+	})
+	return ListVersionsMock(article)
+}
+
+var GetVersionFilesMock func(aid int64, vid int64) (string, func(), error)
+
+func (m VersionServiceMock) GetVersionFiles(aid int64, vid int64) (string, func(), error) {
+	m.Mock.CallFunc("GetVersionFiles", &map[string]interface{}{
+		"aid": aid,
+		"vid": vid,
+	})
+	return GetVersionFilesMock(aid, vid)
 }

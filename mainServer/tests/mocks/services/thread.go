@@ -1,23 +1,24 @@
 package services
 
-import "mainServer/models"
+import (
+	"mainServer/models"
+	mocks "mainServer/tests/util"
+)
 
-// ThreadServiceMock mocks class using publicly modifiable mock functions
 type ThreadServiceMock struct {
-	// mock tracks what functions were called and with what parameters
-	Called *map[string]bool
-	Params *map[string]map[string]interface{}
+	Mock *mocks.Mock
 }
 
-// NewThreadServiceMock initializes a mock with variables that are passed by reference,
-// so the values can be retrieved from anywhere in the program
 func NewThreadServiceMock() ThreadServiceMock {
-	return ThreadServiceMock{
-		Called: &map[string]bool{},
-		Params: &map[string]map[string]interface{}{},
-	}
+	return ThreadServiceMock{Mock: mocks.NewMock()}
 }
+
+var StartThreadMock func(thread models.Thread, aid int64) (int64, error)
 
 func (m ThreadServiceMock) StartThread(thread models.Thread, aid int64) (int64, error) {
-	panic("implement me")
+	m.Mock.CallFunc("StartThread", &map[string]interface{}{
+		"thread": thread,
+		"aid":    aid,
+	})
+	return StartThreadMock(thread, aid)
 }

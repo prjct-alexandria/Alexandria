@@ -1,18 +1,15 @@
 package thread
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
 	"mainServer/controllers"
 	"mainServer/entities"
 	"mainServer/models"
+	"mainServer/tests"
 	"mainServer/tests/mocks/services"
 	"net/http"
-	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
@@ -21,6 +18,7 @@ var commitThreadServMock services.CommitThreadServiceMock
 var requestThreadServMock services.RequestThreadServiceMock
 var contr controllers.ThreadController
 var r *gin.Engine
+var loggedInUser *string
 
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
@@ -34,6 +32,13 @@ func globalSetup() {
 	// Setup test router, to test controller endpoints through http
 	r = gin.Default()
 	contr = controllers.ThreadController{}
+
+	// Mock the authentication middleware, that sets the email of logged-in user
+	r.Use(func(c *gin.Context) {
+		if loggedInUser != nil {
+			c.Set("Email", *loggedInUser)
+		}
+	})
 
 	// routes
 	r.POST("/articles/:articleID/thread/:threadType/id/:specificID/", func(c *gin.Context) {
@@ -79,33 +84,18 @@ func TestGetCommitThreadFail(t *testing.T) {
 	const cid string = "3"
 	url := fmt.Sprintf("/articles/%d/versions/%d/history/%s/threads", aid, vid, cid)
 
-	// create request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-		return
-	}
-
-	// perform the request, with a response recorder
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	// check the response
-	if w.Code != 400 {
-		b, _ := ioutil.ReadAll(w.Body)
-		t.Error(w.Code, string(b))
-	}
+	tests.TestEndpoint(t, r, "GET", url, nil, http.StatusInternalServerError, nil)
 
 	// check the service mock
-	if !(*commitThreadServMock.Called)["GetCommitThreads"] {
-		t.Errorf("Expected GetRequestThreads to be called")
-	}
-	a := (*commitThreadServMock.Params)["GetCommitThreads"]["aid"]
-	c := (*commitThreadServMock.Params)["GetCommitThreads"]["cid"]
-	if a != aid || c != cid {
-		t.Errorf("Expected different function params, got article=%v and commit=%v", a, c)
-	}
+	commitThreadServMock.Mock.AssertCalled(t, "GetCommitThreads", 1)
+	commitThreadServMock.Mock.AssertCalledWith(t, "GetCommitThreads", &map[string]interface{}{
+		"aid": aid,
+		"cid": cid,
+	})
 }
+
+// TODO: getcommitthread
+// bad param
 
 func TestGetCommitThreadsSuccess(t *testing.T) {
 	localSetup()
@@ -121,37 +111,14 @@ func TestGetCommitThreadsSuccess(t *testing.T) {
 	const cid string = "3"
 	url := fmt.Sprintf("/articles/%d/versions/%d/history/%s/threads", aid, vid, cid)
 
-	// create request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-		return
-	}
-
-	// perform the request with a response recorder
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	// check the response
-	b, err := ioutil.ReadAll(w.Body)
-	if w.Code != 200 {
-		t.Error(w.Code, string(b))
-	}
-	var threads []models.Thread
-	err = json.Unmarshal(b, &threads)
-	if !reflect.DeepEqual(threads, exampleThreads) {
-		t.Errorf("Expected expected=%v but got actual=%v", exampleThreads, threads)
-	}
+	tests.TestEndpoint(t, r, "GET", url, nil, http.StatusOK, exampleThreads)
 
 	// check the service mock
-	if !(*commitThreadServMock.Called)["GetCommitThreads"] {
-		t.Errorf("Expected GetCommitThreads to be called")
-	}
-	a := (*commitThreadServMock.Params)["GetCommitThreads"]["aid"]
-	c := (*commitThreadServMock.Params)["GetCommitThreads"]["cid"]
-	if a != aid || c != cid {
-		t.Errorf("Expected different function params, got article=%v and commit=%v", a, c)
-	}
+	commitThreadServMock.Mock.AssertCalled(t, "GetCommitThreads", 1)
+	commitThreadServMock.Mock.AssertCalledWith(t, "GetCommitThreads", &map[string]interface{}{
+		"aid": aid,
+		"cid": cid,
+	})
 }
 
 func TestGetRequestThreadFail(t *testing.T) {
@@ -167,33 +134,18 @@ func TestGetRequestThreadFail(t *testing.T) {
 	const rid int64 = 3
 	url := fmt.Sprintf("/articles/%d/requests/%d/threads", aid, rid)
 
-	// create request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-		return
-	}
-
-	// perform the request, with a response recorder
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	// check the response
-	if w.Code != 400 {
-		b, _ := ioutil.ReadAll(w.Body)
-		t.Error(w.Code, string(b))
-	}
+	tests.TestEndpoint(t, r, "GET", url, nil, http.StatusInternalServerError, nil)
 
 	// check the service mock
-	if !(*requestThreadServMock.Called)["GetRequestThreads"] {
-		t.Errorf("Expected GetRequestThreads to be called")
-	}
-	a := (*requestThreadServMock.Params)["GetRequestThreads"]["aid"]
-	r := (*requestThreadServMock.Params)["GetRequestThreads"]["rid"]
-	if a != aid || r != rid {
-		t.Errorf("Expected different function params, got article=%v and request=%v", a, r)
-	}
+	requestThreadServMock.Mock.AssertCalled(t, "GetRequestThreads", 1)
+	requestThreadServMock.Mock.AssertCalledWith(t, "GetRequestThreads", &map[string]interface{}{
+		"aid": aid,
+		"rid": rid,
+	})
 }
+
+// TODO: getcommitthread
+// bad params
 
 func TestGetRequestThreadsSuccess(t *testing.T) {
 	localSetup()
@@ -208,38 +160,24 @@ func TestGetRequestThreadsSuccess(t *testing.T) {
 	const rid int64 = 3
 	url := fmt.Sprintf("/articles/%d/requests/%d/threads", aid, rid)
 
-	// create request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-		return
-	}
-
-	// perform the request with a response recorder
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	// check the response
-	b, err := ioutil.ReadAll(w.Body)
-	if w.Code != 200 {
-		t.Error(w.Code, string(b))
-	}
-	var threads []models.Thread
-	err = json.Unmarshal(b, &threads)
-	if !reflect.DeepEqual(threads, exampleThreads) {
-		t.Errorf("Expected expected=%v but got actual=%v", exampleThreads, threads)
-	}
+	tests.TestEndpoint(t, r, "GET", url, nil, http.StatusOK, exampleThreads)
 
 	// check the service mock
-	if !(*requestThreadServMock.Called)["GetRequestThreads"] {
-		t.Errorf("Expected GetRequestThreads to be called")
-	}
-	a := (*requestThreadServMock.Params)["GetRequestThreads"]["aid"]
-	r := (*requestThreadServMock.Params)["GetRequestThreads"]["rid"]
-	if a != aid || r != rid {
-		t.Errorf("Expected different function params, got article=%v and request=%v", a, r)
-	}
+	requestThreadServMock.Mock.AssertCalled(t, "GetRequestThreads", 1)
+	requestThreadServMock.Mock.AssertCalledWith(t, "GetRequestThreads", &map[string]interface{}{
+		"aid": aid,
+		"rid": rid,
+	})
 }
+
+// TODO: commitSelection
+// success
+// bad param
+// 500
+
+// TODO: saveCOmment
+
+// TODo:
 
 var exampleThreads = []models.Thread{
 	{
