@@ -48,7 +48,7 @@ export default function VersionListElement(props: VListProps) {
                   <span className="visually-hidden">Toggle Dropright</span>
               </button>
               <ul className="dropdown-menu">
-                  <li><a className="dropdown-item" href={baseLink + "?relatedID=" + props.version.versionID}>
+                  <li><a className="dropdown-item" href={baseLink + "?sourceID=" + props.version.versionID}>
                       See requests as source
                   </a></li>
                   <li><a className="dropdown-item" href={baseLink + "?targetID=" + props.version.versionID}>
