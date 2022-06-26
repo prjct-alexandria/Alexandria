@@ -7,6 +7,8 @@ import (
 	"mainServer/entities"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils/auth"
+	gitUtils "mainServer/utils/git"
 	"mainServer/utils/httperror"
 	"net/http"
 	"strconv"
@@ -32,6 +34,13 @@ type ThreadController struct {
 // @Failure 	 500  {object} httperror.HTTPError
 // @Router       /articles/:articleID/thread/:threadType/id/:specificID/ [post]
 func (contr *ThreadController) CreateThread(c *gin.Context) {
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
+
 	var thread models.Thread
 	err := c.BindJSON(&thread)
 	if err != nil {
@@ -60,7 +69,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	// save first comment in the db
-	coid, err := contr.CommentService.SaveComment(thread.Comments[0], tid)
+	coid, err := contr.CommentService.SaveComment(thread.Comments[0], tid, loggedInAs)
 
 	if err != nil {
 		fmt.Println(err)
@@ -68,22 +77,24 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 		return
 	}
 
-	// TODO: split these things up over four different endpoints if needed instead of using one with multiple responsibilities
+	// If needed, these could be split up over 4 different endpoints instead of using one with multiple responsibilities
 	var id int64
+	var threadError error
+
 	switch threadType {
 	case "commit":
 		// check if the specific thread ID string can actually be a commit ID
-		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
-		if len(sid) != 40 && err == nil {
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+		if !gitUtils.IsCommitHash(sid) {
+			err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", sid)
+			httperror.NewError(c, http.StatusBadRequest, err)
 			return
 		}
-		id, err = contr.CommitThreadService.StartCommitThread(sid, tid)
+		id, threadError = contr.CommitThreadService.StartCommitThread(sid, tid)
 	case "commitSelection":
 		// check if the specific thread ID string can actually be a commit ID
-		_, err := strconv.ParseUint(sid, 16, 64) // checks if it has just hexadecimal characters 0...f
-		if len(sid) != 40 && err == nil {
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit ID, got %s", sid))
+		if !gitUtils.IsCommitHash(sid) {
+			err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", sid)
+			httperror.NewError(c, http.StatusBadRequest, err)
 			return
 		}
 
@@ -93,29 +104,28 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 			return
 		}
 
-		id, err = contr.CommitSelectionThreadService.StartCommitSelectionThread(sid, tid, selection)
+		id, threadError = contr.CommitSelectionThreadService.StartCommitSelectionThread(sid, tid, selection)
 	case "request":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
-			fmt.Println(err)
-			c.Status(http.StatusBadRequest)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid requestID, got %v", sid))
 			return
 		}
-		id, err = contr.RequestThreadService.StartRequestThread(intSid, tid)
+		id, threadError = contr.RequestThreadService.StartRequestThread(intSid, tid, loggedInAs)
 	case "review":
 		intSid, err := strconv.ParseInt(sid, 10, 64)
 		if err != nil {
-			fmt.Println(err)
-			c.Status(http.StatusBadRequest)
+			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid reviewID, got %v", sid))
 			return
 		}
-		id, err = contr.ReviewThreadService.StartReviewThread(intSid, tid)
+		id, threadError = contr.ReviewThreadService.StartReviewThread(intSid, tid)
 	default:
-		id, err = -1, errors.New("invalid thread type")
+		id, threadError = -1, errors.New("invalid thread type")
 	}
 
-	if err != nil {
-		c.Status(http.StatusBadRequest)
+	if threadError != nil {
+		//TODO: Distinguish between different error types
+		httperror.NewError(c, http.StatusBadRequest, errors.New("could not create thread"))
 		fmt.Println(err)
 		return
 	}
@@ -128,7 +138,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.IndentedJSON(http.StatusOK, ids)
+	c.JSON(http.StatusOK, ids)
 }
 
 // SaveComment godoc
@@ -142,6 +152,13 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 // @Failure     500 "failed saving comment"
 // @Router      /comments/thread/:threadID [post]
 func (contr *ThreadController) SaveComment(c *gin.Context) {
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
+
 	var comment entities.Comment
 	err := c.BindJSON(&comment)
 	if err != nil {
@@ -153,14 +170,12 @@ func (contr *ThreadController) SaveComment(c *gin.Context) {
 	tid := c.Param("threadID")
 	intTid, err := strconv.ParseInt(tid, 10, 64)
 	if err != nil {
-		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("could not parse threadID %v", tid))
 		return
 	}
 
-	id, err := contr.CommentService.SaveComment(comment, intTid)
+	id, err := contr.CommentService.SaveComment(comment, intTid, loggedInAs)
 	if err != nil {
-		fmt.Println(err)
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("failed saving comment"))
 		return
 	}

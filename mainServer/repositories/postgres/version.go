@@ -18,7 +18,7 @@ func (r PgVersionRepository) GetVersion(version int64) (entities.Version, error)
 	}
 
 	// add owners
-	owners, err := r.getOwners(version)
+	owners, err := r.GetOwners(version)
 	if err != nil {
 		return entities.Version{}, err
 	}
@@ -129,7 +129,7 @@ func (r PgVersionRepository) createVersionTable() error {
 	_, err := r.Db.Exec(`CREATE TABLE IF NOT EXISTS version (
     			id SERIAL PRIMARY KEY,
     			articleID int NOT NULL,
-    			title VARCHAR(255) NOT NULL,
+    			title VARCHAR(255) UNIQUE NOT NULL,
     			status VARCHAR(16) NOT NULL DEFAULT 'draft',
     			latestCommit CHAR(40),
     			FOREIGN KEY (articleID) REFERENCES article(id)    			
@@ -190,7 +190,8 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 		row := entities.Version{}
 		var email string
 		if err := rows.Scan(&row.Id, &row.Title, &row.Status, &email, &row.LatestCommitID); err != nil {
-			return nil, err
+			fmt.Printf("GetVersionsByArticle: %v\n", err.Error())
+			continue
 		}
 
 		// Insert new version into map, or append email to existing
@@ -215,7 +216,7 @@ func (r PgVersionRepository) GetVersionsByArticle(article int64) ([]entities.Ver
 }
 
 // GetOwners gets a string of owner emails, belonging to the specified version
-func (r PgVersionRepository) getOwners(version int64) ([]string, error) {
+func (r PgVersionRepository) GetOwners(version int64) ([]string, error) {
 	// Prepare and execute query
 	stmt, err := r.Db.Prepare("SELECT email FROM versionOwners WHERE versionid=$1")
 	if err != nil {

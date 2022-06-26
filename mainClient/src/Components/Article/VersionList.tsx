@@ -100,7 +100,7 @@ export default function VersionList() {
   return (
     <div className="wrapper col-8 m-auto">
       <div>
-        {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
+        {(!isLoadedVersions || !isLoadedMain) && <LoadingSpinner />}
         {(errorVersions || errorMain) && (
           <NotificationAlert
             errorType="danger"

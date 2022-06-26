@@ -15,8 +15,15 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import VersionList from "./Components/Article/VersionList";
 import CompareView from "./Components/Article/CompareView";
 import MRList from "./Components/Article/MRList";
+import About from "./Components/About"
+import {authCookieCheck} from "./Components/User/AuthHelpers/isUserLoggedIn";
 
 function App() {
+  //This callback syncs localStorage with a possible present authenticationCookie
+  setInterval(() => {
+    authCookieCheck()
+  }, 1000)
+
   return (
     <>
       <Router>
@@ -44,6 +51,10 @@ function App() {
               <Route
                 path="/articles/:articleId/requests/*"
                 element={<MRList />}
+              ></Route>
+              <Route
+                  path="/about"
+                  element={<About />}
               ></Route>
             </Routes>
           </div>

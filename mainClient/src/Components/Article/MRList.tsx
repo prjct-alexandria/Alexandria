@@ -57,7 +57,7 @@ export default function MRList() {
         setError(error);
       }
     );
-  });
+  },[]);
 
   const mrListMap = () => {
     return (
@@ -80,6 +80,7 @@ export default function MRList() {
         />
       )}
       {
+        MRListData &&
         <div>
           <h2 className="text-center mb-5">See all requests</h2>
           <div className="row wrapper col-8 m-auto">

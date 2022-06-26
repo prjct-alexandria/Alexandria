@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
 	"mainServer/services/interfaces"
+	"mainServer/utils/auth"
+	gitUtils "mainServer/utils/git"
 	"mainServer/utils/httperror"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -29,8 +29,6 @@ type VersionController struct {
 // @Failure 	400 {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions/{versionID} [get]
 func (contr VersionController) GetVersion(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -50,38 +48,30 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	}
 
 	// get optional query parameter for specific history/commit ID
-	values := c.Request.URL.Query()
-	var usingCommit bool
-	var commitHashArr *[20]byte
-	if commitStr, ok := values["historyID"]; ok {
-		// read the string like 'a8fc73280...' into a byte array for the commit hash
-		commitHashSlice, err := hex.DecodeString(commitStr[0])
-		if err != nil || len(commitHashSlice) != 20 {
-			fmt.Println(err)
-			httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitStr[0]))
-			return
-		}
-
-		// cast the Go slice to a fixed length array, after having checked if the slice had the right length
-		commitHashArr = (*[20]byte)(commitHashSlice)
-		usingCommit = true
+	commitID := c.Query("historyID")
+	usingCommit := commitID != ""
+	if usingCommit && !gitUtils.IsCommitHash(commitID) {
+		err := fmt.Errorf("invalid commit id=%s, should be a 40-character long hex string", commitID)
+		fmt.Println(err)
+		httperror.NewError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	// Get either a specific version or just the latest
 	var res models.Version
 	if usingCommit {
-		res, err = contr.Serv.GetVersionByCommitID(article, version, *commitHashArr)
+		res, err = contr.Serv.GetVersionByCommitID(article, version, commitID)
 	} else {
 		res, err = contr.Serv.GetVersion(article, version)
 	}
-
 	if err != nil {
 		fmt.Println(err)
 		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
-	fmt.Println(res.LatestCommitID)
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // ListVersions 	godoc
@@ -94,8 +84,6 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 // @Failure 	500  {object} httperror.HTTPError
 // @Router		/articles/{articleID}/versions [get]
 func (contr VersionController) ListVersions(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-
 	// extract article id
 	aid := c.Param("articleID")
 	article, err := strconv.ParseInt(aid, 10, 64)
@@ -112,7 +100,9 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get versions of aid=%d", article))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, res)
 }
 
 // UpdateVersion godoc
@@ -125,6 +115,12 @@ func (contr VersionController) ListVersions(c *gin.Context) {
 // @Failure 	400  {object} httperror.HTTPError
 // @Router      /articles/{articleID}/versions/{versionID} [post]
 func (contr VersionController) UpdateVersion(c *gin.Context) {
+	// Check if user is logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// get file from form data
 	file, err := c.FormFile("file")
@@ -153,7 +149,7 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 	}
 
 	// update version data
-	if err := contr.Serv.UpdateVersion(c, file, article, version); err != nil {
+	if err := contr.Serv.UpdateVersion(c, file, article, version, loggedInAs); err != nil {
 		c.Status(http.StatusBadRequest)
 		fmt.Println(err)
 		return
@@ -173,6 +169,12 @@ func (contr VersionController) UpdateVersion(c *gin.Context) {
 // @Failure      500  {object} httperror.HTTPError
 // @Router       /articles/{articleID}/versions [post]
 func (contr VersionController) CreateVersionFrom(c *gin.Context) {
+	// Check if logged in
+	if !auth.IsLoggedIn(c) {
+		httperror.NewError(c, http.StatusForbidden, errors.New("must be logged in to perform this request"))
+		return
+	}
+	loggedInAs := auth.GetLoggedInEmail(c)
 
 	// Extract article id
 	aid := c.Param("articleID")
@@ -193,10 +195,11 @@ func (contr VersionController) CreateVersionFrom(c *gin.Context) {
 	}
 
 	// Create version
-	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners)
+	version, err := contr.Serv.CreateVersionFrom(article, form.SourceVersionID, form.Title, form.Owners, loggedInAs)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create new version on server"))
+		httperror.NewError(c, http.StatusInternalServerError,
+			errors.New("could not create new version on server, version name might already be in use"))
 		return
 	}
 
@@ -230,21 +233,14 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 		return
 	}
 
-	path, err := contr.Serv.GetVersionFiles(article, version)
+	path, cleanup, err := contr.Serv.GetVersionFiles(article, version)
 	if err != nil {
 		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
 		return
 	}
-
-	//GetVersionFiles creates a temporary zip file, which needs to be removed after this method is finished
-
-	defer func(name string) {
-		err := os.Remove(name)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(path)
+	// delete temporary files when done
+	defer cleanup()
 
 	//Return files
 	c.Header("Access-Control-Expose-Headers", "content-disposition")

@@ -27,6 +27,7 @@ export default function ArticleVersionPage() {
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();
   let [isLoggedIn, setLoggedIn] = useState<boolean>(isUserLoggedIn());
+  let [isOutdated, setOutdated] = useState<boolean>();
   let [isUserAnOwner, setIsOwner] = useState<boolean>(false);
   let [editorContent, setContent] = useState<string>("");
 
@@ -63,12 +64,12 @@ export default function ArticleVersionPage() {
     params.versionId;
 
   // get the optional specific history param
-  const [searchParams] = useSearchParams(); // used for the source and target
-  let historyID = searchParams.get("history");
-  const viewingOldVersion = historyID != null;
-  if (viewingOldVersion) {
+  const [searchParams] = useSearchParams();
+  const historyID = searchParams.get("history");
+  if (historyID != null) {
     url = url + "?historyID=" + historyID;
   }
+  let viewingOldVersion = false;
 
   useEffect(() => {
     fetch(url, {
@@ -84,8 +85,10 @@ export default function ArticleVersionPage() {
         if (response.ok) {
           setError(undefined);
           let VersionData: ArticleVersion = await response.json();
+          viewingOldVersion = VersionData.latestHistoryID != historyID
           setData(VersionData);
           setLoaded(true);
+          setOutdated(historyID != null && VersionData.latestHistoryID != historyID)
           setIsOwner(isLoggedInUserTheOwner() || false);
         } else {
           // Set error with message returned from the server
@@ -181,7 +184,7 @@ export default function ArticleVersionPage() {
               <FileDownload />
             </a>
           </li>
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -206,7 +209,7 @@ export default function ArticleVersionPage() {
               </a>
             </li>
           )}
-          {!viewingOldVersion && isLoggedIn && (
+          {!isOutdated && isLoggedIn && (
             <li className="nav-item">
               <a className="nav-link">
                 <button
@@ -236,7 +239,7 @@ export default function ArticleVersionPage() {
           )}
         </ul>
 
-        {viewingOldVersion && (
+        {isOutdated && (
           <p>
             <em>
               {
@@ -300,7 +303,7 @@ export default function ArticleVersionPage() {
                 </button>
               </li>
 
-              {!viewingOldVersion && isLoggedIn && (
+              {!isOutdated && isLoggedIn && (
                 <li className="nav-item" role="presentation">
                   <button
                     className="nav-link"
@@ -369,12 +372,11 @@ export default function ArticleVersionPage() {
               </div>
             </div>
           </div>
-
           <div className="col-3" style={{alignContent: 'center'}}>
-            {(versionData && !viewingOldVersion && (
+            {(versionData && !isOutdated && (
               <ThreadList
                 threadType={"commit"}
-                specificId={versionData && versionData.latestHistoryID}
+                specificId={versionData.latestHistoryID}
               />
             )) ||
               (historyID && (
@@ -388,7 +390,7 @@ export default function ArticleVersionPage() {
                                threadType={"commitSelection"} posX={xPosCommentButton} posY={yPosCommentButton}
                                hidden={commentButtonHidden} selection={selection}/>
         <div>
-          {versionData && !viewingOldVersion && <SelectionThreadList
+          {versionData && !isOutdated && <SelectionThreadList
                   threadType={"commitSection"}
                   specificId={versionData && versionData.latestHistoryID}
               />
