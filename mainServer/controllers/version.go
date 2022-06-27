@@ -66,7 +66,7 @@ func (contr VersionController) GetVersion(c *gin.Context) {
 	}
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusNotFound, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get version with aid=%d and vid=%d", article, version))
 		return
 	}
 
@@ -234,13 +234,12 @@ func (contr VersionController) GetVersionFiles(c *gin.Context) {
 	}
 
 	path, cleanup, err := contr.Serv.GetVersionFiles(article, version)
+	defer cleanup() // delete temporary files when done
 	if err != nil {
 		//TODO create separate error scenarios (article / version doesn't exist, zip failed)
 		httperror.NewError(c, http.StatusBadRequest, errors.New("could not get article files"))
 		return
 	}
-	// delete temporary files when done
-	defer cleanup()
 
 	//Return files
 	c.Header("Access-Control-Expose-Headers", "content-disposition")

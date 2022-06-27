@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 )
 
 type RequestController struct {
-	Serv services.RequestService
+	Serv interfaces.RequestService
 }
 
 // CreateRequest godoc
@@ -214,7 +214,7 @@ func (contr RequestController) GetRequest(c *gin.Context) {
 // @Param		targetID	query	string	false	"Target version"
 // @Param		relatedID	query	string	false	"Source or Target version"
 // @Produce		json
-// @Success		200 {object} []models.Request
+// @Success		200 {object} []models.RequestListElement
 // @Failure		400 "Invalid article ID provided"
 // @Failure		404 "Could not find merge requests for this article"
 // @Router		/articles/{articleID}/requests [get]
@@ -271,7 +271,7 @@ func (contr RequestController) GetRequestList(c *gin.Context) {
 	list, err := contr.Serv.GetRequestList(articleId, sourceId, targetId, relatedId)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("could not fetch request list"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("could not fetch request list"))
 		return
 	}
 

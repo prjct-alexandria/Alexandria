@@ -14,7 +14,7 @@ import (
 )
 
 type RepoEnv struct {
-	storer                storer.Storer
+	storer                interfaces.Storer
 	article               interfaces.ArticleRepository
 	user                  interfaces.UserRepository
 	version               interfaces.VersionRepository
@@ -29,15 +29,15 @@ type RepoEnv struct {
 
 type ServiceEnv struct {
 	version               servinterfaces.VersionService
-	article               services.ArticleService
-	user                  services.UserService
-	req                   services.RequestService
-	thread                services.ThreadService
-	comment               services.CommentService
-	commitThread          services.CommitThreadService
-	commitSelectionThread services.CommitSelectionThreadService
-	requestThread         services.RequestThreadService
-	reviewThread          services.ReviewThreadService
+	article               servinterfaces.ArticleService
+	user                  servinterfaces.UserService
+	req                   servinterfaces.RequestService
+	thread                servinterfaces.ThreadService
+	comment               servinterfaces.CommentService
+	commitThread          servinterfaces.CommitThreadService
+	commitSelectionThread servinterfaces.CommitSelectionThreadService
+	requestThread         servinterfaces.RequestThreadService
+	reviewThread          servinterfaces.ReviewThreadService
 }
 
 type ControllerEnv struct {
@@ -67,7 +67,7 @@ func initRepoEnv(cfg *config.Config, database *sql.DB) RepoEnv {
 func initServiceEnv(repos RepoEnv) ServiceEnv {
 	return ServiceEnv{
 		article:               services.NewArticleService(repos.article, repos.version, repos.user, repos.storer),
-		user:                  services.UserService{UserRepository: repos.user},
+		user:                  services.NewUserService(repos.user),
 		req:                   services.RequestService{Repo: repos.req, Versionrepo: repos.version, Storer: repos.storer},
 		version:               services.VersionService{VersionRepo: repos.version, Storer: repos.storer, UserRepo: repos.user},
 		thread:                services.ThreadService{ThreadRepository: repos.thread},

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mainServer/models"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/auth"
 	"mainServer/utils/httperror"
 	"net/http"
@@ -13,10 +13,10 @@ import (
 )
 
 type ArticleController struct {
-	serv services.ArticleService
+	serv interfaces.ArticleService
 }
 
-func NewArticleController(serv services.ArticleService) ArticleController {
+func NewArticleController(serv interfaces.ArticleService) ArticleController {
 	return ArticleController{serv: serv}
 }
 
@@ -78,7 +78,7 @@ func (contr ArticleController) GetMainVersion(c *gin.Context) {
 	mv, err := contr.serv.GetMainVersion(article)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot get main version ID"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot get main version ID"))
 		return
 	}
 	c.Header("Content-Type", "application/json")
@@ -98,5 +98,5 @@ func (contr ArticleController) ArticleList(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("server could not retrieve article list"))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, list)
+	c.JSON(http.StatusOK, list)
 }

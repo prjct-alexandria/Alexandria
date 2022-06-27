@@ -16,8 +16,8 @@ type Storer struct {
 }
 
 // NewStorer returns Storer, initialized with the config. Creates necessary paths
-func NewStorer(cfg *config.StorerConfig) Storer {
-	return Storer{
+func NewStorer(cfg *config.StorerConfig) *Storer {
+	return &Storer{
 		pool:  locking.NewMutexPool(cfg.MutexCount),
 		fs:    filesystem.NewFileSystem(cfg.Path, cfg.DefaultFile),
 		clock: clock.RealClock{},
@@ -26,6 +26,6 @@ func NewStorer(cfg *config.StorerConfig) Storer {
 
 // SetClock changes the clock that is used to set creation dates of commits
 // Can be used to supply a mock for testing purposes
-func (s Storer) SetClock(clock clock.Clock) {
+func (s *Storer) SetClock(clock clock.Clock) {
 	s.clock = clock
 }
