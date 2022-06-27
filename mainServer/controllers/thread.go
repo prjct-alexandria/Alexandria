@@ -125,7 +125,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 
 	if threadError != nil {
 		//TODO: Distinguish between different error types
-		httperror.NewError(c, http.StatusBadRequest, errors.New("could not create thread"))
+		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create thread"))
 		fmt.Println(err)
 		return
 	}
@@ -214,7 +214,7 @@ func (contr *ThreadController) GetRequestThreads(c *gin.Context) {
 	threads, err := contr.RequestThreadService.GetRequestThreads(intAid, intRid)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find requestthreads for this request"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find requestthreads for this request"))
 		return
 	}
 
@@ -238,14 +238,19 @@ func (contr *ThreadController) GetCommitThreads(c *gin.Context) {
 	intAid, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("articleID id %v is invalid", aid))
+		return
+	}
+
+	if !gitUtils.IsCommitHash(cid) {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("commit id %v is invalid", cid))
 		return
 	}
 
 	threads, err := contr.CommitThreadService.GetCommitThreads(intAid, cid)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find committhreads for this article"))
 		return
 	}
 
@@ -269,14 +274,19 @@ func (contr *ThreadController) GetCommitSelectionThreads(c *gin.Context) {
 	intAid, err := strconv.ParseInt(aid, 10, 64)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("articleID id %v is invalid", aid))
+		return
+	}
+
+	if !gitUtils.IsCommitHash(cid) {
+		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("commit id %v is invalid", cid))
 		return
 	}
 
 	threads, err := contr.CommitSelectionThreadService.GetCommitSelectionThreads(cid, intAid)
 	if err != nil {
 		fmt.Println(err)
-		httperror.NewError(c, http.StatusBadRequest, fmt.Errorf("cannot find committhreads for this article"))
+		httperror.NewError(c, http.StatusInternalServerError, fmt.Errorf("cannot find committhreads for this article"))
 		return
 	}
 

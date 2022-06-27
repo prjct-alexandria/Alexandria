@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"mainServer/controllers"
+	"mainServer/tests"
 	"mainServer/tests/mocks/services"
 	"mime/multipart"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 var servMock services.VersionServiceMock
 var contr controllers.VersionController
 var r *gin.Engine
+var loggedInUser *string
 
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
@@ -31,10 +33,15 @@ func globalSetup() {
 	r = gin.Default()
 	contr = controllers.VersionController{}
 
+	// Mock the authentication middleware, that sets the email of logged-in user
+	r.Use(func(c *gin.Context) {
+		if loggedInUser != nil {
+			c.Set("Email", *loggedInUser)
+		}
+	})
+
 	// route
 	r.POST("/articles/:articleID/versions/:versionID", func(c *gin.Context) {
-		//TODO: Remove this hardcoded email to an Auth mock (or similar) once implemented)
-		c.Set("Email", "testUser@gmail.com")
 		contr.UpdateVersion(c)
 	})
 }
@@ -50,9 +57,13 @@ func TestUpdateVersionSuccess(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
 		return nil
 	}
+
+	// set the logged-in user
+	email := "zoo@mail.com"
+	loggedInUser = &email
 
 	// set request url
 	const article int64 = 42
@@ -78,19 +89,27 @@ func TestUpdateVersionSuccess(t *testing.T) {
 
 	// check the service mock
 	servMock.Mock.AssertCalled(t, "UpdateVersion", 1)
-	servMock.Mock.AssertCalledWith(t, "UpdateVersion", &map[string]interface{}{
-		"article": article,
-		"version": version,
-	})
+	// check the service mock params manually, only checks the non-pointer parameters
+	calledWith := servMock.Mock.Params["UpdateVersion"]
+	if calledWith["article"] != article ||
+		calledWith["version"] != version ||
+		calledWith["loggedInAs"] != email {
+		t.Errorf("Expected %v,%v,%v, but got %v,%v,%v",
+			article, version, email, calledWith["article"], calledWith["version"], calledWith["loggedInAs"])
+	}
 }
 
 func TestUpdateVersionFail(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
-		return errors.New("oh no, the version coulnd't be updated")
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
+		return errors.New("oh no, the version couldn't be updated")
 	}
+
+	// set the logged-in user
+	email := "zoo@mail.com"
+	loggedInUser = &email
 
 	// set request url
 	const article int64 = 42
@@ -116,17 +135,21 @@ func TestUpdateVersionFail(t *testing.T) {
 
 	// check the service mock
 	servMock.Mock.AssertCalled(t, "UpdateVersion", 1)
-	servMock.Mock.AssertCalledWith(t, "UpdateVersion", &map[string]interface{}{
-		"article": article,
-		"version": version,
-	})
+	// check the service mock params manually, only checks the non-pointer parameters
+	calledWith := servMock.Mock.Params["UpdateVersion"]
+	if calledWith["article"] != article ||
+		calledWith["version"] != version ||
+		calledWith["loggedInAs"] != email {
+		t.Errorf("Expected %v,%v,%v, but got %v,%v,%v",
+			article, version, email, calledWith["article"], calledWith["version"], calledWith["loggedInAs"])
+	}
 }
 
 func TestUpdateVersionNoFile(t *testing.T) {
 	localSetup()
 
 	// define service mock behaviour
-	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64) error {
+	services.UpdateVersionMock = func(c *gin.Context, file *multipart.FileHeader, article int64, version int64, loggedInAs string) error {
 		return nil
 	}
 
@@ -135,21 +158,7 @@ func TestUpdateVersionNoFile(t *testing.T) {
 	const version = "123456"
 	url := fmt.Sprintf("/articles/%s/versions/%s", article, version)
 
-	// create request
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		t.Error(err)
-	}
-
-	// perform the request, with a response recorder
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-
-	// check the response
-	if w.Code != 400 {
-		b, _ := ioutil.ReadAll(w.Body)
-		t.Error(w.Code, string(b))
-	}
+	tests.TestEndpoint(t, r, "POST", url, nil, http.StatusBadRequest, nil)
 
 	// check the service mock
 	servMock.Mock.AssertCalled(t, "UpdateVersion", 0)
