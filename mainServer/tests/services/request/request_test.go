@@ -764,6 +764,46 @@ func TestAcceptRequestDbFetchFail(t *testing.T) {
 	versionRepoMock.Mock.AssertCalled(t, "UpdateVersionLatestCommit", 0)
 }
 
+func TestAcceptRequestConflictFail(t *testing.T) {
+	// Arrange
+	localSetup()
+
+	requestId := int64(42)
+	loggedInAs := "johnDoe@gmail.com"
+	articleId := int64(1)
+	sourceVersionId := int64(5)
+	targetVersionId := int64(12)
+
+	req := entities.Request{
+		ArticleID:       articleId,
+		SourceVersionID: sourceVersionId,
+		TargetVersionID: targetVersionId,
+		Conflicted:      true,
+	}
+
+	repositories.GetRequestMock = func(request int64) (entities.Request, error) {
+		return req, nil
+	}
+
+	// Act
+	actual := serv.AcceptRequest(requestId, loggedInAs)
+
+	// Assert
+	assert.NotEqual(t, nil, actual)
+
+	requestRepoMock.Mock.AssertCalledWith(t, "GetRequest", &map[string]interface{}{
+		"request": requestId,
+	})
+
+	versionRepoMock.Mock.AssertCalled(t, "GetVersion", 0)
+
+	requestRepoMock.Mock.AssertCalled(t, "SetStatus", 0)
+
+	storerMock.Mock.AssertCalled(t, "Merge", 0)
+
+	versionRepoMock.Mock.AssertCalled(t, "UpdateVersionLatestCommit", 0)
+}
+
 func TestAcceptRequestSourceVersionFetchFail(t *testing.T) {
 	// Arrange
 	localSetup()
@@ -1215,19 +1255,169 @@ func TestAcceptRequestUpdateCommitFail(t *testing.T) {
 }
 
 // Test GetRequest (with comparison)
-
+// TODO: Test bad weather cases for this function
 func TestGetRequestSuccess(t *testing.T) {
+	// Arrange
+	localSetup()
 
+	requestId := int64(1)
+	articleId := int64(3)
+
+	req := entities.Request{
+		ArticleID:       articleId,
+		SourceVersionID: int64(3),
+		TargetVersionID: int64(5),
+		RequestID:       requestId,
+	}
+
+	sourceVersion := entities.Version{
+		ArticleID:      articleId,
+		Id:             req.SourceVersionID,
+		Title:          "abc",
+		Owners:         nil,
+		Status:         "",
+		LatestCommitID: "",
+	}
+
+	targetVersion := entities.Version{
+		ArticleID:      articleId,
+		Id:             req.TargetVersionID,
+		Title:          "abc",
+		Owners:         nil,
+		Status:         "",
+		LatestCommitID: "",
+	}
+
+	repositories.GetRequestMock = func(request int64) (entities.Request, error) {
+		return req, nil
+	}
+
+	repositories.GetVersionMock = func(version int64) (entities.Version, error) {
+		if version == req.SourceVersionID {
+			return sourceVersion, nil
+		} else if version == req.TargetVersionID {
+			return targetVersion, nil
+		}
+		return entities.Version{}, nil
+	}
+
+	repositories.GetRequestComparisonMock = func(article int64, request int64) (string, string, error) {
+		return "text1", "text2", nil
+	}
+
+	expected := models.RequestWithComparison{
+		Request: models.Request(req),
+		Source: models.Version{
+			ArticleID: sourceVersion.ArticleID,
+			Id:        sourceVersion.Id,
+			Title:     sourceVersion.Title,
+			Owners:    sourceVersion.Owners,
+			Status:    sourceVersion.Status,
+		},
+		Target: models.Version{
+			ArticleID: targetVersion.ArticleID,
+			Id:        targetVersion.Id,
+			Title:     targetVersion.Title,
+			Owners:    targetVersion.Owners,
+			Status:    targetVersion.Status,
+		},
+		Before: "text1",
+		After:  "text2",
+	}
+
+	// Act
+	actual, err := serv.GetRequest(requestId)
+
+	// Assert
+	assert.Equal(t, expected, actual)
+	assert.Equal(t, err, nil)
+
+	requestRepoMock.Mock.AssertCalledWith(t, "GetRequest", &map[string]interface{}{
+		"request": requestId,
+	})
+
+	versionRepoMock.Mock.AssertCalled(t, "GetVersion", 2)
+	versionRepoMock.Mock.AssertCalledWith(t, "GetVersion", &map[string]interface{}{
+		"version": targetVersion.Id,
+	})
+
+	storerMock.Mock.AssertCalledWith(t, "GetRequestComparison", &map[string]interface{}{
+		"article": articleId,
+		"request": requestId,
+	})
 }
 
 //Test UpdateRequestComparison
-
+// TODO: Test bad weather cases for this function
 func TestUpdateRequestComparisonSuccess(t *testing.T) {
+	// Arrange
+	localSetup()
 
+	requestId := int64(1)
+	articleId := int64(3)
+
+	req := entities.Request{
+		ArticleID:       articleId,
+		SourceVersionID: int64(3),
+		TargetVersionID: int64(5),
+		RequestID:       requestId,
+		Status:          "pending",
+	}
+
+	sourceVersion := entities.Version{
+		ArticleID:      articleId,
+		Id:             req.SourceVersionID,
+		Title:          "abc",
+		Owners:         nil,
+		Status:         "",
+		LatestCommitID: "commitIdSource",
+	}
+
+	targetVersion := entities.Version{
+		ArticleID:      articleId,
+		Id:             req.TargetVersionID,
+		Title:          "abc",
+		Owners:         nil,
+		Status:         "",
+		LatestCommitID: "commitIdTarget",
+	}
+
+	repositories.StoreRequestComparisonMock = func(article int64, request int64, source int64, target int64) (bool, error) {
+		return false, nil
+	}
+
+	repositories.UpdateRequestMock = func(req entities.Request) error {
+		return nil
+	}
+
+	// Act
+	err := serv.UpdateRequestComparison(req, sourceVersion, targetVersion)
+
+	// Assert
+	assert.Equal(t, nil, err)
+
+	storerMock.Mock.AssertCalledWith(t, "StoreRequestComparison", &map[string]interface{}{
+		"article": articleId,
+		"request": requestId,
+		"source":  req.SourceVersionID,
+		"target":  req.TargetVersionID,
+	})
+
+	requestRepoMock.Mock.AssertCalledWith(t, "UpdateRequest", &map[string]interface{}{
+		"req": entities.Request{
+			RequestID:       req.RequestID,
+			ArticleID:       req.ArticleID,
+			SourceVersionID: sourceVersion.Id,
+			SourceHistoryID: sourceVersion.LatestCommitID,
+			TargetVersionID: targetVersion.Id,
+			TargetHistoryID: targetVersion.LatestCommitID,
+			Status:          "pending",
+			Conflicted:      false,
+		},
+	})
 }
 
 // Test GetRequestList
-
 func TestGetRequestListSuccess(t *testing.T) {
 	// Arrange
 	localSetup()
