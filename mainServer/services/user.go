@@ -8,15 +8,19 @@ import (
 )
 
 type UserService struct {
-	UserRepository interfaces.UserRepository
+	userRepository interfaces.UserRepository
 }
 
-func (u *UserService) SaveUser(user entities.User) error {
-	return u.UserRepository.CreateUser(user)
+func NewUserService(userRepository interfaces.UserRepository) UserService {
+	return UserService{userRepository: userRepository}
 }
 
-func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.User, error) {
-	dbUser, err := u.UserRepository.GetFullUserByEmail(email)
+func (u UserService) SaveUser(user entities.User) error {
+	return u.userRepository.CreateUser(user)
+}
+
+func (u UserService) CheckPassword(email string, pwdClaim string) (entities.User, error) {
+	dbUser, err := u.userRepository.GetFullUserByEmail(email)
 	if err != nil {
 		fmt.Println(err)
 		return entities.User{}, err
@@ -24,6 +28,6 @@ func (u *UserService) CheckPassword(email string, pwdClaim string) (entities.Use
 	return dbUser, bcrypt.CompareHashAndPassword([]byte(dbUser.Pwd), []byte(pwdClaim))
 }
 
-func (u *UserService) GetUserByEmail(email string) (entities.User, error) {
-	return u.UserRepository.GetFullUserByEmail(email)
+func (u UserService) GetUserByEmail(email string) (entities.User, error) {
+	return u.userRepository.GetFullUserByEmail(email)
 }

@@ -100,7 +100,7 @@ export default function VersionList() {
   return (
     <div className="wrapper col-8 m-auto">
       <div>
-        {!isLoadedVersions || (!isLoadedMain && <LoadingSpinner />)}
+        {(!isLoadedVersions || !isLoadedMain) && <LoadingSpinner />}
         {(errorVersions || errorMain) && (
           <NotificationAlert
             errorType="danger"
@@ -110,7 +110,11 @@ export default function VersionList() {
         )}
         {dataVersions &&
           dataMain &&
-          dataVersions.map((version, i) => (
+          dataVersions
+              .sort(
+                  (a,b) => a.versionID > b.versionID ? 1 : -1
+              )
+              .map((version, i) => (
             <VersionListElement key={i} version={version} mv={dataMain} />
           ))}
       </div>

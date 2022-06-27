@@ -1,0 +1,33 @@
+{
+  "hosting":  {
+    "back-end": {
+      "host" : "",
+      "port": 8080,
+      "use-ssl": false
+    },
+    "front-end": {
+      "host" : "localhost",
+      "port": 3000,
+      "use-ssl": false
+    }
+  },
+  "database": {
+    "url" : {
+      "host": "host.docker.internal",
+      "port": 5433,
+      "use-ssl": false
+    },
+    "user": "postgres",
+    "pwd": "admin",
+    "dbname": "AlexandriaPG"
+  },
+  "auth": {
+    "jwt-secret": "thisShouldBeKeptVerySecret",
+    "token-expire-minutes": 15
+  },
+  "fs": {
+    "path": "gitfiles",
+    "default-file": "./resources/defaultArticle.qmd",
+    "mutex-count": 12
+  }
+}

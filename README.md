@@ -8,18 +8,29 @@ We work for clients Andrew Demetriou, PhD. student, and Cynthia Liem, PhD., to d
 ---
 This section explains usage of the software with the default configuration. If a configuration file is edited, values like ports and passwords may be different.
 
-## Database
+## Using docker compose
+All the different components can be started together using docker-compose in the project root:
+
+    docker-compose up
+
+For this, both docker and docker-compose (or a package that combines them) needs to be installed.After running this command, the UI will be accessible at `localhost:3000`.
+
+Note that this option will create git repositories for internal use within the Alexandria repository, which might be annoying during the development process.
+This option uses the `dockerconfig.json` file together with `Dockerfile` to correctly configure all ports and URL's. Changes to `mainServer/config.json` will be ignored using this option.
+
+## Without docker
+### Database
 A postgreSQL database should be running on port 5432, with user `postgres` and (by default) the password `admin`.
 A database should be created with the name `AlexandriaPG`. When running the system later, the program will automatically add the necessary tables.
 
-## Back-end
+### Back-end
 To start up the backend server, have Go version 1.18 installed. Then, the project root, run:
     
     cd ./mainServer 
     go build mainServer
     go run mainServer
 
-## Front-end
+### Front-end
 To start up the frontend server, with npm installed, from the project root, run:
 
     cd ./mainClient

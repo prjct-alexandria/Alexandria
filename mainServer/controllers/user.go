@@ -7,13 +7,13 @@ import (
 	"mainServer/middlewares"
 	"mainServer/models"
 	"mainServer/server/config"
-	"mainServer/services"
+	"mainServer/services/interfaces"
 	"mainServer/utils/httperror"
 	"net/http"
 )
 
 type UserController struct {
-	UserService services.UserService
+	UserService interfaces.UserService
 	Cfg         *config.Config
 }
 
@@ -21,7 +21,7 @@ type UserController struct {
 // @Summary		Endpoint for user registration
 // @Description	Takes in user credentials from a JSON body, and makes sure they are securely stored in the database.
 // @Accept		json
-// @Param		credentials	body	entities.User true "User credentials"
+// @Param		credentials	body	models.RegisterForm true "User credentials"
 // @Success		200 "Success"
 // @Failure		400 "Could not read request body"
 // @Failure		400 "Invalid user JSON provided"
@@ -29,14 +29,15 @@ type UserController struct {
 // @Failure		409 "Could not save user to database"
 // @Router		/users	[post]
 func (u *UserController) Register(c *gin.Context) {
-	var user entities.User
+	var form models.RegisterForm
 
-	err := c.BindJSON(&user)
+	err := c.BindJSON(&form)
 	if err != nil {
 		httperror.NewError(c, http.StatusBadRequest, errors.New("invalid user JSON provided"))
 		return
 	}
 
+	user := entities.User(form)
 	hashedUser, err := user.Hash()
 	if err != nil {
 		httperror.NewError(c, http.StatusForbidden, errors.New("could not generate password hash"))
@@ -85,14 +86,13 @@ func (u *UserController) Login(c *gin.Context) {
 		httperror.NewError(c, http.StatusInternalServerError, errors.New("could not create token"))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, models.User{Name: dbUser.Name, Email: dbUser.Email})
+	c.JSON(http.StatusOK, models.User{Name: dbUser.Name, Email: dbUser.Email})
 }
 
 // Logout		godoc
 // @Summary		Endpoint for user logging out
 // @Description	Sets an expired cookie with an empty email and returns a JWT token
 // @Accept		json
-// @Param		credentials	body	models.LoginForm true "User credentials"
 // @Success		200 "Success"
 // @Failure		400 "Could not read request body"
 // @Failure		400 "Invalid JSON provided"
@@ -106,5 +106,5 @@ func (u *UserController) Logout(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, models.User{Name: "", Email: ""})
+	c.Status(http.StatusOK)
 }

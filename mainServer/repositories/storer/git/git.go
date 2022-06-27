@@ -6,6 +6,7 @@ import (
 	"github.com/ldez/go-git-cmd-wrapper/v2/add"
 	"github.com/ldez/go-git-cmd-wrapper/v2/checkout"
 	"github.com/ldez/go-git-cmd-wrapper/v2/commit"
+	"github.com/ldez/go-git-cmd-wrapper/v2/config"
 	"github.com/ldez/go-git-cmd-wrapper/v2/git"
 	"github.com/ldez/go-git-cmd-wrapper/v2/merge"
 	"github.com/ldez/go-git-cmd-wrapper/v2/revparse"
@@ -38,6 +39,17 @@ func (r Repo) Init(mainVersion int64) error {
 	// Checkout a new branch immediately before committing, this renames the main branch
 	branchName := strconv.FormatInt(mainVersion, 10)
 	output, err = git.Checkout(checkout.NewBranch(branchName), runGitIn(r.path))
+	if err != nil {
+		return errors.New(output)
+	}
+
+	// Git config
+	output, err = git.Config(runGitIn(r.path), config.Entry("user.email", "alexandria@manager.git"))
+	if err != nil {
+		return errors.New(output)
+	}
+
+	output, err = git.Config(runGitIn(r.path), config.Entry("user.name", "Alexandria Git Manager"))
 	if err != nil {
 		return errors.New(output)
 	}

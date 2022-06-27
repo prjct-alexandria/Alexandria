@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import { useEffect, useState } from "react";
 import PrismDiff from "./PrismDiff";
 import LoadingSpinner from "../LoadingSpinner";
@@ -28,10 +28,11 @@ export type Request = {
 }
 
 type ArticleVersion = {
-  id: number;
+  versionID: number;
   title: string;
   owners: string[];
   content: string;
+  latestHistoryID: string;
 };
 
 function getRequest(
@@ -268,41 +269,51 @@ export default function CompareView() {
     return (
       <div className="row">
         <div>
-          <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-            Compare Versions
-          </h1>
-
+        {(comparisonData !== undefined) &&
+            <h1 style={{ textAlign: "center", marginBottom: "30px" }}> {"Request to merge "}
+                <Link to={"/articles/" + params.articleId + "/versions/" + comparisonData.source.versionID + "?history=" + comparisonData.request.sourceHistoryID}>
+                    {comparisonData.source.title}
+                </Link>
+                {" into "}
+                <Link to={"/articles/" + params.articleId + "/versions/" + comparisonData.target.versionID + "?history=" + comparisonData.request.targetHistoryID}>
+                    {comparisonData.target.title}
+                </Link>
+            </h1>
+        }
             {comparisonData !== undefined && comparisonData.request.conflicted &&
                 <NotificationAlert errorType="warning" title={"Warning: Conflicting Changes!"} message=
                     {"There are conflicting changes in the two versions that this request would merge.\nThe conflicts are highlighted in the preview between each set of  '<<<<', '====', and '>>>>' markers."}
                 />
             }
-
-          <div className="row justify-content-center">
-              {/*Version names*/}
-              <div className='row col-8 mb-2'>
-                  <div className='col-6'>
-                      <h5>Changes of '{comparisonData !== undefined && comparisonData.source.title}'</h5>
-                  </div>
-                  <div className='col-6'>
-                      <h5>Result: {comparisonData !== undefined && comparisonData.target.title}</h5>
-                  </div>
-              </div>
-
-              {/*Accept, reject and delete button*/}
-              <div className='col-1' id='AcceptButton'>
-                  {acceptButton()}
-              </div>
-              <div className='col-1'>
-                  {rejectButton()}
-              </div>
-              {/*TODO: un hide when delete implemented on backend*/}
-              {/*<div className='col-1'>*/}
-              {/*    {deleteButton()}*/}
-              {/*</div>*/}
-
-          </div>
-
+            <div className="row justify-content-center mb-2">
+                {/*Content of versions*/}
+                <div className={"wrapper col-8"}>
+                    <div className='row'>
+                        {/*Differences between before and after*/}
+                        <div className='col-6'>
+                            <h5>Changes</h5>
+                        </div>
+                        <div className='col-6'>
+                            <h5>Result</h5>
+                        </div>
+                    </div>
+                </div>
+                <div className="wrapper col-3">
+                    <div className="row justify-content-evenly">
+                        {/*Accept, reject and delete button*/}
+                        <div className='col-1' id='AcceptButton'>
+                            {acceptButton()}
+                        </div>
+                        <div className='col-1'>
+                            {rejectButton()}
+                        </div>
+                        {/*TODO: un hide when delete implemented on backend*/}
+                        {/*<div className='col-1'>*/}
+                        {/*    {deleteButton()}*/}
+                        {/*</div>*/}
+                    </div>
+                </div>
+            </div>
           <div className="row justify-content-center">
               {/*Content of versions*/}
               <div className={"wrapper col-8"}>
