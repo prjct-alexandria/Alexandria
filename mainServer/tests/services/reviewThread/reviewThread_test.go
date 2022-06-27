@@ -26,7 +26,7 @@ func globalSetup() {
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// Make a clean controller with clean mocks
+	// Make a clean service with clean mocks
 	reviewThreadRepoMock = repositories.NewReviewThreadRepositoryMock()
 	servVal := services.ReviewThreadService{ReviewThreadRepository: reviewThreadRepoMock}
 	serv = &servVal
@@ -50,7 +50,7 @@ func TestStartReviewThreadSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	reviewThreadRepoMock.Mock.AssertCalledWith(t, "CreateReviewThread", &map[string]interface{}{
 		"rid": reviewId,
@@ -75,7 +75,7 @@ func TestStartReviewThreadDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	reviewThreadRepoMock.Mock.AssertCalledWith(t, "CreateReviewThread", &map[string]interface{}{
 		"rid": reviewId,

@@ -27,7 +27,7 @@ func globalSetup() {
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// Make a clean controller with clean mocks
+	// Make a clean service with clean mocks
 	commitSelectionThreadRepoMock = repositories.NewCommitSelectionThreadRepositoryMock()
 	servVal := services.CommitSelectionThreadService{CommitSelectionThreadRepository: commitSelectionThreadRepoMock}
 	serv = &servVal
@@ -52,7 +52,7 @@ func TestStartCommitSelectionThreadSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalledWith(t, "CreateCommitSelectionThread", &map[string]interface{}{
 		"cid":     commitId,
@@ -76,7 +76,7 @@ func TestStartCommitSelectionThreadNoCommitIdFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalled(t, "CreateCommitSelectionThread", 0)
 }
@@ -100,7 +100,7 @@ func TestStartCommitSelectionThreadDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalledWith(t, "CreateCommitSelectionThread", &map[string]interface{}{
 		"cid":     commitId,
@@ -143,7 +143,7 @@ func TestGetCommitSelectionThreadsSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalledWith(t, "GetCommitSelectionThreads", &map[string]interface{}{
 		"aid": articleId,
@@ -165,7 +165,7 @@ func TestGetCommitSelectionThreadsCommitIdFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalled(t, "GetCommitSelectionThreads", 0)
 }
@@ -204,7 +204,7 @@ func TestGetCommitSelectionThreadsDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitSelectionThreadRepoMock.Mock.AssertCalledWith(t, "GetCommitSelectionThreads", &map[string]interface{}{
 		"aid": articleId,

@@ -33,7 +33,7 @@ func globalSetup() {
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// Make a clean controller with clean mocks
+	// Make a clean service with clean mocks
 	articleRepoMock = repositories.NewArticleRepositoryMock()
 	versionRepoMock = repositories.NewVersionRepositoryMock()
 	userRepoMock = repositories.NewUserRepositoryMock()
@@ -60,7 +60,7 @@ func TestGetMainVersionSucces(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, actual, expected)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	articleRepoMock.Mock.AssertCalledWith(t, "GetMainVersion", &map[string]interface{}{
 		"article": articleId,
@@ -82,7 +82,7 @@ func TestGetMainVersionFail(t *testing.T) {
 	actual, err := serv.GetMainVersion(articleId)
 	// Assert
 	assert.Equal(t, actual, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	articleRepoMock.Mock.AssertCalledWith(t, "GetMainVersion", &map[string]interface{}{
 		"article": articleId,
@@ -154,7 +154,7 @@ func TestGetArticleListSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, actual, expected)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	articleRepoMock.Mock.AssertCalled(t, "GetAllArticles", 1)
 
@@ -192,7 +192,7 @@ func TestGetArticleListDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, actual, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	articleRepoMock.Mock.AssertCalled(t, "GetAllArticles", 1)
 
@@ -259,7 +259,7 @@ func TestGetArticleListElementFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, actual, expected)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	articleRepoMock.Mock.AssertCalled(t, "GetAllArticles", 1)
 
@@ -324,7 +324,7 @@ func TestCreateArticleSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -383,7 +383,7 @@ func TestCreateArticleNonExistingUserFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -420,7 +420,7 @@ func TestCreateArticleCannotCheckUserExistsFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[0],
@@ -457,7 +457,7 @@ func TestCreateArticleOwnerNotAuthorizedFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -503,7 +503,7 @@ func TestCreateArticleDbArticleCreationFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -553,7 +553,7 @@ func TestCreateArticleDbVersionCreationFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -616,7 +616,7 @@ func TestCreateArticleUpdateMainVersionFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -687,7 +687,7 @@ func TestCreateArticleInitMainVersionFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],
@@ -765,7 +765,7 @@ func TestCreateArticleUpdateLatestCommitFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, article, expected)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	userRepoMock.Mock.AssertCalledWith(t, "CheckIfExists", &map[string]interface{}{
 		"email": owners[1],

@@ -57,7 +57,7 @@ func TestStartThreadSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	threadRepoMock.Mock.AssertCalledWith(t, "CreateThread", &map[string]interface{}{
 		"aid": articleId,
@@ -83,7 +83,7 @@ func TestStartThreadNoIdMatchFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	threadRepoMock.Mock.AssertCalled(t, "CreateThread", 0)
 }
@@ -113,7 +113,7 @@ func TestStartThreadDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	threadRepoMock.Mock.AssertCalledWith(t, "CreateThread", &map[string]interface{}{
 		"aid": articleId,

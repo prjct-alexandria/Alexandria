@@ -27,7 +27,7 @@ func globalSetup() {
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// Make a clean controller with clean mocks
+	// Make a clean service with clean mocks
 	commitThreadRepoMock = repositories.NewCommitThreadRepositoryMock()
 	servVal := services.CommitThreadService{CommitThreadRepository: commitThreadRepoMock}
 	serv = &servVal
@@ -51,7 +51,7 @@ func TestStartCommitThreadSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalledWith(t, "CreateCommitThread", &map[string]interface{}{
 		"cid": commitId,
@@ -73,7 +73,7 @@ func TestStartCommitThreadNoCommitIdFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalled(t, "CreateCommitThread", 0)
 }
@@ -96,7 +96,7 @@ func TestStartCommitThreadDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalledWith(t, "CreateCommitThread", &map[string]interface{}{
 		"cid": commitId,
@@ -136,7 +136,7 @@ func TestGetCommitThreadsSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalledWith(t, "GetCommitThreads", &map[string]interface{}{
 		"aid": articleId,
@@ -158,7 +158,7 @@ func TestGetCommitThreadsCommitIdFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalled(t, "GetCommitThreads", 0)
 }
@@ -195,7 +195,7 @@ func TestGetCommitThreadsDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commitThreadRepoMock.Mock.AssertCalledWith(t, "GetCommitThreads", &map[string]interface{}{
 		"aid": articleId,

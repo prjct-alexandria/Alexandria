@@ -185,7 +185,7 @@ func (serv VersionService) GetVersionFiles(article int64, version int64) (string
 	// Get information about the version from the database
 	versionEntity, err := serv.VersionRepo.GetVersion(version)
 	if err != nil {
-		return "", nil, nil
+		return "", nil, err
 	}
 
 	// Get a path to the version file contents, zipped

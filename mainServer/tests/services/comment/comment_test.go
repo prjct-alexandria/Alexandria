@@ -27,7 +27,7 @@ func globalSetup() {
 
 // localSetup should be called before each individual test
 func localSetup() {
-	// Make a clean controller with clean mocks
+	// Make a clean service with clean mocks
 	commentRepoMock = repositories.NewCommentRepositoryMock()
 	servVal := services.CommentService{CommentRepository: commentRepoMock}
 	serv = &servVal
@@ -60,7 +60,7 @@ func TestSaveCommentSuccess(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 
 	commentRepoMock.Mock.AssertCalledWith(t, "SaveComment", &map[string]interface{}{
 		"id": comment,
@@ -94,7 +94,7 @@ func TestSaveCommentAuthFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commentRepoMock.Mock.AssertCalled(t, "SaveComment", 0)
 }
@@ -126,7 +126,7 @@ func TestSaveCommentDbFail(t *testing.T) {
 
 	// Assert
 	assert.Equal(t, expected, actual)
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, nil, err)
 
 	commentRepoMock.Mock.AssertCalledWith(t, "SaveComment", &map[string]interface{}{
 		"id": comment,
