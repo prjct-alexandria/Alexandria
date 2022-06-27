@@ -12,8 +12,8 @@ func (serv ReviewThreadService) StartReviewThread(rid int64, tid int64) (int64, 
 	// create reviewThread
 	id, err := serv.ReviewThreadRepository.CreateReviewThread(rid, tid)
 	if err != nil {
-		return 0, err
+		return -1, err
 	}
 
-	return id, err
+	return id, nil
 }

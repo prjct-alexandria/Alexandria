@@ -18,7 +18,6 @@ func (serv CommentService) SaveComment(comment entities.Comment, tid int64, logg
 			fmt.Errorf("provided author %v does not match logged-in author %v", comment.AuthorId, loggedInAs)
 	}
 
-	var err error
 	id, err := serv.CommentRepository.SaveComment(
 		entities.Comment{
 			AuthorId:     comment.AuthorId,
@@ -29,5 +28,5 @@ func (serv CommentService) SaveComment(comment entities.Comment, tid int64, logg
 	if err != nil {
 		return int64(-1), err
 	}
-	return id, err
+	return id, nil
 }

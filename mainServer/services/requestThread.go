@@ -15,6 +15,9 @@ type RequestThreadService struct {
 
 func (serv RequestThreadService) StartRequestThread(rid int64, tid int64, loggedInAs string) (int64, error) {
 	req, err := serv.RequestRepository.GetRequest(rid)
+	if err != nil {
+		return -1, errors.New("could not fetch request in database")
+	}
 
 	//Check if user is allowed to create request
 	isSourceOwner, err := serv.VersionRepository.CheckIfOwner(req.SourceVersionID, loggedInAs)
