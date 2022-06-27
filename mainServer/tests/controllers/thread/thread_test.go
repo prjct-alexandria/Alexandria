@@ -18,6 +18,7 @@ var commitThreadServMock services.CommitThreadServiceMock
 var requestThreadServMock services.RequestThreadServiceMock
 var commitSelectionThreadServMock services.CommitSelectionThreadServiceMock
 var commentServMock services.CommentServiceMock
+var reviewThreadServMock services.ReviewThreadServiceMock
 var contr controllers.ThreadController
 var r *gin.Engine
 var loggedInUser *string
@@ -43,7 +44,7 @@ func globalSetup() {
 	})
 
 	// routes
-	r.POST("/articles/:articleID/thread/:threadType/id/:specificID/", func(c *gin.Context) {
+	r.POST("/articles/:articleID/thread/:threadType/id/:specificID", func(c *gin.Context) {
 		contr.CreateThread(c)
 	})
 
@@ -72,12 +73,14 @@ func localSetup() {
 	commitThreadServMock = services.NewCommitThreadServiceMock()
 	commitSelectionThreadServMock = services.NewCommitSelectionThreadServiceMock()
 	commentServMock = services.NewCommentServiceMock()
+	reviewThreadServMock = services.NewReviewThreadServiceMock()
 
 	contr.ThreadService = threadServMock
 	contr.RequestThreadService = requestThreadServMock
 	contr.CommitThreadService = commitThreadServMock
 	contr.CommitSelectionThreadService = commitSelectionThreadServMock
 	contr.CommentService = commentServMock
+	contr.ReviewThreadService = reviewThreadServMock
 }
 
 func TestGetCommitThreadsSuccess(t *testing.T) {
@@ -466,7 +469,288 @@ func TestSaveCommentInternalError(t *testing.T) {
 	})
 }
 
-// TODo: createThread
+func TestCreateCommitThread(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid string = "0123456789012345678901234567890123456789"
+	const tid int64 = 42
+
+	//define service mock behaviour
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return 42, nil
+	}
+	services.StartCommitThreadMock = func(sid string, tid int64) (int64, error) {
+		return 43, nil
+	}
+	services.SaveCommentMock = func(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+		return 44, nil
+	}
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/commit/id/%s", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleThreads[0], http.StatusOK, exampleReturnThreadIds)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 1)
+	commitThreadServMock.Mock.AssertCalled(t, "StartCommitThread", 1)
+	commitThreadServMock.Mock.AssertCalledWith(t, "StartCommitThread", &map[string]interface{}{
+		"cid": sid,
+		"tid": tid,
+	})
+}
+
+func TestCreateCommitSelectionThread(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid string = "0123456789012345678901234567890123456789"
+	const tid int64 = 42
+
+	//define service mock behaviour
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return 42, nil
+	}
+	services.StartCommitSelectionThreadMock = func(cid string, tid int64, selection string) (int64, error) {
+		return 43, nil
+	}
+	services.SaveCommentMock = func(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+		return 44, nil
+	}
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/commitSelection/id/%s", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusOK, exampleReturnThreadIds)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 1)
+	commitSelectionThreadServMock.Mock.AssertCalled(t, "StartCommitSelectionThread", 1)
+	commitSelectionThreadServMock.Mock.AssertCalledWith(t, "StartCommitSelectionThread", &map[string]interface{}{
+		"cid":     sid,
+		"tid":     tid,
+		"section": exampleSelectionThreads[0].Selection,
+	})
+}
+
+func TestCreateRequestThread(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	//define service mock behaviour
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return 42, nil
+	}
+	services.StartRequestThreadMock = func(rid int64, tid int64, loggedInAs string) (int64, error) {
+		return 43, nil
+	}
+	services.SaveCommentMock = func(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+		return 44, nil
+	}
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/request/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusOK, exampleReturnThreadIds)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 1)
+	requestThreadServMock.Mock.AssertCalled(t, "StartRequestThread", 1)
+	requestThreadServMock.Mock.AssertCalledWith(t, "StartRequestThread", &map[string]interface{}{
+		"rid":        sid,
+		"tid":        tid,
+		"loggedInAs": email,
+	})
+}
+
+func TestCreateReviewThread(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	//define service mock behaviour
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return 42, nil
+	}
+	services.StartReviewThreadMock = func(rid int64, tid int64) (int64, error) {
+		return 43, nil
+	}
+	services.SaveCommentMock = func(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+		return 44, nil
+	}
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/review/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusOK, exampleReturnThreadIds)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 1)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 1)
+	reviewThreadServMock.Mock.AssertCalledWith(t, "StartReviewThread", &map[string]interface{}{
+		"rid": sid,
+		"tid": tid,
+	})
+}
+
+func TestCreateThreadNotLoggedIn(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	// mock the authentication and set the logged-in user
+	loggedInUser = nil
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/review/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusForbidden, nil)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 0)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 0)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 0)
+}
+
+func TestCreateThreadBadJson(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/review/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, "some literal comment text", http.StatusBadRequest, nil)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 0)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 0)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 0)
+}
+
+func TestCreateThreadBadParameter(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/a/thread/review/id/%d", sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusBadRequest, nil)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 0)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 0)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 0)
+}
+
+func TestCreateThreadThreadError(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return -1, errors.New("fake error for testing")
+	}
+
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/review/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusInternalServerError, nil)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 0)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 0)
+}
+
+func TestCreateThreadCommentError(t *testing.T) {
+	localSetup()
+
+	const aid int64 = 2
+	const sid int64 = 9
+	const tid int64 = 42
+
+	//define service mock behaviour
+	services.StartThreadMock = func(thread models.Thread, aid int64) (int64, error) {
+		return 42, nil
+	}
+	services.StartReviewThreadMock = func(rid int64, tid int64) (int64, error) {
+		return 43, nil
+	}
+	services.SaveCommentMock = func(comment entities.Comment, tid int64, loggedInAs string) (int64, error) {
+		return -1, errors.New("fake error for testing")
+	}
+	// mock the authentication and set the logged-in user
+	email := "john@mail.com"
+	loggedInUser = &email
+
+	// set request url
+	url := fmt.Sprintf("/articles/%d/thread/review/id/%d", aid, sid)
+
+	tests.TestEndpoint(t, r, "POST", url, exampleSelectionThreads[0], http.StatusInternalServerError, nil)
+
+	// check the service mocks
+	threadServMock.Mock.AssertCalled(t, "StartThread", 1)
+	commentServMock.Mock.AssertCalled(t, "SaveComment", 1)
+	reviewThreadServMock.Mock.AssertCalled(t, "StartReviewThread", 0)
+}
+
+// success
+// not logged in
+// bad aid
+// 500 thread
+// 500 comment
+// bad cid
+// bad selection
+// 500 ___threadError
+// bad threadType
 
 var exampleComment = entities.Comment{
 	Id:           1,
@@ -474,6 +758,12 @@ var exampleComment = entities.Comment{
 	ThreadId:     2,
 	Content:      "I like this",
 	CreationDate: "2022-06-26T22:20:17.485Z",
+}
+
+var exampleReturnThreadIds = models.ReturnThreadIds{
+	Id:        43,
+	ThreadId:  42,
+	CommentId: 44,
 }
 
 var exampleThreads = []models.Thread{

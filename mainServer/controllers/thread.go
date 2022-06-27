@@ -64,7 +64,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 	tid, err := contr.ThreadService.StartThread(thread, intAid)
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (contr *ThreadController) CreateThread(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		c.Status(http.StatusBadRequest)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
