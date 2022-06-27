@@ -136,7 +136,6 @@ export default function CreateMR() {
 
           if (typeof window !== "undefined") {
             window.location.href =
-              configData.front_end_url +
               "/articles/" +
               params.articleId +
               "/requests/" +

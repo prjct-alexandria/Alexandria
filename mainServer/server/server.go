@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"mainServer/controllers"
 	"mainServer/db"
@@ -98,8 +99,18 @@ func initControllerEnv(cfg *config.Config, servs ServiceEnv) ControllerEnv {
 
 func Init() {
 	// read config file
-	cfg := config.ReadConfig("./config.json")
+	var cfg config.Config
 
+	dockerPtr := flag.Bool("dockerconfig", false, "running in docker environment")
+	flag.Parse()
+
+	if *dockerPtr {
+		cfg = config.ReadConfig("./dockerconfig.json")
+	} else {
+		cfg = config.ReadConfig("./config.json")
+	}
+
+	// connect to database
 	database := db.Connect(&cfg.Database)
 
 	// create environments in order
