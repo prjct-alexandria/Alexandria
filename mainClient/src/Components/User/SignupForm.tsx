@@ -28,7 +28,6 @@ export default function SignupForm(props: SignupFormProps) {
             <h5 className="modal-title" id="signUpLabel">
               Sign up
             </h5>
-
             <button
               type="button"
               className="btn-close"
@@ -74,6 +73,11 @@ export default function SignupForm(props: SignupFormProps) {
                   className="form-control"
                   name="passwordConfirm"
                 />
+              </div>
+              <div>
+              <h5 className="modal-title">
+                <b>Please note: This platform is still under development. By signing up, you agree your email address might be exposed to other users.</b>
+              </h5>
               </div>
             </div>
             <div className="modal-footer">
