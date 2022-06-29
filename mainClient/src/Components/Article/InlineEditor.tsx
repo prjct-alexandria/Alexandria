@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import * as React from "react";
 import FileUpload from "./FileUpload";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 type EditorProps = {
   content: string;
@@ -17,7 +18,8 @@ export default function InlineEditor(props: EditorProps) {
   let params = useParams();
 
   const url =
-    "http://localhost:8080/articles/" +
+    backEndUrl() +
+      "/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId;
