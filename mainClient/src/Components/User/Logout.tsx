@@ -2,13 +2,13 @@ import * as React from "react";
 import { useState } from "react";
 import NotificationAlert from "../NotificationAlert";
 import removeUserFromLocalStorage from "./AuthHelpers/removeUserFromLocalStorage";
-import configData from "../../config.json";
+import backEndUrl from "../../urlUtils";
 
 export default function Logout() {
   let [error, setError] = useState<Error>();
   let [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
 
-  const url = configData.back_end_url + "/logout";
+  const url = backEndUrl() + "/logout";
 
   const LogoutHandler = () => {
     fetch(url, {

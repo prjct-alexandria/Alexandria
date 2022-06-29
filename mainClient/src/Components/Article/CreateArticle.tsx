@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 export default function CreateArticle() {
   let [mainVersionTitle, setMainVersionTitle] = useState<string>("");
@@ -32,7 +32,7 @@ export default function CreateArticle() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = configData.back_end_url + "/articles";
+    const url = backEndUrl() + "/articles";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = mainVersionTags.split(",");

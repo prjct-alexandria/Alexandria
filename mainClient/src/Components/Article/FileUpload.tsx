@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 export default function FileUpload() {
   let [selectedFile, setSelectedFile] = useState<string | Blob>("file");
@@ -15,7 +15,7 @@ export default function FileUpload() {
 
   let params = useParams();
   const url =
-    configData.back_end_url +"/articles/" +
+    backEndUrl() +"/articles/" +
     params.articleId +
     "/versions/" +
     params.versionId;

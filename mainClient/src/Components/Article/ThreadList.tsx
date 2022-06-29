@@ -4,9 +4,9 @@ import LoadingSpinner from "../LoadingSpinner";
 import { useParams } from "react-router-dom";
 import Thread from "./Thread";
 import CreateThread from "./CreateThread";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
+import backEndUrl from "../../urlUtils";
 
 type ThreadListProps = {
   threadType: string;
@@ -29,7 +29,7 @@ type ThreadEntity = {
 };
 
 export default function ThreadList(props: ThreadListProps) {
-  let baseUrl = configData.back_end_url;
+  let baseUrl = backEndUrl();
   let [threadListData, setData] = useState<ThreadEntity[]>();
   let [isLoaded, setLoaded] = useState<boolean>(false);
   let [error, setError] = useState<Error>();

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json";
+import backEndUrl from "../../urlUtils";
 
 export default function CreateArticleVersion() {
   let [newVersionTitle, setNewVersionTitle] = useState<string>("");
@@ -36,7 +36,7 @@ export default function CreateArticleVersion() {
     e.preventDefault();
 
     const url =
-      configData.back_end_url + "/articles/" + params.articleId + "/versions";
+      backEndUrl() + "/articles/" + params.articleId + "/versions";
 
     // Make list of strings from input string separated by ","
     let tagList: string[] = newVersionTags.split(",");

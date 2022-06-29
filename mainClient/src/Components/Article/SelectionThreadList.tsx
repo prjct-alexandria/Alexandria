@@ -2,10 +2,10 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import { useParams } from "react-router-dom";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import SelectionThread from "./SelectionThread";
+import backEndUrl from "../../urlUtils";
 
 type ThreadListProps = {
     "threadType": string
@@ -31,7 +31,7 @@ type ThreadEntity = {
 
 // A selectionThreadList is a list of threads that can be related to specific pieces of text (selections) in the document.
 export default function SelectionThreadList(props: ThreadListProps) {
-    let baseUrl= configData.back_end_url;
+    let baseUrl= backEndUrl();
     let [threadListData, setData] = useState<ThreadEntity[]>();
     let [isLoaded, setLoaded] = useState<boolean>(false);
     let [error, setError] = useState<Error>();

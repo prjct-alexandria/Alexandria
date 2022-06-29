@@ -4,8 +4,8 @@ import LoadingSpinner from "../LoadingSpinner";
 import MRListElement from "./MRListElement";
 import { useParams, useSearchParams } from "react-router-dom";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json";
 import { Request } from "./CompareView";
+import backEndUrl from "../../urlUtils";
 
 type MR = {
   request: Request;
@@ -22,7 +22,7 @@ export default function MRList() {
   let [error, setError] = useState<Error>();
 
   const baseUrl =
-    configData.back_end_url + "/articles/" + params.articleId + "/requests";
+    backEndUrl() + "/articles/" + params.articleId + "/requests";
 
   let appendUrl = "?" + searchParams.toString();
   const url = baseUrl + appendUrl;

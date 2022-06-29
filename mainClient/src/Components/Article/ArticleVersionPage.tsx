@@ -6,14 +6,13 @@ import CreateMR from "./CreateMR";
 import ThreadList from "./ThreadList";
 import CreateArticleVersion from "./CreateArticleVersion";
 import FileDownload from "./FileDownload";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
 import InlineEditor from "./InlineEditor";
 import getLoggedInEmail from "../User/AuthHelpers/getLoggedInEmail";
 import CreateSelectionThread from "./CreateSelectionThread";
-import CreateThread from "./CreateThread";
 import SelectionThreadList from "./SelectionThreadList";
+import backEndUrl from "../../urlUtils";
 
 type ArticleVersion = {
   owners: Array<string>;
@@ -57,7 +56,7 @@ export default function ArticleVersionPage() {
   let params = useParams();
 
   let url = //"/article_version1.json";
-    configData.back_end_url +
+    backEndUrl() +
     "/articles/" +
     params.articleId +
     "/versions/" +
