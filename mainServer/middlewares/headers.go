@@ -19,7 +19,7 @@ func CorsHeaders(cfg *config.Config) gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Origin", c.GetHeader("origin"))
 		} else {
 			// Probably redundant
-			c.Header("Access-Control-Allow-Origin", c.GetHeader(cfg.Hosting.Frontend.LocalUrl()))
+			c.Header("Access-Control-Allow-Origin", cfg.Hosting.Frontend.LocalUrl())
 		}
 		c.Header("Access-Control-Allow-Credentials", "true")
 
