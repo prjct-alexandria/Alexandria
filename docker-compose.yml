@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   front-end:
-    container_name: react_containerk
+    container_name: react_container
     restart: always
     build:
       context: mainClient
@@ -11,6 +11,8 @@ services:
       - '3000:3000'
   back-end:
     container_name: golang_container
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
     build:
       context: mainServer
