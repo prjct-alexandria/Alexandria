@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json";
 import { Request } from "./CompareView";
+import backEndUrl from "../../urlUtils";
 
 type Version = {
   articleID: string;
@@ -27,7 +27,7 @@ export default function CreateMR() {
   const [selectedVersion, setSelectedVersion] = useState("");
 
   const urlCurrentArticle =
-    configData.back_end_url +
+    backEndUrl() +
     "/articles/" +
     params.articleId +
     "/versions/" +
@@ -68,7 +68,7 @@ export default function CreateMR() {
   }, [urlCurrentArticle]);
 
   const urlArticleVersions =
-    configData.back_end_url + "/articles/" + params.articleId + "/versions";
+    backEndUrl() + "/articles/" + params.articleId + "/versions";
   //const urlArticleVersions = "/versionList.json";
   useEffect(() => {
     fetch(urlArticleVersions, {
@@ -110,7 +110,7 @@ export default function CreateMR() {
   }
 
   const urlSubmitMR =
-    configData.back_end_url + "/articles/" + params.articleId + "/requests";
+    backEndUrl() + "/articles/" + params.articleId + "/requests";
   // post the new merge request
   const submitMR = () => {
     fetch(urlSubmitMR, {

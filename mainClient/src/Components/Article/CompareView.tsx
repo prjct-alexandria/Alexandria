@@ -6,7 +6,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import ThreadList from "./ThreadList";
 import NotificationAlert from "../NotificationAlert";
 import isUserLoggedIn from "../User/AuthHelpers/isUserLoggedIn";
-import configData from "../../config.json";
+import backEndUrl from "../../urlUtils";
 
 type RequestWithComparison = {
     request: Request;
@@ -76,7 +76,7 @@ export default function CompareView() {
   let params = useParams();
 
   //const urlRequest = "/request.json";
-  const urlRequest = configData.back_end_url + "/articles/" + params.articleId  + "/requests/" + params.requestId;
+  const urlRequest = backEndUrl() + "/articles/" + params.articleId  + "/requests/" + params.requestId;
 
   let [comparisonData, setComparisonData] = useState<RequestWithComparison>();
   let [isLoadedRequest, setLoadedRequest] = useState<boolean>(false);
@@ -150,7 +150,7 @@ export default function CompareView() {
   const handleAcceptClick = async (e: { preventDefault: () => void; }) => {
       e.preventDefault()
     const url =
-      configData.back_end_url + "/articles/" +
+      backEndUrl() + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId +
@@ -190,7 +190,7 @@ export default function CompareView() {
   const handleRejectClick = async (e: { preventDefault: () => void; }) => {
       e.preventDefault()
     const url =
-      configData.back_end_url + "/articles/" +
+      backEndUrl() + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId +
@@ -230,7 +230,7 @@ export default function CompareView() {
   const handleDeleteClick = async (e: { preventDefault: () => void; }) => {
       e.preventDefault()
     const url =
-      configData.back_end_url + "/articles/" +
+      backEndUrl() + "/articles/" +
       params.articleId +
       "/requests/" +
       params.requestId;

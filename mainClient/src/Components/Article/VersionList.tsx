@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import VersionListElement from "./VersionListElement";
 import LoadingSpinner from "../LoadingSpinner";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 type Version = {
   articleID: string;
@@ -19,7 +19,7 @@ export default function VersionList() {
   let params = useParams();
   // const urlVersions = "/versionList.json"; // Placeholder
   const urlVersions =
-    configData.back_end_url + "/articles/" + params.articleId + "/versions";
+    backEndUrl() + "/articles/" + params.articleId + "/versions";
 
   let [dataVersions, setDataVersions] = useState<Version[]>();
   let [isLoadedVersions, setLoadedVersions] = useState<boolean>(false);
@@ -59,7 +59,7 @@ export default function VersionList() {
 
   // const urlMain = "/mainVersion.json"; // Placeholder
   const urlMain =
-    configData.back_end_url + "/articles/" + params.articleId + "/mainVersion";
+    backEndUrl() + "/articles/" + params.articleId + "/mainVersion";
 
   let [dataMain, setDataMain] = useState<string>();
   let [isLoadedMain, setLoadedMain] = useState<boolean>(false);

@@ -2,8 +2,8 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ArticleListElement from "./ArticleListElement";
 import LoadingSpinner from "../LoadingSpinner";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 type Article = {
   articleId: string;
@@ -22,7 +22,7 @@ export default function ArticleList() {
   let [error, setError] = useState<Error>();
 
   useEffect(() => {
-    const url = configData.back_end_url + "/articles";
+    const url = backEndUrl() + "/articles";
     //const url = "/articleList.json"; // Placeholder
 
     fetch(url, {

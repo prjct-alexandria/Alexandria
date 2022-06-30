@@ -73,7 +73,20 @@ func ReadConfig(path string) Config {
 	return config
 }
 
-// Url creates an actual url string from the struct fields
+// Hostname creates an actual url string from the struct fields, without using the port
+// This might be used when working with a domain name
+func (url URLConfig) Hostname() string {
+	var prefix string
+	if url.UseSSL {
+		prefix = "https"
+	} else {
+		prefix = "http"
+	}
+	return fmt.Sprintf("%s://%s:", prefix, url.Host)
+}
+
+// Url creates an actual url string from the struct fields, using both the hostname and the port
+// This might be used when working with ip-address + port instead of domain name.
 func (url URLConfig) Url() string {
 	var prefix string
 	if url.UseSSL {
@@ -82,4 +95,15 @@ func (url URLConfig) Url() string {
 		prefix = "http"
 	}
 	return fmt.Sprintf("%s://%s:%d", prefix, url.Host, url.Port)
+}
+
+// LocalUrl creates an actual url string from the struct fields, hardcoded to point to localhost
+func (url URLConfig) LocalUrl() string {
+	var prefix string
+	if url.UseSSL {
+		prefix = "https"
+	} else {
+		prefix = "http"
+	}
+	return fmt.Sprintf("%s://%s:%d", prefix, "localhost", url.Port)
 }

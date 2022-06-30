@@ -101,6 +101,7 @@ func Init() {
 	// read config file
 	var cfg config.Config
 
+	// check if running in a docker environment
 	dockerPtr := flag.Bool("dockerconfig", false, "running in docker environment")
 	flag.Parse()
 

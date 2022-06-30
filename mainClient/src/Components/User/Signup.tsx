@@ -2,8 +2,8 @@ import * as React from "react";
 import { useState } from "react";
 import $ from "jquery";
 import SignupForm from "./SignupForm";
-import configData from "../../config.json";
 import NotificationAlert from "../NotificationAlert";
+import backEndUrl from "../../urlUtils";
 
 export default function Signup() {
   let [username, setUsername] = useState<string>();
@@ -34,7 +34,7 @@ export default function Signup() {
     // Prevent unwanted default browser behavior
     e.preventDefault();
 
-    const url = configData.back_end_url +"/users";
+    const url = backEndUrl() +"/users";
 
     // Construct request body
     const body = {

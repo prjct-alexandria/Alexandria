@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import * as React from "react";
 import NotificationAlert from "../NotificationAlert";
-import configData from "../../config.json";
+import backEndUrl from "../../urlUtils";
 
 export default function FileDownload() {
   let [error, setError] = useState<Error>();
@@ -13,7 +13,7 @@ export default function FileDownload() {
   let params = useParams();
 
   const endpointUrl =
-    configData.back_end_url +
+    backEndUrl() +
     "/articles/" +
     params.articleId +
     "/versions/" +

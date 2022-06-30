@@ -3,13 +3,24 @@ package middlewares
 import (
 	"github.com/gin-gonic/gin"
 	"mainServer/server/config"
+	"mainServer/utils/arrays"
 	"net/http"
 )
 
-//Source: https://github.com/gin-gonic/gin/issues/559#issuecomment-350911039
+//Partially found from: https://github.com/gin-gonic/gin/issues/559#issuecomment-350911039
 func CorsHeaders(cfg *config.Config) gin.HandlerFunc {
+	allowedOrigins := []string{
+		cfg.Hosting.Frontend.Url(),
+		cfg.Hosting.Frontend.Hostname(),
+		cfg.Hosting.Frontend.LocalUrl(),
+	}
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", cfg.Hosting.Frontend.Url())
+		if arrays.Contains(allowedOrigins, c.GetHeader("origin")) {
+			c.Header("Access-Control-Allow-Origin", c.GetHeader("origin"))
+		} else {
+			// Probably redundant
+			c.Header("Access-Control-Allow-Origin", cfg.Hosting.Frontend.LocalUrl())
+		}
 		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method != "OPTIONS" {
