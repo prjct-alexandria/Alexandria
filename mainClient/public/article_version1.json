@@ -1,0 +1,7 @@
+{
+  "articleID": 1,
+  "versionID": 1,
+  "title":"Web-Development research",
+  "owners":["Jane Doe", "John Doe"],
+  "content":"\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Duis commodo felis sed dui suscipit faucibus. Duis eget imperdiet augue, mollis imperdiet urna. Donec ac elit sodales, interdum enim eget, tristique metus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In vehicula eu ligula posuere dapibus. Curabitur lorem ligula, ornare a purus vitae, blandit ullamcorper sem. Nulla dignissim egestas luctus. Sed volutpat consequat velit, non bibendum neque aliquet non. Mauris malesuada hendrerit eros ut interdum. Aliquam erat volutpat. Fusce nec rhoncus erat. Cras auctor elit in aliquet suscipit. In sed rutrum leo. Mauris tincidunt ante id leo facilisis congue."
+}

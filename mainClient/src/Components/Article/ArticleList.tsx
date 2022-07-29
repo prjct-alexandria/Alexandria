@@ -23,7 +23,6 @@ export default function ArticleList() {
 
   useEffect(() => {
     const url = backEndUrl() + "/articles";
-    //const url = "/articleList.json"; // Placeholder
 
     fetch(url, {
       method: "GET",
