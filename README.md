@@ -1,11 +1,9 @@
 # Alexandria
 
----
-We work for clients Andrew Demetriou, PhD. student, and Cynthia Liem, PhD., to develop a collaborative platform and workflow for scientific publishing, for the duration of quarter 4. Our goal is to produce an open-source collaborative scientific publishing software product by translating the git workflow that is usually utilised by a narrow demographic (programmers, computer scientists) into a process that scientists from all domains will be able to use to publish articles and perform peer reviewing.
+An open-source collaborative scientific publishing web application. It translates the git workflow that is usually utilised by a narrow demographic (programmers, computer scientists) into a process that scientists from all domains will be able to use to publish articles and perform peer reviewing.
 
 # Getting started
 
----
 This section explains usage of the software with the default configuration. If a configuration file is edited, values like ports and passwords may be different.
 
 ## Using docker compose
@@ -44,19 +42,19 @@ A [SwaggerUI](https://swagger.io/tools/swagger-ui/) API documentation is availab
 
 
 # Contributing
-
----
 For contribution to the project and setting up a development environment, see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 
 # Team
+This application is created by five second year BSc Computer Science and Engineering students from TU Delft,
+in the academic year 2021-2022:
 
----
-| Name                | Email adress                       |
-|---------------------|------------------------------------|
-| Amy van der Meijden | A.vanderMeijden@student.tudelft.nl |
-| Andreea Zlei        | A.Zlei@student.tudelft.nl          | 
-| Jos Sloof           | A.J.G.Sloof@student.tudelft.nl     |
-| Mattheo de Wit      | M.C.A.deWit@student.tudelft.nl     |
-| Emiel Witting       | E.A.Witting@student.tudelft.nl     |
+- Amy van der Meijden
+- Andreea Zlei
+- Emiel Witting
+- Jos Sloof
+- Mattheo de Wit
+
+The application is made in collaboration with Andrew Demetriou and
+Cynthia Liem, from Delft University of Technology.
 
