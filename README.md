@@ -1,6 +1,9 @@
+![Poster.svg](Poster.svg)
+
 # Alexandria
 
 An open-source collaborative scientific publishing web application. It translates the git workflow that is usually utilised by a narrow demographic (programmers, computer scientists) into a process that scientists from all domains will be able to use to publish articles and perform peer reviewing.
+
 
 # Getting started
 
