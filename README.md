@@ -3,6 +3,7 @@
 # Alexandria
 
 An open-source collaborative scientific publishing web application. It translates the git workflow that is usually utilised by a narrow demographic (programmers, computer scientists) into a process that scientists from all domains will be able to use to publish articles and perform peer reviewing.
+This repo is part of a larger project hosted on the Open Science Framework: https://osf.io/hd5nu/. 
 
 
 # Getting started
